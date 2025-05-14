@@ -24,6 +24,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -40,6 +42,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -394,6 +397,7 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
                 Items.FROGSPAWN,
                 //? >= 1.21.4 {
                 Items.PALE_HANGING_MOSS,
+                Items.RESIN_CLUMP,
                 //}
                 //? >= 1.21.5 {
                 Items.DRY_SHORT_GRASS,
@@ -741,7 +745,28 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
             case OFF_HAND -> HAS_USED_OFF_HAND_ITEM;
         };
 
-        Predicate<StateTransition.TransitionContext> itemHasChanged = context -> !ItemStack.isSameItemSameComponents(context.driverContainer().getDriverValue(getItemDriver(interactionHand)), context.driverContainer().getDriverValue(getRenderedItemDriver(interactionHand)));
+        Predicate<StateTransition.TransitionContext> itemHasChanged = context -> {
+            ItemStack itemPreviousTick = context.driverContainer().getDriverValue(getRenderedItemDriver(interactionHand));
+            ItemStack itemCurrentTick = context.driverContainer().getDriverValue(getItemDriver(interactionHand));
+            if (!itemPreviousTick.is(itemCurrentTick.getItem())) {
+                return true;
+            }
+            for (TypedDataComponent<?> dataComponent : itemCurrentTick.getComponents()) {
+                if (dataComponent.type() == DataComponents.DAMAGE) {
+                    continue;
+                }
+                if (!itemPreviousTick.getComponents().has(dataComponent.type())) {
+                    return true;
+                }
+                if (!Objects.equals(itemPreviousTick.get(dataComponent.type()), dataComponent.value())) {
+                    LOGGER.info(dataComponent.type().toString());
+                    LOGGER.info(dataComponent.value());
+                    LOGGER.info(itemPreviousTick.get(dataComponent.type()));
+                    return true;
+                }
+            }
+            return false;
+        };
         Predicate<StateTransition.TransitionContext> hotbarHasChanged = context -> interactionHand == InteractionHand.MAIN_HAND && context.driverContainer().getDriver(HOTBAR_SLOT).hasValueChanged();
         Predicate<StateTransition.TransitionContext> newItemIsEmpty = context -> context.driverContainer().getDriverValue(getItemDriver(interactionHand)).isEmpty();
         Predicate<StateTransition.TransitionContext> oldItemIsEmpty = context -> context.driverContainer().getDriverValue(getRenderedItemDriver(interactionHand)).isEmpty();
