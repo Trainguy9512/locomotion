@@ -49,6 +49,17 @@ public class MixinMultiPlayerGameMode {
     }
 
     @Inject(
+            method = "continueDestroyBlock",
+            at = @At("HEAD")
+    )
+    public void enableMiningAnimationOnContinueMining(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
+        assert this.minecraft.player != null;
+        if (!this.minecraft.player.getAbilities().instabuild) {
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonPlayerJointAnimator.IS_MINING).setValue(true));
+        }
+    }
+
+    @Inject(
             method = "destroyBlock",
             at = @At("RETURN")
     )
