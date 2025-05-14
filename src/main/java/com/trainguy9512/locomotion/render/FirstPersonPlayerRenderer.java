@@ -21,6 +21,8 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -34,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRenderState, PlayerModel> {
 
@@ -99,8 +102,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                             FirstPersonPlayerJointAnimator.HandPose leftHandPose = dataContainer.getDriverValue(FirstPersonPlayerJointAnimator.getHandPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
                             FirstPersonPlayerJointAnimator.HandPose rightHandPose = dataContainer.getDriverValue(FirstPersonPlayerJointAnimator.getHandPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
 
-                            leftHandItem = ItemStack.isSameItemSameComponents(leftHandItem, leftHandRenderedItem) ? leftHandItem : leftHandRenderedItem;
-                            rightHandItem = ItemStack.isSameItemSameComponents(rightHandItem, rightHandRenderedItem) ? rightHandItem : rightHandRenderedItem;
+                            leftHandItem = getItemStackToRender(leftHandItem, leftHandRenderedItem);
+                            rightHandItem = getItemStackToRender(rightHandItem, rightHandRenderedItem);
 
                             this.renderItem(
                                     abstractClientPlayer,
@@ -145,6 +148,27 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
         );
 
         buffer.endBatch();
+    }
+
+    private static ItemStack getItemStackToRender(ItemStack currentItem, ItemStack renderedItem) {
+        if (!ItemStack.isSameItem(currentItem, renderedItem)) {
+            return renderedItem;
+        }
+        if (ItemStack.isSameItemSameComponents(currentItem, renderedItem)) {
+            return currentItem;
+        }
+        for (TypedDataComponent<?> dataComponent : currentItem.getComponents()) {
+            if (dataComponent.type() == DataComponents.DAMAGE) {
+                continue;
+            }
+            if (!renderedItem.getComponents().has(dataComponent.type())) {
+                return renderedItem;
+            }
+            if (!Objects.equals(renderedItem.get(dataComponent.type()), dataComponent.value())) {
+                return renderedItem;
+            }
+        }
+        return currentItem;
     }
 
     private void renderArm(AbstractClientPlayer abstractClientPlayer, PlayerModel playerModel, HumanoidArm arm, PoseStack poseStack, MultiBufferSource buffer, int combinedLight) {
