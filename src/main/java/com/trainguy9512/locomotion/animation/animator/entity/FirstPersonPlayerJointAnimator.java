@@ -1263,7 +1263,7 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
                         // If the falling animation is finishing and the player is walking, play the walking animation.
                         .addOutboundTransition(StateTransition.builder(GroundMovementStates.WALKING)
                                 .isTakenIfTrue(walkingCondition)
-                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(40)).setEasement(Easing.CUBIC_IN_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_IN_OUT).build())
                                 .setPriority(60)
                                 .build())
                         .build())
