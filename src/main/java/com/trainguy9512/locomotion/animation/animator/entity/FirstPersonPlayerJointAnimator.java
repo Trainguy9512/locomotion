@@ -468,7 +468,8 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
         TOOL (HandPoseStates.TOOL_RAISE, HandPoseStates.TOOL_LOWER, HandPoseStates.TOOL, HAND_TOOL_POSE, HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
         SWORD (HandPoseStates.SWORD_RAISE, HandPoseStates.SWORD_LOWER, HandPoseStates.SWORD, HAND_TOOL_POSE, null),
         SHIELD (HandPoseStates.SHIELD_RAISE, HandPoseStates.SHIELD_LOWER, HandPoseStates.SHIELD, HAND_SHIELD_POSE, HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-        BOW (HandPoseStates.BOW_RAISE, HandPoseStates.BOW_LOWER, HandPoseStates.BOW, HAND_BOW_POSE, HAND_TOOL_ATTACK_PICKAXE_MONTAGE);
+        BOW (HandPoseStates.BOW_RAISE, HandPoseStates.BOW_LOWER, HandPoseStates.BOW, HAND_BOW_POSE, HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
+        CROSSBOW (HandPoseStates.CROSSBOW_RAISE, HandPoseStates.CROSSBOW_LOWER, HandPoseStates.CROSSBOW, HAND_CROSSBOW_POSE, HAND_TOOL_ATTACK_PICKAXE_MONTAGE);
 
         public final HandPoseStates raisingState;
         public final HandPoseStates loweringState;
@@ -494,6 +495,9 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
         private static HandPose fromItemStack(ItemStack itemStack) {
             if (itemStack.isEmpty()) {
                 return EMPTY;
+            }
+            if (itemStack.is(Items.CROSSBOW)) {
+                return CROSSBOW;
             }
             if (itemStack.is(Items.BOW)) {
                 return BOW;
@@ -563,7 +567,10 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
         SHIELD_LOWER,
         BOW,
         BOW_RAISE,
-        BOW_LOWER
+        BOW_LOWER,
+        CROSSBOW,
+        CROSSBOW_RAISE,
+        CROSSBOW_LOWER
     }
 
     public static final ResourceLocation HAND_EMPTY_LOWERED = makeAnimationSequenceResourceLocation("hand/empty/lowered");
@@ -595,6 +602,8 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
     public static final ResourceLocation HAND_BOW_PULL = makeAnimationSequenceResourceLocation("hand/bow/pull");
     public static final ResourceLocation HAND_BOW_RELEASE = makeAnimationSequenceResourceLocation("hand/bow/release");
 
+    public static final ResourceLocation HAND_CROSSBOW_POSE = makeAnimationSequenceResourceLocation("hand/crossbow/pose");
+    public static final ResourceLocation HAND_CROSSBOW_RAISE = makeAnimationSequenceResourceLocation("hand/crossbow/raise");
 
     public PoseFunction<LocalSpacePose> constructHandPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
 
@@ -676,6 +685,20 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
                         SequenceEvaluatorFunction.builder(HAND_BOW_POSE).build(),
                         SequencePlayerFunction.builder(HAND_TOOL_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
                 ),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build()
+        );
+        this.addStatesForHandPose(
+                handPoseStateMachineBuilder,
+                fromLoweringAliasBuilder,
+                interactionHand,
+                HandPose.CROSSBOW,
+                HandPose.CROSSBOW.getMiningStateMachine(cachedPoseContainer, interactionHand),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(HAND_CROSSBOW_POSE).build(),
+                        SequencePlayerFunction.builder(HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
+                ),
+                SequencePlayerFunction.builder(HAND_CROSSBOW_RAISE).build(),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build()
         );
@@ -1103,6 +1126,7 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
         WALKING,
         STOPPING,
         JUMP,
+        WALK_TO_FALLING,
         FALLING,
         LAND,
         SOFT_LAND
@@ -1195,6 +1219,12 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
+                .defineState(State.builder(GroundMovementStates.WALK_TO_FALLING, SequenceEvaluatorFunction.builder(GROUND_MOVEMENT_POSE).build())
+                        .addOutboundTransition(StateTransition.builder(GroundMovementStates.FALLING)
+                                .isTakenIfTrue(StateTransition.ALWAYS_TRUE)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_OUT).build())
+                                .build())
+                        .build())
                 .defineState(State.builder(GroundMovementStates.FALLING, fallingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         // Move into the landing animation if the player is no longer falling
@@ -1243,9 +1273,9 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
                                 .setPriority(60)
                                 .build())
                         // Transition to the jumping animation if the player is falling.
-                        .addOutboundTransition(StateTransition.builder(GroundMovementStates.FALLING)
+                        .addOutboundTransition(StateTransition.builder(GroundMovementStates.WALK_TO_FALLING)
                                 .isTakenIfTrue(StateTransition.booleanDriverPredicate(IS_GROUNDED).negate())
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(2)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(50)
                                 .build())
                         .build())
@@ -1263,7 +1293,7 @@ public class FirstPersonPlayerJointAnimator implements LivingEntityJointAnimator
                         // If the falling animation is finishing and the player is walking, play the walking animation.
                         .addOutboundTransition(StateTransition.builder(GroundMovementStates.WALKING)
                                 .isTakenIfTrue(walkingCondition)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_IN_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.5f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(60)
                                 .build())
                         .build())

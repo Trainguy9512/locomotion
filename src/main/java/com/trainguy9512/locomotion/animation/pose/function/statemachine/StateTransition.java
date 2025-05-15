@@ -29,6 +29,7 @@ public record StateTransition<S extends Enum<S>>(
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/StateTransition");
 
+    public static final Predicate<TransitionContext> ALWAYS_TRUE = transitionContext -> true;
     public static final Predicate<TransitionContext> CURRENT_TRANSITION_FINISHED = transitionContext -> transitionContext.currentStateWeight() == 1 && transitionContext.previousStateWeight() == 1;
     public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING = makeMostRelevantAnimationPlayerFinishedCondition(1f);
     public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED = makeMostRelevantAnimationPlayerFinishedCondition(0f);
