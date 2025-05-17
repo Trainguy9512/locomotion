@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,20 +20,22 @@ import net.minecraft.world.item.Items;
 import java.util.List;
 
 public enum FirstPersonGenericItemPose {
-    DEFAULT_2D_ITEM (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE, false),
-    BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE, true),
-    SMALL_BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_SMALL_BLOCK_POSE, true),
-    ROD (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE, false),
-    DOOR_BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE, true),
-    BANNER (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BANNER_POSE, false),
-    ARROW (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ARROW_POSE, false);
+    DEFAULT_2D_ITEM (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE, false, false),
+    BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE, true, false),
+    SMALL_BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_SMALL_BLOCK_POSE, true, false),
+    ROD (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE, false, false),
+    DOOR_BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE, true, false),
+    BANNER (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BANNER_POSE, false, false),
+    ARROW (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ARROW_POSE, false, true);
 
     public final ResourceLocation basePoseLocation;
     public final boolean rendersBlockState;
+    public final boolean rendersMirrored;
 
-    FirstPersonGenericItemPose(ResourceLocation basePoseLocation, boolean rendersBlockState) {
+    FirstPersonGenericItemPose(ResourceLocation basePoseLocation, boolean rendersBlockState, boolean rendersMirrored) {
         this.basePoseLocation = basePoseLocation;
         this.rendersBlockState = rendersBlockState;
+        this.rendersMirrored = rendersMirrored;
     }
 
     public static final List<Item> ROD_ITEMS = List.of(
@@ -223,6 +226,15 @@ public enum FirstPersonGenericItemPose {
         return DEFAULT_2D_ITEM;
     }
 
+    public boolean shouldMirrorItemModel(FirstPersonHandPose handPose, HumanoidArm side) {
+        if (side == HumanoidArm.RIGHT) {
+            return false;
+        }
+        if (handPose != FirstPersonHandPose.GENERIC_ITEM) {
+            return false;
+        }
+        return this.rendersMirrored;
+    }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
         PoseFunction<LocalSpacePose> miningStateMachine = switch (interactionHand) {

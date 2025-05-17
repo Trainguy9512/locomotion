@@ -219,7 +219,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             poseStack.pushPose();
             jointChannel.transformPoseStack(poseStack, 16f);
 
-            if (shouldMirrorItem(side, handPose, genericItemPose)) {
+            if (genericItemPose.shouldMirrorItemModel(handPose, side)) {
                 SHOULD_FLIP_ITEM_TRANSFORM = true;
             }
             switch (renderType) {
@@ -261,21 +261,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             SHOULD_FLIP_ITEM_TRANSFORM = false;
             poseStack.popPose();
         }
-    }
-
-
-
-    private boolean shouldMirrorItem(HumanoidArm side, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
-        if (side == HumanoidArm.RIGHT) {
-            return false;
-        }
-        if (handPose != FirstPersonHandPose.GENERIC_ITEM) {
-            return false;
-        }
-        if (genericItemPose == FirstPersonGenericItemPose.ARROW) {
-            return true;
-        }
-        return false;
     }
 
     private BlockState getDefaultBlockState(Block block) {
