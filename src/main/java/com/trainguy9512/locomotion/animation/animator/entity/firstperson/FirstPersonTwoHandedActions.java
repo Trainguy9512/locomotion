@@ -124,6 +124,7 @@ public class FirstPersonTwoHandedActions {
     }
 
     public static void defineCrossbowStatesForHand(StateMachineFunction.Builder<TwoHandedActionStates> stateMachineBuilder, InteractionHand interactionHand) {
+        InteractionHand oppositeHand = interactionHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         TwoHandedActionStates crossbowReloadState = TwoHandedActionStates.getCrossbowReloadState(interactionHand);
         TwoHandedActionStates crossbowFinishReloadState = TwoHandedActionStates.getCrossbowFinishReloadState(interactionHand);
 
@@ -183,6 +184,9 @@ public class FirstPersonTwoHandedActions {
                                 .isTakenIfTrue(isReloadingEmptyCrossbow)
                                 .bindToOnTransitionTaken(evaluationState -> {
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderItemAsStaticDriver(interactionHand)).setValue(true);
+                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
+                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPose.EMPTY);
+                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItemPose.DEFAULT_2D_ITEM);
                                 })
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(12))
                                         .setEasement(Easing.SINE_IN_OUT)
