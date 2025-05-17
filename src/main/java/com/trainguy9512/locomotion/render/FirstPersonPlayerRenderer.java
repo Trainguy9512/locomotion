@@ -4,7 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
-import com.trainguy9512.locomotion.animation.animator.entity.FirstPersonPlayerJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonGenericItemPose;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonHandPose;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.access.AlternateSingleBlockRenderer;
 import net.minecraft.client.Minecraft;
@@ -66,10 +69,10 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                 dataContainer -> jointAnimatorDispatcher.getInterpolatedFirstPersonPlayerPose().ifPresent(
                         animationPose -> {
 
-                            JointChannel rightArmPose = animationPose.getJointChannel(FirstPersonPlayerJointAnimator.RIGHT_ARM_JOINT);
-                            JointChannel leftArmPose = animationPose.getJointChannel(FirstPersonPlayerJointAnimator.LEFT_ARM_JOINT);
-                            JointChannel rightItemPose = animationPose.getJointChannel(FirstPersonPlayerJointAnimator.RIGHT_ITEM_JOINT);
-                            JointChannel leftItemPose = animationPose.getJointChannel(FirstPersonPlayerJointAnimator.LEFT_ITEM_JOINT);
+                            JointChannel rightArmPose = animationPose.getJointChannel(FirstPersonJointAnimator.RIGHT_ARM_JOINT);
+                            JointChannel leftArmPose = animationPose.getJointChannel(FirstPersonJointAnimator.LEFT_ARM_JOINT);
+                            JointChannel rightItemPose = animationPose.getJointChannel(FirstPersonJointAnimator.RIGHT_ITEM_JOINT);
+                            JointChannel leftItemPose = animationPose.getJointChannel(FirstPersonJointAnimator.LEFT_ITEM_JOINT);
 
                             poseStack.pushPose();
                             poseStack.mulPose(Axis.ZP.rotationDegrees(180));
@@ -92,15 +95,15 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
 
                             boolean leftHanded = this.minecraft.options.mainHand().get() == HumanoidArm.LEFT;
 
-                            ItemStack leftHandRenderedItem = dataContainer.getDriverValue(leftHanded ? FirstPersonPlayerJointAnimator.RENDERED_MAIN_HAND_ITEM : FirstPersonPlayerJointAnimator.RENDERED_OFF_HAND_ITEM);
-                            ItemStack rightHandRenderedItem = dataContainer.getDriverValue(leftHanded ? FirstPersonPlayerJointAnimator.RENDERED_OFF_HAND_ITEM : FirstPersonPlayerJointAnimator.RENDERED_MAIN_HAND_ITEM);
-                            ItemStack leftHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonPlayerJointAnimator.MAIN_HAND_ITEM : FirstPersonPlayerJointAnimator.OFF_HAND_ITEM);
-                            ItemStack rightHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonPlayerJointAnimator.OFF_HAND_ITEM : FirstPersonPlayerJointAnimator.MAIN_HAND_ITEM);
+                            ItemStack leftHandRenderedItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDERED_MAIN_HAND_ITEM : FirstPersonDrivers.RENDERED_OFF_HAND_ITEM);
+                            ItemStack rightHandRenderedItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDERED_OFF_HAND_ITEM : FirstPersonDrivers.RENDERED_MAIN_HAND_ITEM);
+                            ItemStack leftHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.MAIN_HAND_ITEM : FirstPersonDrivers.OFF_HAND_ITEM);
+                            ItemStack rightHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.OFF_HAND_ITEM : FirstPersonDrivers.MAIN_HAND_ITEM);
 
-                            FirstPersonPlayerJointAnimator.GenericItemPose leftHandGenericItemPose = dataContainer.getDriverValue(FirstPersonPlayerJointAnimator.getGenericItemPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
-                            FirstPersonPlayerJointAnimator.GenericItemPose rightHandGenericItemPose = dataContainer.getDriverValue(FirstPersonPlayerJointAnimator.getGenericItemPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
-                            FirstPersonPlayerJointAnimator.HandPose leftHandPose = dataContainer.getDriverValue(FirstPersonPlayerJointAnimator.getHandPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
-                            FirstPersonPlayerJointAnimator.HandPose rightHandPose = dataContainer.getDriverValue(FirstPersonPlayerJointAnimator.getHandPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            FirstPersonGenericItemPose leftHandGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            FirstPersonGenericItemPose rightHandGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            FirstPersonHandPose leftHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            FirstPersonHandPose rightHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
 
                             leftHandItem = getItemStackToRender(leftHandItem, leftHandRenderedItem);
                             rightHandItem = getItemStackToRender(rightHandItem, rightHandRenderedItem);
@@ -116,7 +119,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                                     HumanoidArm.RIGHT,
                                     rightHandPose,
                                     rightHandGenericItemPose,
-                                    dataContainer.getDriverValue(!leftHanded ? FirstPersonPlayerJointAnimator.RENDER_MAIN_HAND_ITEM_AS_STATIC : FirstPersonPlayerJointAnimator.RENDER_OFF_HAND_ITEM_AS_STATIC)
+                                    dataContainer.getDriverValue(!leftHanded ? FirstPersonDrivers.RENDER_MAIN_HAND_ITEM_AS_STATIC : FirstPersonDrivers.RENDER_OFF_HAND_ITEM_AS_STATIC)
                             );
                             this.renderItem(
                                     abstractClientPlayer,
@@ -129,7 +132,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                                     HumanoidArm.LEFT,
                                     leftHandPose,
                                     leftHandGenericItemPose,
-                                    dataContainer.getDriverValue(leftHanded ? FirstPersonPlayerJointAnimator.RENDER_MAIN_HAND_ITEM_AS_STATIC : FirstPersonPlayerJointAnimator.RENDER_OFF_HAND_ITEM_AS_STATIC)
+                                    dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDER_MAIN_HAND_ITEM_AS_STATIC : FirstPersonDrivers.RENDER_OFF_HAND_ITEM_AS_STATIC)
                             );
 
 
@@ -202,8 +205,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             MultiBufferSource bufferSource,
             int combinedLight,
             HumanoidArm side,
-            FirstPersonPlayerJointAnimator.HandPose handPose,
-            FirstPersonPlayerJointAnimator.GenericItemPose genericItemPose,
+            FirstPersonHandPose handPose,
+            FirstPersonGenericItemPose genericItemPose,
             boolean overrideStatic
     ) {
         if (!itemStack.isEmpty()) {
@@ -262,14 +265,14 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
 
 
 
-    private boolean shouldMirrorItem(HumanoidArm side, FirstPersonPlayerJointAnimator.HandPose handPose, FirstPersonPlayerJointAnimator.GenericItemPose genericItemPose) {
+    private boolean shouldMirrorItem(HumanoidArm side, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
         if (side == HumanoidArm.RIGHT) {
             return false;
         }
-        if (handPose != FirstPersonPlayerJointAnimator.HandPose.GENERIC_ITEM) {
+        if (handPose != FirstPersonHandPose.GENERIC_ITEM) {
             return false;
         }
-        if (genericItemPose == FirstPersonPlayerJointAnimator.GenericItemPose.ARROW) {
+        if (genericItemPose == FirstPersonGenericItemPose.ARROW) {
             return true;
         }
         return false;
@@ -347,7 +350,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
     public void transformCamera(PoseStack poseStack){
         if(this.minecraft.options.getCameraType().isFirstPerson()){
             this.jointAnimatorDispatcher.getInterpolatedFirstPersonPlayerPose().ifPresent(animationPose -> {
-                JointChannel cameraPose = animationPose.getJointChannel(FirstPersonPlayerJointAnimator.CAMERA_JOINT);
+                JointChannel cameraPose = animationPose.getJointChannel(FirstPersonJointAnimator.CAMERA_JOINT);
 
                 Vector3f cameraRot = cameraPose.getEulerRotationZYX();
                 cameraRot.z *= -1;
@@ -373,9 +376,9 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                 Items.SHIELD
         );
 
-        public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonPlayerJointAnimator.HandPose handPose, FirstPersonPlayerJointAnimator.GenericItemPose genericItemPose) {
+        public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
             Item item = itemStack.getItem();
-            if (genericItemPose.rendersBlockState && itemStack.getItem() instanceof BlockItem && handPose == FirstPersonPlayerJointAnimator.HandPose.GENERIC_ITEM) {
+            if (genericItemPose.rendersBlockState && itemStack.getItem() instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {
                 return DEFAULT_BLOCK_STATE;
             }
             if (STATIC_ITEMS.contains(item)) {

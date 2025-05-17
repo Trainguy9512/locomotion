@@ -2,7 +2,7 @@ package com.trainguy9512.locomotion.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
-import com.trainguy9512.locomotion.animation.animator.entity.FirstPersonPlayerJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -40,7 +40,7 @@ public abstract class MixinMinecraft {
     )
     public void playItemDropAnimation(CallbackInfo ci) {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-            dataContainer.getDriver(FirstPersonPlayerJointAnimator.HAS_DROPPED_ITEM).trigger();
+            dataContainer.getDriver(FirstPersonDrivers.HAS_DROPPED_ITEM).trigger();
         });
     }
 
@@ -49,7 +49,7 @@ public abstract class MixinMinecraft {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V"))
     public void injectStartAttackHitEntity(CallbackInfoReturnable<Boolean> cir) {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-            dataContainer.getDriver(FirstPersonPlayerJointAnimator.HAS_ATTACKED).trigger();
+            dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger();
         });
     }
 
@@ -58,7 +58,7 @@ public abstract class MixinMinecraft {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
     public void injectStartAttackMiss(CallbackInfoReturnable<Boolean> cir) {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-            dataContainer.getDriver(FirstPersonPlayerJointAnimator.HAS_ATTACKED).trigger();
+            dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger();
         });
     }
 
@@ -69,8 +69,8 @@ public abstract class MixinMinecraft {
     public void injectOnSwingPlayerHandWhenBeginningUse(CallbackInfo ci, @Local InteractionHand interactionHand) {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
             switch (interactionHand) {
-                case MAIN_HAND -> dataContainer.getDriver(FirstPersonPlayerJointAnimator.HAS_USED_MAIN_HAND_ITEM).trigger();
-                case OFF_HAND -> dataContainer.getDriver(FirstPersonPlayerJointAnimator.HAS_USED_OFF_HAND_ITEM).trigger();
+                case MAIN_HAND -> dataContainer.getDriver(FirstPersonDrivers.HAS_USED_MAIN_HAND_ITEM).trigger();
+                case OFF_HAND -> dataContainer.getDriver(FirstPersonDrivers.HAS_USED_OFF_HAND_ITEM).trigger();
             }
         });
     }

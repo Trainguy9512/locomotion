@@ -1,7 +1,7 @@
 package com.trainguy9512.locomotion;
 
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorRegistry;
-import com.trainguy9512.locomotion.animation.animator.entity.FirstPersonPlayerJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
 import com.trainguy9512.locomotion.config.LocomotionConfig;
 
 public class LocomotionMain {
@@ -29,7 +29,7 @@ public class LocomotionMain {
 
 
 	private static void registerEntityAnimators(){
-		JointAnimatorRegistry.registerFirstPersonPlayerJointAnimator(new FirstPersonPlayerJointAnimator());
+		JointAnimatorRegistry.registerFirstPersonPlayerJointAnimator(new FirstPersonJointAnimator());
 	}
 
 	/*

@@ -2,10 +2,8 @@ package com.trainguy9512.locomotion.mixin;
 
 //? if >= 1.21.5 {
 
-import com.trainguy9512.locomotion.LocomotionMain;
-import com.trainguy9512.locomotion.animation.animator.JointAnimator;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
-import com.trainguy9512.locomotion.animation.animator.entity.FirstPersonPlayerJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,7 +22,7 @@ public class MixinBlocksAttacks {
     )
     public void playShieldImpactMontageOnShieldBlocked(ServerLevel serverLevel, LivingEntity livingEntity, CallbackInfo ci) {
         if (Minecraft.getInstance().isLocalPlayer(livingEntity.getUUID())) {
-            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonPlayerJointAnimator.HAS_BLOCKED_ATTACK).trigger());
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonDrivers.HAS_BLOCKED_ATTACK).trigger());
         }
     }
 }

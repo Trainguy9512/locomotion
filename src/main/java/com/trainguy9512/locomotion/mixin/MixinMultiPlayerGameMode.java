@@ -1,7 +1,7 @@
 package com.trainguy9512.locomotion.mixin;
 
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
-import com.trainguy9512.locomotion.animation.animator.entity.FirstPersonPlayerJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
@@ -30,8 +30,8 @@ public class MixinMultiPlayerGameMode {
 //                if (driverContainer.getDriver(FirstPersonPlayerJointAnimator.IS_MINING).getCurrentValue() && !driverContainer.getDriver(FirstPersonPlayerJointAnimator.IS_MINING).getPreviousValue()) {
 //                    driverContainer.getDriver(FirstPersonPlayerJointAnimator.HAS_ATTACKED).trigger();
 //                }
-                if (dataContainer.getDriver(FirstPersonPlayerJointAnimator.IS_MINING).getPreviousValue()) {
-                    dataContainer.getDriver(FirstPersonPlayerJointAnimator.IS_MINING).setValue(false);
+                if (dataContainer.getDriver(FirstPersonDrivers.IS_MINING).getPreviousValue()) {
+                    dataContainer.getDriver(FirstPersonDrivers.IS_MINING).setValue(false);
                 }
             });
         }
@@ -44,7 +44,7 @@ public class MixinMultiPlayerGameMode {
     public void enableMiningAnimationOnBeginMining(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
         assert this.minecraft.player != null;
         if (!this.minecraft.player.getAbilities().instabuild) {
-            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonPlayerJointAnimator.IS_MINING).setValue(true));
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonDrivers.IS_MINING).setValue(true));
         }
     }
 
@@ -55,7 +55,7 @@ public class MixinMultiPlayerGameMode {
     public void enableMiningAnimationOnContinueMining(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
         assert this.minecraft.player != null;
         if (!this.minecraft.player.getAbilities().instabuild) {
-            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonPlayerJointAnimator.IS_MINING).setValue(true));
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonDrivers.IS_MINING).setValue(true));
         }
     }
 
@@ -66,7 +66,7 @@ public class MixinMultiPlayerGameMode {
     public void destroyBlockInCreativeInstantly(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         assert this.minecraft.player != null;
         if (cir.getReturnValue() && this.minecraft.player.getAbilities().instabuild) {
-            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonPlayerJointAnimator.HAS_ATTACKED).trigger());
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger());
         }
     }
 }
