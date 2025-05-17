@@ -23,6 +23,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.Items;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,13 +70,13 @@ public enum FirstPersonHandPose {
         if (itemStack.isEmpty()) {
             return EMPTY;
         }
-        if (itemStack.is(Items.CROSSBOW)) {
+        if (itemStack.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
             return CROSSBOW;
         }
-        if (itemStack.is(Items.BOW)) {
+        if (itemStack.getUseAnimation() == ItemUseAnimation.BOW) {
             return BOW;
         }
-        if (itemStack.is(Items.SHIELD)) {
+        if (itemStack.getUseAnimation() == ItemUseAnimation.BLOCK) {
             return SHIELD;
         }
         if (itemStack.is(ItemTags.SWORDS)) {
