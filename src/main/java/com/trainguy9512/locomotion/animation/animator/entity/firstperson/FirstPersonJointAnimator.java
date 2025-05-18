@@ -17,9 +17,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.predicates.EnchantmentsPredicate;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Quaternionf;
@@ -174,13 +181,22 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         driverContainer.getDriver(FirstPersonDrivers.IS_USING_MAIN_HAND_ITEM).setValue(false);
         driverContainer.getDriver(FirstPersonDrivers.IS_USING_OFF_HAND_ITEM).setValue(false);
-        if (dataReference.isUsingItem() && dataReference.getUsedItemHand() == InteractionHand.MAIN_HAND) {
-            driverContainer.getDriver(FirstPersonDrivers.IS_USING_MAIN_HAND_ITEM).setValue(true);
-            driverContainer.getDriver(FirstPersonDrivers.PROJECTILE_ITEM).setValue(dataReference.getProjectile(dataReference.getMainHandItem()));
-        }
-        if (dataReference.isUsingItem() && dataReference.getUsedItemHand() == InteractionHand.OFF_HAND) {
-            driverContainer.getDriver(FirstPersonDrivers.IS_USING_OFF_HAND_ITEM).setValue(true);
-            driverContainer.getDriver(FirstPersonDrivers.PROJECTILE_ITEM).setValue(dataReference.getProjectile(dataReference.getOffhandItem()));
+
+        for (InteractionHand interactionHand : InteractionHand.values()) {
+            ItemStack itemInHand = dataReference.getItemInHand(interactionHand);
+
+            driverContainer.getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).setValue(false);
+            if (!dataReference.isUsingItem() || dataReference.getUsedItemHand() != interactionHand) {
+                continue;
+            }
+            driverContainer.getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).setValue(true);
+            driverContainer.getDriver(FirstPersonDrivers.PROJECTILE_ITEM).setValue(dataReference.getProjectile(itemInHand));
+            if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
+                ItemEnchantments itemEnchantments = itemInHand.getEnchantments();
+                float chargeTime = EnchantmentHelper.modifyCrossbowChargingTime(itemInHand, dataReference, 1.25f);
+                float chargeSpeedMultiplier = 1.25f / chargeTime;
+                driverContainer.getDriver(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED).setValue(chargeSpeedMultiplier);
+            }
         }
 
 

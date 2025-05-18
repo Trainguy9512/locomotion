@@ -132,6 +132,7 @@ public class FirstPersonTwoHandedActions {
                 .bindToTimeMarker("begin_pulling_crossbow", evaluationState -> {
                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderItemAsStaticDriver(interactionHand)).setValue(false);
                 })
+                .setPlayRate(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED))
                 .build();
         PoseFunction<LocalSpacePose> crossbowFinishReloadPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_CROSSBOW_RELOAD_FINISH)
                 .build();

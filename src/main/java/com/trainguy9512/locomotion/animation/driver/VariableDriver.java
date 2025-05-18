@@ -1,6 +1,7 @@
 package com.trainguy9512.locomotion.animation.driver;
 
 import com.trainguy9512.locomotion.util.Interpolator;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.function.Function;
@@ -126,7 +127,7 @@ public class VariableDriver<D> implements Driver<D> {
      * Creates a float driver that will be linearly interpolated between ticks.
      * @param defaultValue      Default value set from the start and set upon resetting the driver.
      */
-    public static VariableDriver<Float> ofFloat(Supplier<Float> defaultValue) {
+    public static VariableDriver<Float> ofFloat(@Nullable Supplier<Float> defaultValue) {
         return VariableDriver.ofInterpolatable(defaultValue, Interpolator.FLOAT);
     }
 
