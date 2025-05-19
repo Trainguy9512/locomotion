@@ -51,6 +51,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
     private final JointAnimatorDispatcher jointAnimatorDispatcher;
 
     public static boolean SHOULD_FLIP_ITEM_TRANSFORM = false;
+    public static boolean IS_RENDERING_LOCOMOTION_FIRST_PERSON = false;
 
     public FirstPersonPlayerRenderer(EntityRendererProvider.Context context) {
         this.minecraft = Minecraft.getInstance();
@@ -210,6 +211,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             boolean overrideStatic
     ) {
         if (!itemStack.isEmpty()) {
+            IS_RENDERING_LOCOMOTION_FIRST_PERSON = true;
             ItemRenderType renderType = ItemRenderType.fromItemStack(itemStack, handPose, genericItemPose);
             if (overrideStatic) {
                 renderType = ItemRenderType.THIRD_PERSON_ITEM_STATIC;
@@ -259,6 +261,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                 }
             }
             SHOULD_FLIP_ITEM_TRANSFORM = false;
+            IS_RENDERING_LOCOMOTION_FIRST_PERSON = false;
             poseStack.popPose();
         }
     }

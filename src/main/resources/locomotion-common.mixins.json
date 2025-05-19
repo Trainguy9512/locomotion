@@ -6,8 +6,10 @@
   "mixins": [
   ],
   "client": [
+    "MixinBlockRenderDispatcher",
     "MixinBlocksAttacks",
     "MixinCapeLayer",
+    "MixinCrossbowPull",
     "MixinDebugScreenOverlay",
     "MixinElytraLayer",
     "MixinEntityRenderDispatcher",
@@ -20,7 +22,6 @@
     "MixinMinecraft",
     "MixinModelPart",
     "MixinMultiPlayerGameMode",
-    "MixinBlockRenderDispatcher",
     "development.MixinDefaultPlayerSkin"
   ],
   "injectors": {
