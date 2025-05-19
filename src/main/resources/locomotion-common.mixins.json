@@ -20,7 +20,7 @@
     "MixinMinecraft",
     "MixinModelPart",
     "MixinMultiPlayerGameMode",
-    "development.MixinBlockRenderDispatcher",
+    "MixinBlockRenderDispatcher",
     "development.MixinDefaultPlayerSkin"
   ],
   "injectors": {
