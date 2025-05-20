@@ -1,4 +1,4 @@
-package com.trainguy9512.locomotion.mixin;
+package com.trainguy9512.locomotion.mixin.render;
 
 import com.trainguy9512.locomotion.access.LivingEntityRenderStateAccess;
 import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator;

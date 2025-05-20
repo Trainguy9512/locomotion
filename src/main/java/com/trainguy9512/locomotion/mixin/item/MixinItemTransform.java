@@ -1,4 +1,4 @@
-package com.trainguy9512.locomotion.mixin;
+package com.trainguy9512.locomotion.mixin.item;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;

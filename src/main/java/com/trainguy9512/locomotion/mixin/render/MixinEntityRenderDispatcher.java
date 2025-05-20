@@ -1,4 +1,4 @@
-package com.trainguy9512.locomotion.mixin;
+package com.trainguy9512.locomotion.mixin.render;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.trainguy9512.locomotion.access.FirstPersonPlayerRendererGetter;

@@ -1,4 +1,4 @@
-package com.trainguy9512.locomotion.mixin;
+package com.trainguy9512.locomotion.mixin.item;
 
 //? if >= 1.21.5 {
 

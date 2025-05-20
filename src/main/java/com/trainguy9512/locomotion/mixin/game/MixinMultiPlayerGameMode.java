@@ -1,4 +1,4 @@
-package com.trainguy9512.locomotion.mixin;
+package com.trainguy9512.locomotion.mixin.game;
 
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;

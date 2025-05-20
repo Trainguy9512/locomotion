@@ -19,7 +19,6 @@ public class VariableDriver<D> implements Driver<D> {
     protected D currentValue;
     protected D previousValue;
 
-
     protected VariableDriver(Supplier<D> initialValue, Interpolator<D> interpolator) {
         this.initialValue = initialValue;
         this.interpolator = interpolator;
