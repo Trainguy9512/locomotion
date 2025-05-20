@@ -54,16 +54,19 @@ public class TimerDriver extends VariableDriver<Float> {
             this.maxValue = Float.MAX_VALUE;
         }
 
-        public void setInitialIncrement(float incrementPerTick) {
+        public Builder setInitialIncrement(float incrementPerTick) {
             this.incrementPerTick = incrementPerTick;
+            return this;
         }
 
-        public void setMinValue(float minValue) {
+        public Builder setMinValue(float minValue) {
             this.minValue = minValue;
+            return this;
         }
 
-        public void setMaxValue(float maxValue) {
+        public Builder setMaxValue(float maxValue) {
             this.maxValue = maxValue;
+            return this;
         }
 
         public TimerDriver build() {
