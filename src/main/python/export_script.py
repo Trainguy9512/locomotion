@@ -449,3 +449,9 @@ if __name__ == "__main__":
     animation_mod_export_dialog = AnimationModExportDialog()
     animation_mod_export_dialog.show()
 
+
+"""
+locomotion_directory = 
+sequences_path = "C:/Users/train/Desktop/Minecraft Modding/trainguys-animation-overhaul-1.19.x/src/main/resources/assets/locomotion/sequences"
+script_path = "C:/Users/train/Desktop/Minecraft Modding/trainguys-animation-overhaul-1.19.x/src/main/python"
+"""

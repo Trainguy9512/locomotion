@@ -122,8 +122,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                                     HumanoidArm.RIGHT,
                                     !leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
                                     rightHandPose,
-                                    rightHandGenericItemPose,
-                                    dataContainer.getDriverValue(!leftHanded ? FirstPersonDrivers.RENDER_MAIN_HAND_ITEM_AS_STATIC : FirstPersonDrivers.RENDER_OFF_HAND_ITEM_AS_STATIC)
+                                    rightHandGenericItemPose
                             );
                             this.renderItem(
                                     abstractClientPlayer,
@@ -136,8 +135,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                                     HumanoidArm.LEFT,
                                     leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
                                     leftHandPose,
-                                    leftHandGenericItemPose,
-                                    dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDER_MAIN_HAND_ITEM_AS_STATIC : FirstPersonDrivers.RENDER_OFF_HAND_ITEM_AS_STATIC)
+                                    leftHandGenericItemPose
                             );
 
 
@@ -212,16 +210,12 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             HumanoidArm side,
             InteractionHand interactionHand,
             FirstPersonHandPose handPose,
-            FirstPersonGenericItemPose genericItemPose,
-            boolean overrideStatic
+            FirstPersonGenericItemPose genericItemPose
     ) {
         if (!itemStack.isEmpty()) {
             IS_RENDERING_LOCOMOTION_FIRST_PERSON = true;
             CURRENT_ITEM_INTERACTION_HAND = interactionHand;
             ItemRenderType renderType = ItemRenderType.fromItemStack(itemStack, handPose, genericItemPose);
-            if (overrideStatic) {
-                renderType = ItemRenderType.THIRD_PERSON_ITEM_STATIC;
-            }
 
             poseStack.pushPose();
             jointChannel.transformPoseStack(poseStack, 16f);
@@ -230,7 +224,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                 SHOULD_FLIP_ITEM_TRANSFORM = true;
             }
             switch (renderType) {
-                case THIRD_PERSON_ITEM, THIRD_PERSON_ITEM_STATIC -> {
+                case THIRD_PERSON_ITEM -> {
                     //? if >= 1.21.5 {
                     this.itemRenderer.renderStatic(entity, itemStack, displayContext, poseStack, bufferSource, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());
                     //?} else
@@ -362,20 +356,12 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
 
     private enum ItemRenderType {
         THIRD_PERSON_ITEM,
-        THIRD_PERSON_ITEM_STATIC,
         DEFAULT_BLOCK_STATE;
-
-        public static final List<Item> STATIC_ITEMS = List.of(
-                Items.SHIELD
-        );
 
         public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
             Item item = itemStack.getItem();
             if (genericItemPose.rendersBlockState && itemStack.getItem() instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {
                 return DEFAULT_BLOCK_STATE;
-            }
-            if (STATIC_ITEMS.contains(item)) {
-                return THIRD_PERSON_ITEM_STATIC;
             }
             return THIRD_PERSON_ITEM;
         }

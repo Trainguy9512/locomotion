@@ -26,7 +26,7 @@ public class MixinCrossbowPull {
             at = @At("HEAD"),
             cancellable = true
     )
-    public void injectCustomCrossbowPull(ItemStack stack, ClientLevel level, LivingEntity entity, int seed, CallbackInfoReturnable<Float> cir) {
+    public void injectLocomotionCrossbowPull(ItemStack stack, ClientLevel level, LivingEntity entity, int seed, CallbackInfoReturnable<Float> cir) {
         if (FirstPersonPlayerRenderer.IS_RENDERING_LOCOMOTION_FIRST_PERSON) {
             JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
                 cir.setReturnValue(dataContainer.getInterpolatedDriverValue(

@@ -18,7 +18,7 @@ public class MixinItemTransform {
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack$Pose;scale(FFF)V")
     )
     public void flipItemModel(boolean bl, PoseStack.Pose pose, CallbackInfo ci) {
-        if (FirstPersonPlayerRenderer.SHOULD_FLIP_ITEM_TRANSFORM) {
+        if (FirstPersonPlayerRenderer.SHOULD_FLIP_ITEM_TRANSFORM && FirstPersonPlayerRenderer.IS_RENDERING_LOCOMOTION_FIRST_PERSON) {
             pose.rotate(Axis.YP.rotation(Mth.PI));
         }
     }
