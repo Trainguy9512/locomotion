@@ -53,10 +53,10 @@ public class FirstPersonDrivers {
 
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_MAIN_HAND_PROPERTY = DriverKey.of("property/is_using_main_hand", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_OFF_HAND_PROPERTY = DriverKey.of("property/is_using_main_hand", () -> VariableDriver.ofBoolean(() -> false));
-    public static final DriverKey<TimerDriver> USE_DURATION_MAIN_HAND_PROPERTY = DriverKey.of("property/use_duration_main_hand", () -> TimerDriver.builder(() -> 0f).build());
-    public static final DriverKey<TimerDriver> USE_DURATION_OFF_HAND_PROPERTY = DriverKey.of("property/use_duration_off_hand", () -> TimerDriver.builder(() -> 0f).build());
-    public static final DriverKey<TimerDriver> CROSSBOW_PULL_MAIN_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_main_hand", () -> TimerDriver.builder(() -> 0f).build());
-    public static final DriverKey<TimerDriver> CROSSBOW_PULL_OFF_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_off_hand", () -> TimerDriver.builder(() -> 0f).build());
+    public static final DriverKey<TimerDriver> USE_DURATION_MAIN_HAND_PROPERTY = DriverKey.of("property/use_duration_main_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
+    public static final DriverKey<TimerDriver> USE_DURATION_OFF_HAND_PROPERTY = DriverKey.of("property/use_duration_off_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
+    public static final DriverKey<TimerDriver> CROSSBOW_PULL_MAIN_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_main_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
+    public static final DriverKey<TimerDriver> CROSSBOW_PULL_OFF_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_off_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
 
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
         driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(driverContainer.getDriverValue(getItemDriver(interactionHand)).copy());

@@ -52,6 +52,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
 
     public static boolean SHOULD_FLIP_ITEM_TRANSFORM = false;
     public static boolean IS_RENDERING_LOCOMOTION_FIRST_PERSON = false;
+    public static ItemDisplayContext CURRENT_ITEM_DISPLAY_CONTEXT = ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
 
     public FirstPersonPlayerRenderer(EntityRendererProvider.Context context) {
         this.minecraft = Minecraft.getInstance();
@@ -212,6 +213,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
     ) {
         if (!itemStack.isEmpty()) {
             IS_RENDERING_LOCOMOTION_FIRST_PERSON = true;
+            CURRENT_ITEM_DISPLAY_CONTEXT = displayContext;
             ItemRenderType renderType = ItemRenderType.fromItemStack(itemStack, handPose, genericItemPose);
             if (overrideStatic) {
                 renderType = ItemRenderType.THIRD_PERSON_ITEM_STATIC;
