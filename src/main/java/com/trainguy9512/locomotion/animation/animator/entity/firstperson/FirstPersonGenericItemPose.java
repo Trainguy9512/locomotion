@@ -238,7 +238,7 @@ public enum FirstPersonGenericItemPose {
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
         PoseFunction<LocalSpacePose> miningStateMachine = switch (interactionHand) {
-            case MAIN_HAND -> ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(context -> context.driverContainer().getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build(), MakeDynamicAdditiveFunction.of(
+            case MAIN_HAND -> ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build(), MakeDynamicAdditiveFunction.of(
                     FirstPersonMining.constructPoseFunction(
                             cachedPoseContainer,
                             SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(),
@@ -250,7 +250,7 @@ public enum FirstPersonGenericItemPose {
                             SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_FINISH).build(),
                             Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_OUT).build()),
                     SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build()));
-            case OFF_HAND -> SequenceEvaluatorFunction.builder(context -> context.driverContainer().getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build();
+            case OFF_HAND -> SequenceEvaluatorFunction.builder(context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build();
         };
 
         return miningStateMachine;

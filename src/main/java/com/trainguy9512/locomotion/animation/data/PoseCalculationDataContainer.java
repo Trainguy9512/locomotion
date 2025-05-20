@@ -15,7 +15,7 @@ public interface PoseCalculationDataContainer {
      * @param partialTicks      Percentage of a tick since the previous tick.
      * @return                  Interpolated value
      */
-    public <D, R extends Driver<D>> D getDriverValue(DriverKey<R> driverKey, float partialTicks);
+    public <D, R extends Driver<D>> D getInterpolatedDriverValue(DriverKey<R> driverKey, float partialTicks);
 
     /**
      * Returns the joint skeleton for the data container.

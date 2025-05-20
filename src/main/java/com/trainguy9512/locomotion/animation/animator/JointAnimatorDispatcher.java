@@ -110,7 +110,7 @@ public class JointAnimatorDispatcher {
     public ComponentSpacePose getInterpolatedAnimationPose(JointAnimator<?> jointAnimator, AnimationDataContainer dataContainer, float partialTicks){
         return switch (jointAnimator.getPoseCalulationFrequency()) {
             case CALCULATE_EVERY_FRAME -> dataContainer.computePose(partialTicks).convertedToComponentSpace();
-            case CALCULATE_ONCE_PER_TICK -> dataContainer.getDriverValue(dataContainer.getPerTickCalculatedPoseDriverKey(), partialTicks).convertedToComponentSpace();
+            case CALCULATE_ONCE_PER_TICK -> dataContainer.getInterpolatedDriverValue(dataContainer.getPerTickCalculatedPoseDriverKey(), partialTicks).convertedToComponentSpace();
         };
     }
 

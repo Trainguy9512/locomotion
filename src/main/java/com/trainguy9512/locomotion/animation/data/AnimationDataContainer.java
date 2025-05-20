@@ -68,7 +68,7 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
                 this,
                 this.montageManager,
                 partialTicks,
-                TimeSpan.ofTicks(this.getDriverValue(gameTimeTicksDriverKey, 1) + partialTicks)
+                TimeSpan.ofTicks(this.getInterpolatedDriverValue(gameTimeTicksDriverKey, 1) + partialTicks)
         ));
     }
 
@@ -90,13 +90,13 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
     }
 
     @Override
-    public <D, R extends Driver<D>> D getDriverValue(DriverKey<R> driverKey, float partialTicks) {
+    public <D, R extends Driver<D>> D getInterpolatedDriverValue(DriverKey<R> driverKey, float partialTicks) {
         return this.getDriver(driverKey).getValueInterpolated(partialTicks);
     }
 
     @Override
     public <D, R extends Driver<D>> D getDriverValue(DriverKey<R> driverKey) {
-        return this.getDriverValue(driverKey, 1);
+        return this.getInterpolatedDriverValue(driverKey, 1);
     }
 
     @SuppressWarnings("unchecked")
