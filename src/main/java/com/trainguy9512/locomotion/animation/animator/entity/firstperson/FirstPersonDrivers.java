@@ -2,11 +2,10 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
-import com.trainguy9512.locomotion.animation.driver.DriverKey;
-import com.trainguy9512.locomotion.animation.driver.SpringDriver;
-import com.trainguy9512.locomotion.animation.driver.TriggerDriver;
-import com.trainguy9512.locomotion.animation.driver.VariableDriver;
+import com.trainguy9512.locomotion.animation.driver.*;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3f;
 
@@ -52,7 +51,12 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<ItemStack>> PROJECTILE_ITEM = DriverKey.of("projectile_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<Float>> CROSSBOW_RELOAD_SPEED = DriverKey.of("crossbow_reload_speed", () -> VariableDriver.ofFloat(() -> 1f));
 
-
+    public static final DriverKey<VariableDriver<Boolean>> IS_USING_MAIN_HAND_PROPERTY = DriverKey.of("property/is_using_main_hand", () -> VariableDriver.ofBoolean(() -> false));
+    public static final DriverKey<VariableDriver<Boolean>> IS_USING_OFF_HAND_PROPERTY = DriverKey.of("property/is_using_main_hand", () -> VariableDriver.ofBoolean(() -> false));
+    public static final DriverKey<TimerDriver> USE_DURATION_MAIN_HAND_PROPERTY = DriverKey.of("property/use_duration_main_hand", () -> TimerDriver.builder(() -> 0f).build());
+    public static final DriverKey<TimerDriver> USE_DURATION_OFF_HAND_PROPERTY = DriverKey.of("property/use_duration_off_hand", () -> TimerDriver.builder(() -> 0f).build());
+    public static final DriverKey<TimerDriver> CROSSBOW_PULL_MAIN_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_main_hand", () -> TimerDriver.builder(() -> 0f).build());
+    public static final DriverKey<TimerDriver> CROSSBOW_PULL_OFF_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_off_hand", () -> TimerDriver.builder(() -> 0f).build());
 
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
         driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(driverContainer.getDriverValue(getItemDriver(interactionHand)).copy());
@@ -105,5 +109,21 @@ public class FirstPersonDrivers {
             case MAIN_HAND -> RENDER_MAIN_HAND_ITEM_AS_STATIC;
             case OFF_HAND -> RENDER_OFF_HAND_ITEM_AS_STATIC;
         };
+    }
+
+    private static boolean isDisplayContextMainHand(ItemDisplayContext itemDisplayContext, boolean leftHanded) {
+        return leftHanded == itemDisplayContext.leftHand();
+    }
+
+    public static DriverKey<VariableDriver<Boolean>> getUsingItemPropertyDriverKey(ItemDisplayContext itemDisplayContext, boolean leftHanded) {
+        return isDisplayContextMainHand(itemDisplayContext, leftHanded) ? IS_USING_MAIN_HAND_PROPERTY : IS_USING_OFF_HAND_PROPERTY;
+    }
+
+    public static DriverKey<TimerDriver> getUseDurationPropertyDriverKey(ItemDisplayContext itemDisplayContext, boolean leftHanded) {
+        return isDisplayContextMainHand(itemDisplayContext, leftHanded) ? USE_DURATION_MAIN_HAND_PROPERTY : USE_DURATION_OFF_HAND_PROPERTY;
+    }
+
+    public static DriverKey<TimerDriver> getCrossbowPullPropertyDriverKey(ItemDisplayContext itemDisplayContext, boolean leftHanded) {
+        return isDisplayContextMainHand(itemDisplayContext, leftHanded) ? CROSSBOW_PULL_MAIN_HAND_PROPERTY : CROSSBOW_PULL_OFF_HAND_PROPERTY;
     }
 }

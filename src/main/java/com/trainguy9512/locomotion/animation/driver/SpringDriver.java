@@ -6,6 +6,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -15,7 +16,7 @@ public class SpringDriver<D> extends VariableDriver<D> {
     private final float damping;
     private final float mass;
 
-    private final BiFunction<D, D, D> addition;
+    private final BinaryOperator<D> addition;
     private final BiFunction<D, Float, D> multiplication;
     private final boolean returnsDelta;
 
@@ -29,7 +30,7 @@ public class SpringDriver<D> extends VariableDriver<D> {
             float mass,
             Supplier<D> initialValue,
             Interpolator<D> interpolator,
-            BiFunction<D, D, D> addition,
+            BinaryOperator<D> addition,
             BiFunction<D, Float, D> multiplication,
             boolean returnsDelta
     ) {
@@ -47,7 +48,7 @@ public class SpringDriver<D> extends VariableDriver<D> {
         this.velocity = multiplication.apply(initialValue.get(), 0f);
     }
 
-    public static <D> SpringDriver<D> of(float stiffness, float damping, float mass, Supplier<D> initialValue, Interpolator<D> interpolator, BiFunction<D, D, D> addition, BiFunction<D, Float, D> multiplication, boolean returnsDelta) {
+    public static <D> SpringDriver<D> of(float stiffness, float damping, float mass, Supplier<D> initialValue, Interpolator<D> interpolator, BinaryOperator<D> addition, BiFunction<D, Float, D> multiplication, boolean returnsDelta) {
         return new SpringDriver<>(stiffness, damping, mass, initialValue, interpolator, addition, multiplication, returnsDelta);
     }
 

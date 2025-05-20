@@ -179,9 +179,6 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         });
         driverContainer.getDriver(FirstPersonDrivers.HAS_BLOCKED_ATTACK).runIfTriggered(() -> montageManager.playMontage(FirstPersonMontages.SHIELD_BLOCK_IMPACT_MONTAGE, driverContainer));
 
-        driverContainer.getDriver(FirstPersonDrivers.IS_USING_MAIN_HAND_ITEM).setValue(false);
-        driverContainer.getDriver(FirstPersonDrivers.IS_USING_OFF_HAND_ITEM).setValue(false);
-
         for (InteractionHand interactionHand : InteractionHand.values()) {
             ItemStack itemInHand = dataReference.getItemInHand(interactionHand);
 
