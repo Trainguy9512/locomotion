@@ -6,23 +6,24 @@
   "mixins": [
   ],
   "client": [
-    "render.MixinBlockRenderDispatcher",
-    "item.MixinBlocksAttacks",
-    "render.layer.MixinCapeLayer",
-    "item.property.MixinCrossbowPull",
     "debug.MixinDebugScreenOverlay",
-    "render.layer.MixinElytraLayer",
+    "debug.MixinDefaultPlayerSkin",
+    "game.MixinMinecraft",
+    "game.MixinMultiPlayerGameMode",
+    "item.MixinBlocksAttacks",
+    "item.MixinItemInHandLayer",
+    "item.MixinItemTransform",
+    "item.property.MixinCrossbowPull",
+    "item.property.MixinIsUsingItem",
+    "render.MixinBlockRenderDispatcher",
     "render.MixinEntityRenderDispatcher",
     "render.MixinGameRenderer",
-    "item.MixinItemInHandLayer",
     "render.MixinItemInHandRenderer",
-    "item.MixinItemTransform",
     "render.MixinLivingEntityRenderer",
     "render.MixinLivingEntityRenderState",
-    "game.MixinMinecraft",
     "render.MixinModelPart",
-    "game.MixinMultiPlayerGameMode",
-    "debug.MixinDefaultPlayerSkin"
+    "render.layer.MixinCapeLayer",
+    "render.layer.MixinElytraLayer"
   ],
   "injectors": {
     "defaultRequire": 1

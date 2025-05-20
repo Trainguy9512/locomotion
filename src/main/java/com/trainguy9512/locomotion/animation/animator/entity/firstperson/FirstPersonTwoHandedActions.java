@@ -131,6 +131,10 @@ public class FirstPersonTwoHandedActions {
         PoseFunction<LocalSpacePose> crossbowReloadPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_CROSSBOW_RELOAD)
                 .bindToTimeMarker("begin_pulling_crossbow", evaluationState -> {
                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderItemAsStaticDriver(interactionHand)).setValue(false);
+                    float crossbowReloadSpeed = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED);
+                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getUsingItemPropertyDriverKey(interactionHand)).setValue(true);
+                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getCrossbowPullPropertyDriverKey(interactionHand)).hardReset();
+                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getCrossbowPullPropertyDriverKey(interactionHand)).setIncrementPerTick(TimeSpan.of60FramesPerSecond(50f * 1.25f / crossbowReloadSpeed), 1f);
                 })
                 .setPlayRate(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED))
                 .build();
@@ -165,6 +169,7 @@ public class FirstPersonTwoHandedActions {
                                 .isTakenIfTrue(isReloadingEmptyCrossbow.negate())
                                 .bindToOnTransitionTaken(evaluationState -> {
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderItemAsStaticDriver(interactionHand)).setValue(false);
+                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getUsingItemPropertyDriverKey(interactionHand)).setValue(false);
                                     FirstPersonDrivers.updateRenderedItem(evaluationState.driverContainer(), interactionHand);
                                 })
                                 .setTiming(Transition.SINGLE_TICK)
@@ -202,6 +207,9 @@ public class FirstPersonTwoHandedActions {
                         .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
                                 .isTakenIfTrue(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand)).getUseAnimation() != ItemUseAnimation.CROSSBOW)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
+                                .bindToOnTransitionTaken(evaluationState -> {
+                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getUsingItemPropertyDriverKey(interactionHand)).setValue(false);
+                                })
                                 .build())
                         .build()
                 );

@@ -52,7 +52,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
 
     public static boolean SHOULD_FLIP_ITEM_TRANSFORM = false;
     public static boolean IS_RENDERING_LOCOMOTION_FIRST_PERSON = false;
-    public static ItemDisplayContext CURRENT_ITEM_DISPLAY_CONTEXT = ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
+    public static InteractionHand CURRENT_ITEM_INTERACTION_HAND = InteractionHand.MAIN_HAND;
+    public static float CURRENT_PARTIAL_TICKS = 0;
 
     public FirstPersonPlayerRenderer(EntityRendererProvider.Context context) {
         this.minecraft = Minecraft.getInstance();
@@ -64,7 +65,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
     }
 
     public void render(float partialTicks, PoseStack poseStack, MultiBufferSource.BufferSource buffer, LocalPlayer playerEntity, int combinedLight) {
-
+        CURRENT_PARTIAL_TICKS = partialTicks;
         JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
 
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(
@@ -119,6 +120,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                                     buffer,
                                     combinedLight,
                                     HumanoidArm.RIGHT,
+                                    !leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
                                     rightHandPose,
                                     rightHandGenericItemPose,
                                     dataContainer.getDriverValue(!leftHanded ? FirstPersonDrivers.RENDER_MAIN_HAND_ITEM_AS_STATIC : FirstPersonDrivers.RENDER_OFF_HAND_ITEM_AS_STATIC)
@@ -132,6 +134,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                                     buffer,
                                     combinedLight,
                                     HumanoidArm.LEFT,
+                                    leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
                                     leftHandPose,
                                     leftHandGenericItemPose,
                                     dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDER_MAIN_HAND_ITEM_AS_STATIC : FirstPersonDrivers.RENDER_OFF_HAND_ITEM_AS_STATIC)
@@ -207,18 +210,18 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             MultiBufferSource bufferSource,
             int combinedLight,
             HumanoidArm side,
+            InteractionHand interactionHand,
             FirstPersonHandPose handPose,
             FirstPersonGenericItemPose genericItemPose,
             boolean overrideStatic
     ) {
         if (!itemStack.isEmpty()) {
             IS_RENDERING_LOCOMOTION_FIRST_PERSON = true;
-            CURRENT_ITEM_DISPLAY_CONTEXT = displayContext;
+            CURRENT_ITEM_INTERACTION_HAND = interactionHand;
             ItemRenderType renderType = ItemRenderType.fromItemStack(itemStack, handPose, genericItemPose);
             if (overrideStatic) {
                 renderType = ItemRenderType.THIRD_PERSON_ITEM_STATIC;
             }
-            ItemStack itemStackToRender = renderType == ItemRenderType.THIRD_PERSON_ITEM_STATIC ? itemStack.copy() : itemStack;
 
             poseStack.pushPose();
             jointChannel.transformPoseStack(poseStack, 16f);
@@ -229,7 +232,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             switch (renderType) {
                 case THIRD_PERSON_ITEM, THIRD_PERSON_ITEM_STATIC -> {
                     //? if >= 1.21.5 {
-                    this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, poseStack, bufferSource, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());
+                    this.itemRenderer.renderStatic(entity, itemStack, displayContext, poseStack, bufferSource, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());
                     //?} else
                     /*this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, side == HumanoidArm.LEFT, poseStack, buffer, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());*/
                 }

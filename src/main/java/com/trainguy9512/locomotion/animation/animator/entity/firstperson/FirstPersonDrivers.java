@@ -3,6 +3,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.*;
+import com.trainguy9512.locomotion.util.Easing;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -55,8 +56,8 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_OFF_HAND_PROPERTY = DriverKey.of("property/is_using_main_hand", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<TimerDriver> USE_DURATION_MAIN_HAND_PROPERTY = DriverKey.of("property/use_duration_main_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
     public static final DriverKey<TimerDriver> USE_DURATION_OFF_HAND_PROPERTY = DriverKey.of("property/use_duration_off_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
-    public static final DriverKey<TimerDriver> CROSSBOW_PULL_MAIN_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_main_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
-    public static final DriverKey<TimerDriver> CROSSBOW_PULL_OFF_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_off_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
+    public static final DriverKey<TimerDriver> CROSSBOW_PULL_MAIN_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_main_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).setEasing(Easing.CubicBezier.easeInOf(0.49f,0.01f,0.19f,0.98f)).build());
+    public static final DriverKey<TimerDriver> CROSSBOW_PULL_OFF_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_off_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).setEasing(Easing.CubicBezier.easeInOf(0.49f,0.01f,0.19f,0.98f)).build());
 
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
         driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(driverContainer.getDriverValue(getItemDriver(interactionHand)).copy());
@@ -111,19 +112,24 @@ public class FirstPersonDrivers {
         };
     }
 
-    private static boolean isDisplayContextMainHand(ItemDisplayContext itemDisplayContext, boolean leftHanded) {
-        return leftHanded == itemDisplayContext.leftHand();
+    public static DriverKey<VariableDriver<Boolean>> getUsingItemPropertyDriverKey(InteractionHand interactionHand) {
+        return switch (interactionHand) {
+            case MAIN_HAND -> IS_USING_MAIN_HAND_PROPERTY;
+            case OFF_HAND -> IS_USING_OFF_HAND_PROPERTY;
+        };
     }
 
-    public static DriverKey<VariableDriver<Boolean>> getUsingItemPropertyDriverKey(ItemDisplayContext itemDisplayContext, boolean leftHanded) {
-        return isDisplayContextMainHand(itemDisplayContext, leftHanded) ? IS_USING_MAIN_HAND_PROPERTY : IS_USING_OFF_HAND_PROPERTY;
+    public static DriverKey<TimerDriver> getUseDurationPropertyDriverKey(InteractionHand interactionHand) {
+        return switch (interactionHand) {
+            case MAIN_HAND -> USE_DURATION_MAIN_HAND_PROPERTY;
+            case OFF_HAND -> USE_DURATION_OFF_HAND_PROPERTY;
+        };
     }
 
-    public static DriverKey<TimerDriver> getUseDurationPropertyDriverKey(ItemDisplayContext itemDisplayContext, boolean leftHanded) {
-        return isDisplayContextMainHand(itemDisplayContext, leftHanded) ? USE_DURATION_MAIN_HAND_PROPERTY : USE_DURATION_OFF_HAND_PROPERTY;
-    }
-
-    public static DriverKey<TimerDriver> getCrossbowPullPropertyDriverKey(ItemDisplayContext itemDisplayContext, boolean leftHanded) {
-        return isDisplayContextMainHand(itemDisplayContext, leftHanded) ? CROSSBOW_PULL_MAIN_HAND_PROPERTY : CROSSBOW_PULL_OFF_HAND_PROPERTY;
+    public static DriverKey<TimerDriver> getCrossbowPullPropertyDriverKey(InteractionHand interactionHand) {
+        return switch (interactionHand) {
+            case MAIN_HAND -> CROSSBOW_PULL_MAIN_HAND_PROPERTY;
+            case OFF_HAND -> CROSSBOW_PULL_OFF_HAND_PROPERTY;
+        };
     }
 }

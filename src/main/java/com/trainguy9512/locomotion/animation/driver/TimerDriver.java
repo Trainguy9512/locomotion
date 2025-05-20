@@ -1,23 +1,28 @@
 package com.trainguy9512.locomotion.animation.driver;
 
+import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.Interpolator;
+import com.trainguy9512.locomotion.util.TimeSpan;
 
 import java.util.function.Supplier;
 
 public class TimerDriver extends VariableDriver<Float> {
 
     private float incrementPerTick;
+    private Easing easing;
     private final float minValue;
     private final float maxValue;
 
     protected TimerDriver(
             Supplier<Float> initialValue,
             float incrementPerTick,
+            Easing easing,
             float minValue,
             float maxValue
     ) {
         super(initialValue, Interpolator.FLOAT);
         this.incrementPerTick = incrementPerTick;
+        this.easing = easing;
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
@@ -28,6 +33,15 @@ public class TimerDriver extends VariableDriver<Float> {
 
     public void setIncrementPerTick(float incrementPerTick) {
         this.incrementPerTick = incrementPerTick;
+    }
+
+    public void setIncrementPerTick(TimeSpan timeToIncrementFully, float target) {
+        this.incrementPerTick = 1 / target / timeToIncrementFully.inTicks();
+    }
+
+    @Override
+    public Float getValueInterpolated(float partialTicks) {
+        return this.easing.ease(super.getValueInterpolated(partialTicks));
     }
 
     @Override
@@ -44,18 +58,25 @@ public class TimerDriver extends VariableDriver<Float> {
 
         private final Supplier<Float> initialValue;
         private float incrementPerTick;
+        private Easing easing;
         private float minValue;
         private float maxValue;
 
         private Builder(Supplier<Float> initialValue) {
             this.initialValue = initialValue;
             this.incrementPerTick = 1f;
+            this.easing = Easing.LINEAR;
             this.minValue = -Float.MAX_VALUE;
             this.maxValue = Float.MAX_VALUE;
         }
 
         public Builder setInitialIncrement(float incrementPerTick) {
             this.incrementPerTick = incrementPerTick;
+            return this;
+        }
+
+        public Builder setEasing(Easing easing) {
+            this.easing = easing;
             return this;
         }
 
@@ -73,6 +94,7 @@ public class TimerDriver extends VariableDriver<Float> {
             return new TimerDriver(
                     this.initialValue,
                     this.incrementPerTick,
+                    this.easing,
                     this.minValue,
                     this.maxValue
             );

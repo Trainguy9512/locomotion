@@ -86,7 +86,7 @@ public class VariableDriver<D> implements Driver<D> {
      * Loads both the driver's current and previous values with the driver's default value
      */
     public void hardReset() {
-        this.setValue(this.initialValue.get());
+        this.reset();
         this.pushCurrentToPrevious();
     }
 
