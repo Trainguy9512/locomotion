@@ -1,4 +1,4 @@
-package com.trainguy9512.locomotion.mixin.development;
+package com.trainguy9512.locomotion.mixin.debug;
 
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.PlayerSkin;

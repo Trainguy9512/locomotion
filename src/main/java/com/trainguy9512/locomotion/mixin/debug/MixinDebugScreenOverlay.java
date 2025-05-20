@@ -1,6 +1,5 @@
-package com.trainguy9512.locomotion.mixin;
+package com.trainguy9512.locomotion.mixin.debug;
 
-import com.google.common.base.Strings;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.driver.Driver;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
@@ -8,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.joml.Vector3f;
@@ -23,8 +21,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Vector;
-import java.util.stream.Collectors;
 
 @Mixin(DebugScreenOverlay.class)
 public class MixinDebugScreenOverlay {

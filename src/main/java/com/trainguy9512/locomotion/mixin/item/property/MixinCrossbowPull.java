@@ -1,4 +1,4 @@
-package com.trainguy9512.locomotion.mixin;
+package com.trainguy9512.locomotion.mixin.item.property;
 
 import com.trainguy9512.locomotion.render.FirstPersonPlayerRenderer;
 import net.minecraft.client.multiplayer.ClientLevel;
