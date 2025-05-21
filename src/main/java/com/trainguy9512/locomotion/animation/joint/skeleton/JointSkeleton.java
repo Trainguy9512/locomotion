@@ -163,7 +163,15 @@ public class JointSkeleton {
     }
 
 
-    public record JointConfiguration(boolean isRoot, String parent, List<String> children, String mirrorJoint, boolean usesModelPart, String modelPartIdentifier, PartPose modelPartOffset) {
+    public record JointConfiguration(
+            boolean isRoot,
+            String parent,
+            List<String> children,
+            String mirrorJoint,
+            boolean usesModelPart,
+            String modelPartIdentifier,
+            PartPose modelPartOffset
+    ) {
 
         public static class Builder {
             private final boolean isRoot;
