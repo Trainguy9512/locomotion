@@ -1,7 +1,8 @@
 package com.trainguy9512.locomotion.animation.joint;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.trainguy9512.locomotion.animation.data.AnimationSequenceData;
+import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
+import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import net.minecraft.client.model.geom.PartPose;
@@ -41,7 +42,7 @@ public final class JointChannel {
     }
 
     public static JointChannel ofJointFromAnimationSequence(ResourceLocation sequenceLocation, String jointIdentifier, TimeSpan time, boolean looping){
-        AnimationSequenceData.AnimationSequence animationSequence = AnimationSequenceData.INSTANCE.getOrThrow(sequenceLocation);
+        AnimationSequence animationSequence = LocomotionResources.getOrThrowAnimationSequence(sequenceLocation);
         if(animationSequence.containsTimelinesForJoint(jointIdentifier)){
             return JointChannel.ofTranslationRotationScaleQuaternion(
                     animationSequence.translationTimelines().get(jointIdentifier).getValueAtTime(time.inSeconds(), looping),

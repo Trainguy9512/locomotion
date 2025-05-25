@@ -82,20 +82,4 @@ public class TimeSpan implements Comparable<TimeSpan> {
             return this.timeInTicks > timeSpan.timeInTicks ? 1 : -1;
         }
     }
-
-    public boolean isGreaterThan(TimeSpan other) {
-        return this.compareTo(other) > 0;
-    }
-
-    public boolean isLessThan(TimeSpan other) {
-        return this.compareTo(other) < 0;
-    }
-
-    public boolean isGreaterThanOrEqualTo(TimeSpan other) {
-        return this.compareTo(other) >= 0;
-    }
-
-    public boolean isLessThanOrEqualTo(TimeSpan other) {
-        return this.compareTo(other) <= 0;
-    }
 }

@@ -1,11 +1,11 @@
 package com.trainguy9512.locomotion.animation.pose.function.montage;
 
-import com.trainguy9512.locomotion.animation.data.AnimationSequenceData;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.resources.ResourceLocation;
@@ -152,7 +152,7 @@ public class MontageManager {
             this.configuration = configuration;
 
             this.playRate = configuration.playRateFunction().apply(driverContainer);
-            this.tickLength = AnimationSequenceData.INSTANCE.getOrThrow(configuration.animationSequence()).length().inTicks();
+            this.tickLength = LocomotionResources.getOrThrowAnimationSequence(configuration.animationSequence()).length().inTicks();
 
             this.hasBeenInterrupted = false;
             this.interruptTick = 0;

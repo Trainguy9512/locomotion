@@ -1,9 +1,10 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
 import com.google.common.collect.Maps;
-import com.trainguy9512.locomotion.animation.data.AnimationSequenceData;
+import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -55,7 +56,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
                 this.getInterpolatedTimeElapsed(context),
                 this.isLooping
         );
-        AnimationSequenceData.AnimationSequence sequence = AnimationSequenceData.INSTANCE.getOrThrow(this.animationSequence);
+        AnimationSequence sequence = LocomotionResources.getOrThrowAnimationSequence(this.animationSequence);
         if (this.isAdditive) {
             if (this.additiveSubtractionPose == null) {
                 this.additiveSubtractionPose = LocalSpacePose.fromAnimationSequence(
@@ -77,7 +78,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
     @Override
     public void tick(FunctionEvaluationState evaluationState) {
         super.tick(evaluationState);
-        Set<String> timeMarkersToFire = AnimationSequenceData.INSTANCE.getOrThrow(this.animationSequence).getMarkersInRange(TimeSpan.ofTicks(this.ticksElapsed.getCurrentValue()), TimeSpan.ofTicks(this.ticksElapsed.getCurrentValue() + this.playRate), this.isLooping);
+        Set<String> timeMarkersToFire = LocomotionResources.getOrThrowAnimationSequence(this.animationSequence).getMarkersInRange(TimeSpan.ofTicks(this.ticksElapsed.getCurrentValue()), TimeSpan.ofTicks(this.ticksElapsed.getCurrentValue() + this.playRate), this.isLooping);
         for (String timeMarker : timeMarkersToFire) {
             if (this.timeMarkerBindings.containsKey(timeMarker)) {
                 this.timeMarkerBindings.get(timeMarker).accept(evaluationState);
@@ -111,7 +112,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
 
     @Override
     public Tuple<TimeSpan, TimeSpan> getRemainingTime() {
-        float lengthInTicks = AnimationSequenceData.INSTANCE.getOrThrow(animationSequence).length().inTicks();
+        float lengthInTicks = LocomotionResources.getOrThrowAnimationSequence(animationSequence).length().inTicks();
         float remainingTimePreviously;
         float remainingTimeCurrently;
         if (this.isLooping) {
@@ -126,7 +127,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
 
     @Override
     public TimeSpan getAnimationLength() {
-        return AnimationSequenceData.INSTANCE.getOrThrow(this.animationSequence).length();
+        return LocomotionResources.getOrThrowAnimationSequence(this.animationSequence).length();
     }
 
     public static class Builder<B extends Builder<B>> extends TimeBasedPoseFunction.Builder<B>{
