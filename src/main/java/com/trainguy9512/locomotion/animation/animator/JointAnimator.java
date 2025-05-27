@@ -6,6 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Uses a data reference and a joint skeleton to calculate a pose once per tick.
@@ -14,10 +15,10 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManage
 public interface JointAnimator<T> {
 
     /**
-     * Creates a joint skeleton created upon class construction
-     * @return                              Built joint skeleton
+     * Gets the resource location for the joint skeleton being used.
+     * @return                              Joint skeleton resource location
      */
-    JointSkeleton buildSkeleton();
+    ResourceLocation getJointSkeleton();
 
     /**
      * Uses an object for data reference and updates the animation data container. Called once per tick, prior to pose samplers updating and pose calculation.

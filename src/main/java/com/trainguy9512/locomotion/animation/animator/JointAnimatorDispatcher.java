@@ -119,7 +119,7 @@ public class JointAnimatorDispatcher {
         JointSkeleton jointSkeleton = pose.getJointSkeleton();
         jointSkeleton.getJoints()
                 .forEach(joint -> {
-                    if(jointSkeleton.getJointConfiguration(joint).usesModelPart()){
+                    if(jointSkeleton.getJointConfiguration(joint).modelPartIdentifier() != null){
                         entityModel.getAnyDescendantWithName(jointSkeleton.getJointConfiguration(joint).modelPartIdentifier()).ifPresent(
                                 modelPart -> ((MatrixModelPart)(Object) modelPart).locomotion$setMatrix(pose.getJointChannel(joint).getTransform())
                         );

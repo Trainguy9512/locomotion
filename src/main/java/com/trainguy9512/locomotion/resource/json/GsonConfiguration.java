@@ -1,10 +1,16 @@
 package com.trainguy9512.locomotion.resource.json;
 
 import com.google.gson.*;
+import com.trainguy9512.locomotion.animation.joint.JointChannel;
+import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
+import com.trainguy9512.locomotion.resource.FormatVersion;
+import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.util.Mth;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
+import java.lang.reflect.Type;
 
 public class GsonConfiguration {
 
@@ -16,11 +22,25 @@ public class GsonConfiguration {
                 .registerTypeAdapter(Vector3f.class, vector3fDeserializer())
                 .registerTypeAdapter(Quaternionf.class, quaternionDeserializer())
                 .registerTypeAdapter(AnimationSequence.class, new AnimationSequenceDeserializer())
+                .registerTypeAdapter(JointSkeleton.class, new JointSkeletonDeserializer())
+                .registerTypeAdapter(FormatVersion.class, FormatVersion.getDeserializer())
+                .registerTypeAdapter(JointChannel.class, new JointChannelDeserializer())
+                .registerTypeAdapter(PartPose.class, new PartPoseDeserializer())
                 .create();
     }
 
     public static Gson getInstance() {
         return GSON;
+    }
+
+    public static <D> D deserializeWithFallback(JsonDeserializationContext context, JsonObject json, String key, D fallback) {
+        if (!json.has(key)) {
+            return fallback;
+        }
+        if (json.get(key).isJsonNull()) {
+            return null;
+        }
+        return context.deserialize(json.get(key), fallback.getClass());
     }
 
     private static JsonDeserializer<Vector3f> vector3fDeserializer() {
@@ -44,7 +64,4 @@ public class GsonConfiguration {
             );
         };
     }
-
-
-
 }

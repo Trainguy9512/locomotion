@@ -10,6 +10,7 @@ import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
+import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.TimeSpan;
 
@@ -32,7 +33,7 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
         this.poseFunction = jointAnimator.constructPoseFunction(savedCachedPoseContainer).wrapUnique();
         this.montageManager = MontageManager.of();
 
-        this.jointSkeleton = jointAnimator.buildSkeleton();
+        this.jointSkeleton = LocomotionResources.getOrThrowJointSkeleton(jointAnimator.getJointSkeleton());
         this.perTickCalculatedPoseDriverKey = DriverKey.of("per_tick_calculated_pose", () -> VariableDriver.ofInterpolatable(() -> LocalSpacePose.of(jointSkeleton), Interpolator.LOCAL_SPACE_POSE));
         this.gameTimeTicksDriverKey = DriverKey.of("game_time", () -> VariableDriver.ofConstant(() -> 0L));
         this.tick();

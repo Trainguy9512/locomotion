@@ -1,8 +1,8 @@
 package com.trainguy9512.locomotion.resource;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
@@ -17,9 +17,11 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class LocomotionResources {
@@ -28,86 +30,96 @@ public class LocomotionResources {
 
     public static final ResourceLocation RELOADER_IDENTIFIER = ResourceLocation.fromNamespaceAndPath(LocomotionMain.MOD_ID, "locomotion_asset_loader");
     private static final String ANIMATION_SEQUENCE_PATH = "sequences";
-    private static final String SKELETON_PATH = "skeletons";
+    private static final String JOINT_SKELETON_PATH = "skeletons";
     private static final Map<ResourceLocation, AnimationSequence> ANIMATION_SEQUENCES;
-    private static final Map<ResourceLocation, JointSkeleton> SKELETONS;
+    private static final Map<ResourceLocation, JointSkeleton> JOINT_SKELETONS;
 
     static {
         ANIMATION_SEQUENCES = Maps.newHashMap();
-        SKELETONS = Maps.newHashMap();
+        JOINT_SKELETONS = Maps.newHashMap();
     }
 
     public static Map<ResourceLocation, AnimationSequence> getAnimationSequences() {
         return ANIMATION_SEQUENCES;
     }
 
-    public static Map<ResourceLocation, JointSkeleton> getSkeletons() {
-        return SKELETONS;
+    public static Map<ResourceLocation, JointSkeleton> getJointSkeletons() {
+        return JOINT_SKELETONS;
     }
 
     public static AnimationSequence getOrThrowAnimationSequence(ResourceLocation sequenceLocation) {
-        if(ANIMATION_SEQUENCES.containsKey(sequenceLocation)){
+        if (ANIMATION_SEQUENCES.containsKey(sequenceLocation)) {
             return ANIMATION_SEQUENCES.get(sequenceLocation);
         } else {
             throw new IllegalArgumentException("Tried to access animation sequence from resource location " + sequenceLocation + ", but it was not found in the loaded data.");
         }
     }
 
+    public static JointSkeleton getOrThrowJointSkeleton(ResourceLocation sequenceLocation) {
+        if (JOINT_SKELETONS.containsKey(sequenceLocation)) {
+            return JOINT_SKELETONS.get(sequenceLocation);
+        } else {
+            throw new IllegalArgumentException("Tried to access joint skeleton from resource location " + sequenceLocation + ", but it was not found in the loaded data.");
+        }
+    }
+
     public static CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier barrier, ResourceManager manager, Executor backgroundExecutor, Executor gameExecutor) {
         CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(manager, backgroundExecutor);
+        CompletableFuture<Map<ResourceLocation, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(manager, backgroundExecutor);
 
         return CompletableFuture.allOf(loadedAnimationSequences)
                 .thenCompose(barrier::wait)
                 .thenCompose(voided -> CompletableFuture.runAsync(() -> {
                     ANIMATION_SEQUENCES.clear();
                     ANIMATION_SEQUENCES.putAll(loadedAnimationSequences.join());
+                    JOINT_SKELETONS.clear();
+                    JOINT_SKELETONS.putAll(loadedJointSkeletons.join());
+                    LOGGER.info("Cleared and replaced Locomotion resource data.");
                 }));
     }
 
     private static CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadAnimationSequences(ResourceManager manager, Executor backgroundExecutor) {
+        return loadJsonResources(
+                manager,
+                backgroundExecutor,
+                AnimationSequence.class,
+                ANIMATION_SEQUENCE_PATH,
+                resourceLocation -> LOGGER.info("Successfully loaded animation sequence {}", resourceLocation)
+        );
+    }
+
+    private static CompletableFuture<Map<ResourceLocation, JointSkeleton>> loadJointSkeletons(ResourceManager manager, Executor backgroundExecutor) {
+        return loadJsonResources(
+                manager,
+                backgroundExecutor,
+                JointSkeleton.class,
+                JOINT_SKELETON_PATH,
+                resourceLocation -> LOGGER.info("Successfully loaded joint skeleton {}", resourceLocation)
+        );
+    }
+
+    private static <D> CompletableFuture<Map<ResourceLocation, D>> loadJsonResources(ResourceManager manager, Executor backgroundExecutor, Type type, String pathToListFrom, Consumer<ResourceLocation> onSuccessfullyLoaded) {
         return CompletableFuture.supplyAsync(() -> {
             Predicate<ResourceLocation> isAssetJson = resourceLocation -> resourceLocation.getPath().endsWith(".json");
-            Map<ResourceLocation, Resource> foundResources = manager.listResources(ANIMATION_SEQUENCE_PATH, isAssetJson);
+            Map<ResourceLocation, Resource> foundResources = manager.listResources(pathToListFrom, isAssetJson);
 
-            Map<ResourceLocation, AnimationSequence> deserializedSequences = Maps.newHashMap();
+            Map<ResourceLocation, D> deserializedSequences = Maps.newHashMap();
             foundResources.forEach((resourceLocation, resource) -> {
                 try {
-                    BufferedReader reader = resource.openAsReader();
-                    JsonElement jsonElement = GsonHelper.fromJson(GsonConfiguration.getInstance(), reader, JsonElement.class);
-                    AnimationSequence animationSequence = GsonConfiguration.getInstance().fromJson(jsonElement, AnimationSequence.class);
-                    if (animationSequence != null) {
-                        deserializedSequences.put(resourceLocation, animationSequence);
-                        LOGGER.info("Successfully loaded animation sequence {}", resourceLocation);
-                    } else {
-                        LOGGER.warn("Failed to load sequence {}", resourceLocation);
+                    try (BufferedReader reader = resource.openAsReader()) {
+                        JsonElement jsonElement = GsonHelper.fromJson(GsonConfiguration.getInstance(), reader, JsonElement.class);
+                        D deserializedAsset = GsonConfiguration.getInstance().fromJson(jsonElement, type);
+                        deserializedSequences.put(resourceLocation, deserializedAsset);
+                        onSuccessfullyLoaded.accept(resourceLocation);
+                    } catch (JsonParseException exception) {
+                        LOGGER.warn("Skipping loading of JSON asset {} of type {} due to a JSON parsing error: {}", resourceLocation, type.getTypeName(), exception.getMessage());
                     }
-                    reader.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (IOException exception) {
+                    LOGGER.error("Encountered error while reading asset {} of type {}: {}", resourceLocation, type.getTypeName(), exception.getMessage());
+                    throw new RuntimeException(exception);
                 }
             });
             return deserializedSequences;
         }, backgroundExecutor);
-    }
-
-    private static CompletableFuture<Map<ResourceLocation, JsonElement>> loadJson(ResourceManager resourceManager, Executor executor, String path) {
-        Gson gson = new Gson();
-
-        Map<ResourceLocation, Resource> passedFiles = resourceManager.listResources("sequences", (string) -> string.toString().endsWith(".json"));
-
-        return CompletableFuture.supplyAsync(() -> {
-            Map<ResourceLocation, JsonElement> jsonData = Maps.newHashMap();
-            passedFiles.forEach((resourceLocation, resource) -> {
-                try {
-                    BufferedReader reader = resource.openAsReader();
-                    JsonElement jsonElement = GsonHelper.fromJson(gson, reader, JsonElement.class);
-                    jsonData.put(resourceLocation, jsonElement);
-                    reader.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            return jsonData;
-        }, executor);
     }
 }

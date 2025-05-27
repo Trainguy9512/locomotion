@@ -1,13 +1,18 @@
 package com.trainguy9512.locomotion.animation.joint;
 
+import com.google.gson.*;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.resource.LocomotionResources;
+import com.trainguy9512.locomotion.resource.json.GsonConfiguration;
 import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.*;
+
+import java.lang.reflect.Type;
 
 public final class JointChannel {
 

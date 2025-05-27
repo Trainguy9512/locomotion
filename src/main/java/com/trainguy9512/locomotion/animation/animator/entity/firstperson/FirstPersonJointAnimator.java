@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -70,23 +71,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     public void postProcessModelParts(EntityModel<PlayerRenderState> entityModel, PlayerRenderState entityRenderState) {
     }
 
-    public JointSkeleton buildSkeleton() {
-        return JointSkeleton.of(ROOT_JOINT)
-                .addJointUnderRoot(CAMERA_JOINT)
-                .addJointUnderParent(ARM_BUFFER_JOINT, CAMERA_JOINT)
-                .addJointUnderParent(LEFT_ARM_BUFFER_JOINT, ARM_BUFFER_JOINT)
-                .addJointUnderParent(RIGHT_ARM_BUFFER_JOINT, ARM_BUFFER_JOINT)
-                .addJointUnderParent(LEFT_ARM_JOINT, LEFT_ARM_BUFFER_JOINT)
-                .addJointUnderParent(RIGHT_ARM_JOINT, RIGHT_ARM_BUFFER_JOINT)
-                .addJointUnderParent(LEFT_HAND_JOINT, LEFT_ARM_JOINT)
-                .addJointUnderParent(RIGHT_HAND_JOINT, RIGHT_ARM_JOINT)
-                .addJointUnderParent(LEFT_ITEM_JOINT, LEFT_HAND_JOINT)
-                .addJointUnderParent(RIGHT_ITEM_JOINT, RIGHT_HAND_JOINT)
-                .setMirrorJoint(RIGHT_ARM_BUFFER_JOINT, LEFT_ARM_BUFFER_JOINT)
-                .setMirrorJoint(RIGHT_ARM_JOINT, LEFT_ARM_JOINT)
-                .setMirrorJoint(RIGHT_HAND_JOINT, LEFT_HAND_JOINT)
-                .setMirrorJoint(RIGHT_ITEM_JOINT, LEFT_ITEM_JOINT)
-                .build();
+    @Override
+    public ResourceLocation getJointSkeleton() {
+        return ResourceLocation.fromNamespaceAndPath(LocomotionMain.MOD_ID, "skeletons/entity/player/first_person.json");
     }
 
     @Override
