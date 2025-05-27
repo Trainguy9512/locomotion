@@ -33,14 +33,14 @@ public class GsonConfiguration {
         return GSON;
     }
 
-    public static <D> D deserializeWithFallback(JsonDeserializationContext context, JsonObject json, String key, D fallback) {
+    public static <D> D deserializeWithFallback(JsonDeserializationContext context, JsonObject json, String key, Class<D> type, D fallback) {
         if (!json.has(key)) {
             return fallback;
         }
         if (json.get(key).isJsonNull()) {
             return null;
         }
-        return context.deserialize(json.get(key), fallback.getClass());
+        return context.deserialize(json.get(key), type);
     }
 
     private static JsonDeserializer<Vector3f> vector3fDeserializer() {

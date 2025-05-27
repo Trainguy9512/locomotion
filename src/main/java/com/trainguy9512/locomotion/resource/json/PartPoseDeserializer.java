@@ -25,18 +25,21 @@ public class PartPoseDeserializer implements JsonDeserializer<PartPose> {
                 context,
                 partPoseJson,
                 TRANSLATION_KEY,
+                Vector3f.class,
                 DEFAULT_TRANSLATION
         );
         Vector3f rotation = GsonConfiguration.deserializeWithFallback(
                 context,
                 partPoseJson,
                 ROTATION_KEY,
+                Vector3f.class,
                 DEFAULT_ROTATION
         );
         Vector3f scale = GsonConfiguration.deserializeWithFallback(
                 context,
                 partPoseJson,
                 SCALE_KEY,
+                Vector3f.class,
                 DEFAULT_SCALE
         );
         return new PartPose(

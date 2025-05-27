@@ -29,26 +29,30 @@ public class JointChannelDeserializer implements JsonDeserializer<JointChannel> 
                         context,
                         jointChannelJson,
                         TRANSLATION_KEY,
+                        Vector3f.class,
                         DEFAULT_TRANSLATION
                 ),
                 GsonConfiguration.deserializeWithFallback(
                         context,
                         jointChannelJson,
                         ROTATION_KEY,
+                        Quaternionf.class,
                         DEFAULT_ROTATION
                 ),
                 GsonConfiguration.deserializeWithFallback(
                         context,
                         jointChannelJson,
                         SCALE_KEY,
+                        Vector3f.class,
                         DEFAULT_SCALE
                 ),
-                GsonConfiguration.deserializeWithFallback(
+                Boolean.TRUE.equals(GsonConfiguration.deserializeWithFallback(
                         context,
                         jointChannelJson,
                         VISIBILITY_KEY,
+                        Boolean.class,
                         DEFAULT_VISIBILITY
-                )
+                ))
         );
     }
 }

@@ -94,33 +94,34 @@ public class JointSkeletonDeserializer implements JsonDeserializer<JointSkeleton
             );
         }
         jointConfigurationBuilder.setParent(parent);
-//        jointConfigurationBuilder.setReferencePose(GsonConfiguration.deserializeWithFallback(
-//                context,
-//                jointJsonObject,
-//                REFERENCE_POSE_KEY,
-//                JointChannel.ZERO
-//        ));
-//        jointConfigurationBuilder.setReferencePose(GsonConfiguration.deserializeWithFallback(
-//                context,
-//                jointJsonObject,
-//                MIRROR_JOINT_KEY,
-//                null
-//        ));
-//        jointConfigurationBuilder.setReferencePose(GsonConfiguration.deserializeWithFallback(
-//                context,
-//                jointJsonObject,
-//                REFERENCE_POSE_KEY,
-//                JointChannel.ZERO
-//        ));
-//        jointConfigurationBuilder.setReferencePose(GsonConfiguration.deserializeWithFallback(
-//                context,
-//                jointJsonObject,
-//                REFERENCE_POSE_KEY,
-//                JointChannel.ZERO
-//        ));
-        jointConfigurationBuilder.setMirrorJoint(jointJsonObject.get(MIRROR_JOINT_KEY).isJsonNull() ? null : jointJsonObject.get(MIRROR_JOINT_KEY).getAsString());
-        jointConfigurationBuilder.setModelPartIdentifier(jointJsonObject.get(MODEL_PART_IDENTIFIER_KEY).isJsonNull() ? null : jointJsonObject.get(MODEL_PART_IDENTIFIER_KEY).getAsString());
-        jointConfigurationBuilder.setModelPartOffset(context.deserialize(jointJsonObject.get(MODEL_PART_OFFSET_KEY), PartPose.class));
+        jointConfigurationBuilder.setReferencePose(GsonConfiguration.deserializeWithFallback(
+                context,
+                jointJsonObject,
+                REFERENCE_POSE_KEY,
+                JointChannel.class,
+                JointChannel.ZERO
+        ));
+        jointConfigurationBuilder.setMirrorJoint(GsonConfiguration.deserializeWithFallback(
+                context,
+                jointJsonObject,
+                MIRROR_JOINT_KEY,
+                String.class,
+                null
+        ));
+        jointConfigurationBuilder.setModelPartIdentifier(GsonConfiguration.deserializeWithFallback(
+                context,
+                jointJsonObject,
+                MODEL_PART_IDENTIFIER_KEY,
+                String.class,
+                null
+        ));
+        jointConfigurationBuilder.setModelPartOffset(GsonConfiguration.deserializeWithFallback(
+                context,
+                jointJsonObject,
+                MODEL_PART_OFFSET_KEY,
+                PartPose.class,
+                PartPose.ZERO
+        ));
         skeletonBuilder.defineJoint(joint, jointConfigurationBuilder.build());
     }
 }

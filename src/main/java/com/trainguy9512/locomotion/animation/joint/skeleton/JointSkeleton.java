@@ -39,7 +39,6 @@ public class JointSkeleton {
      * @return List of
      */
     public List<String> getDirectChildrenOfJoint(String joint) {
-        LOGGER.info(this.rootJoint);
         return this.joints.get(joint).children();
     }
 

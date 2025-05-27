@@ -17,7 +17,6 @@
     },
     "joints": {
         "arm_L_buffer_jnt": {
-            "parent": "arm_buffer_jnt",
             "children": [
                 "arm_L_jnt"
             ],
@@ -60,7 +59,6 @@
             }
         },
         "arm_L_jnt": {
-            "parent": "arm_L_buffer_jnt",
             "children": [
                 "hand_L_jnt"
             ],
@@ -103,7 +101,6 @@
             }
         },
         "arm_R_buffer_jnt": {
-            "parent": "arm_buffer_jnt",
             "children": [
                 "arm_R_jnt"
             ],
@@ -146,7 +143,6 @@
             }
         },
         "arm_R_jnt": {
-            "parent": "arm_R_buffer_jnt",
             "children": [
                 "hand_R_jnt"
             ],
@@ -189,7 +185,6 @@
             }
         },
         "arm_buffer_jnt": {
-            "parent": "camera_jnt",
             "children": [
                 "arm_L_buffer_jnt",
                 "arm_R_buffer_jnt"
@@ -233,7 +228,6 @@
             }
         },
         "camera_jnt": {
-            "parent": "root_jnt",
             "children": [
                 "arm_buffer_jnt"
             ],
@@ -276,7 +270,6 @@
             }
         },
         "hand_L_jnt": {
-            "parent": "arm_L_jnt",
             "children": [
                 "item_L_jnt"
             ],
@@ -319,7 +312,6 @@
             }
         },
         "hand_R_jnt": {
-            "parent": "arm_R_jnt",
             "children": [
                 "item_R_jnt"
             ],
@@ -362,7 +354,6 @@
             }
         },
         "item_L_jnt": {
-            "parent": "hand_L_jnt",
             "children": [],
             "mirror_joint": "item_R_jnt",
             "model_part_identifier": null,
@@ -403,7 +394,6 @@
             }
         },
         "item_R_jnt": {
-            "parent": "hand_R_jnt",
             "children": [],
             "mirror_joint": "item_L_jnt",
             "model_part_identifier": null,
@@ -444,7 +434,6 @@
             }
         },
         "root_jnt": {
-            "parent": null,
             "children": [
                 "camera_jnt"
             ],
