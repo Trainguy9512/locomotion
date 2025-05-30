@@ -12,11 +12,13 @@ public abstract class Pose {
 
     protected final JointSkeleton jointSkeleton;
     protected final Map<String, JointChannel> jointChannels;
+    protected final Map<String, Float> customAttributes;
     private final Map<String, Matrix4f> jointParentMatrices;
 
-    protected Pose(JointSkeleton jointSkeleton){
+    protected Pose (JointSkeleton jointSkeleton) {
         this.jointSkeleton = jointSkeleton;
         this.jointChannels = Maps.newHashMap();
+        this.customAttributes = jointSkeleton.getCustomAttributeDefaults();
         this.jointParentMatrices = Maps.newHashMap();
 
         for(String joint : jointSkeleton.getJoints()){
@@ -24,9 +26,10 @@ public abstract class Pose {
         }
     }
 
-    protected Pose(Pose pose){
+    protected Pose (Pose pose) {
         this.jointSkeleton = pose.jointSkeleton;
         this.jointChannels = new HashMap<>(pose.jointChannels);
+        this.customAttributes = Maps.newHashMap(pose.customAttributes);
         this.jointParentMatrices = new HashMap<>(pose.jointParentMatrices);
     }
 
@@ -56,6 +59,26 @@ public abstract class Pose {
      */
     public JointChannel getJointChannel(String joint){
         return JointChannel.of(this.jointChannels.getOrDefault(joint, JointChannel.ZERO));
+    }
+
+    public void loadCustomAttributeValue(String customAttributeName, float value) {
+        this.customAttributes.put(customAttributeName, value);
+    }
+
+    public float getCustomAttributeValue(String customAttributeName) {
+        if (!this.customAttributes.containsKey(customAttributeName)) {
+            throw new IllegalArgumentException("Custom attribute \"" + customAttributeName + "\" cannot be accessed from pose, not included in the following curves: " + this.customAttributes.keySet());
+        }
+        return this.customAttributes.get(customAttributeName);
+    }
+
+    public boolean getCustomAttributeValueAsBoolean(String customAttributeName) {
+        return this.getCustomAttributeValue(customAttributeName) > 0.5;
+    }
+
+    public <P extends Pose> P copyCustomAttributesFrom(P other) {
+        this.customAttributes.putAll(other.customAttributes);
+        return (P) this;
     }
 
     protected void convertChildrenJointsToComponentSpace(String parent, PoseStack poseStack){

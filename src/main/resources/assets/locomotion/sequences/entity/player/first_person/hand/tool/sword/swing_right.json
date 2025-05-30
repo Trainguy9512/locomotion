@@ -1,7 +1,10 @@
 {
-    "format_version": 4,
+    "format_version": 5,
+    "joint_skeleton": "locomotion:entity/player/first_person",
     "length": 0.783,
-    "joints": {
+    "time_markers": {},
+    "custom_attributes": {},
+    "joint_channels": {
         "arm_L_buffer_jnt": {
             "translation": {
                 "0.0": [
@@ -900,13 +903,13 @@
                 ],
                 "0.267": [
                     95.483,
-                    -0.0,
+                    0.0,
                     -0.0
                 ],
                 "0.283": [
                     90.868,
-                    0.0,
-                    -0.0
+                    -0.0,
+                    0.0
                 ],
                 "0.3": [
                     84.984,
@@ -915,7 +918,7 @@
                 ],
                 "0.317": [
                     78.064,
-                    0.0,
+                    -0.0,
                     0.0
                 ],
                 "0.333": [
@@ -1068,7 +1071,5 @@
                 "0.0": true
             }
         }
-    },
-    "time_markers": {},
-    "curves": {}
+    }
 }

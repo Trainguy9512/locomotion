@@ -21,8 +21,6 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<ItemStack>> OFF_HAND_ITEM = DriverKey.of("off_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_MAIN_HAND_ITEM = DriverKey.of("rendered_main_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_OFF_HAND_ITEM = DriverKey.of("rendered_off_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
-    public static final DriverKey<VariableDriver<Boolean>> RENDER_MAIN_HAND_ITEM_AS_STATIC = DriverKey.of("render_main_hand_item_as_static", () -> VariableDriver.ofBoolean(() -> false));
-    public static final DriverKey<VariableDriver<Boolean>> RENDER_OFF_HAND_ITEM_AS_STATIC = DriverKey.of("render_off_hand_item_as_static", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<FirstPersonHandPose>> MAIN_HAND_POSE = DriverKey.of("main_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPose.EMPTY));
     public static final DriverKey<VariableDriver<FirstPersonHandPose>> OFF_HAND_POSE = DriverKey.of("off_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPose.EMPTY));
     public static final DriverKey<VariableDriver<FirstPersonGenericItemPose>> MAIN_HAND_GENERIC_ITEM_POSE = DriverKey.of("main_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItemPose.DEFAULT_2D_ITEM));
@@ -48,16 +46,10 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_OFF_HAND_ITEM = DriverKey.of("is_using_off_hand_item", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_MAIN_HAND_ON_COOLDOWN = DriverKey.of("is_main_hand_on_cooldown", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_OFF_HAND_ON_COOLDOWN = DriverKey.of("is_off_hand_on_cooldown", () -> VariableDriver.ofBoolean(() -> false));
+    public static final DriverKey<VariableDriver<InteractionHand>> LAST_USED_HAND = DriverKey.of("last_used_hand", () -> VariableDriver.ofConstant(() -> InteractionHand.MAIN_HAND));
 
     public static final DriverKey<VariableDriver<ItemStack>> PROJECTILE_ITEM = DriverKey.of("projectile_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<Float>> CROSSBOW_RELOAD_SPEED = DriverKey.of("crossbow_reload_speed", () -> VariableDriver.ofFloat(() -> 1f));
-
-    public static final DriverKey<VariableDriver<Boolean>> IS_USING_MAIN_HAND_PROPERTY = DriverKey.of("property/is_using_main_hand", () -> VariableDriver.ofBoolean(() -> false));
-    public static final DriverKey<VariableDriver<Boolean>> IS_USING_OFF_HAND_PROPERTY = DriverKey.of("property/is_using_main_hand", () -> VariableDriver.ofBoolean(() -> false));
-    public static final DriverKey<TimerDriver> USE_DURATION_MAIN_HAND_PROPERTY = DriverKey.of("property/use_duration_main_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
-    public static final DriverKey<TimerDriver> USE_DURATION_OFF_HAND_PROPERTY = DriverKey.of("property/use_duration_off_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).build());
-    public static final DriverKey<TimerDriver> CROSSBOW_PULL_MAIN_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_main_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).setEasing(Easing.CubicBezier.easeInOf(0.49f,0.01f,0.19f,0.98f)).build());
-    public static final DriverKey<TimerDriver> CROSSBOW_PULL_OFF_HAND_PROPERTY = DriverKey.of("property/crossbow/pull_off_hand", () -> TimerDriver.builder(() -> 0f).setMinValue(0f).setMaxValue(1f).setEasing(Easing.CubicBezier.easeInOf(0.49f,0.01f,0.19f,0.98f)).build());
 
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
         driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(driverContainer.getDriverValue(getItemDriver(interactionHand)).copy());
@@ -102,34 +94,6 @@ public class FirstPersonDrivers {
         return switch (interactionHand) {
             case MAIN_HAND -> IS_USING_MAIN_HAND_ITEM;
             case OFF_HAND -> IS_USING_OFF_HAND_ITEM;
-        };
-    }
-
-    public static DriverKey<VariableDriver<Boolean>> getRenderItemAsStaticDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
-            case MAIN_HAND -> RENDER_MAIN_HAND_ITEM_AS_STATIC;
-            case OFF_HAND -> RENDER_OFF_HAND_ITEM_AS_STATIC;
-        };
-    }
-
-    public static DriverKey<VariableDriver<Boolean>> getUsingItemPropertyDriverKey(InteractionHand interactionHand) {
-        return switch (interactionHand) {
-            case MAIN_HAND -> IS_USING_MAIN_HAND_PROPERTY;
-            case OFF_HAND -> IS_USING_OFF_HAND_PROPERTY;
-        };
-    }
-
-    public static DriverKey<TimerDriver> getUseDurationPropertyDriverKey(InteractionHand interactionHand) {
-        return switch (interactionHand) {
-            case MAIN_HAND -> USE_DURATION_MAIN_HAND_PROPERTY;
-            case OFF_HAND -> USE_DURATION_OFF_HAND_PROPERTY;
-        };
-    }
-
-    public static DriverKey<TimerDriver> getCrossbowPullPropertyDriverKey(InteractionHand interactionHand) {
-        return switch (interactionHand) {
-            case MAIN_HAND -> CROSSBOW_PULL_MAIN_HAND_PROPERTY;
-            case OFF_HAND -> CROSSBOW_PULL_OFF_HAND_PROPERTY;
         };
     }
 }

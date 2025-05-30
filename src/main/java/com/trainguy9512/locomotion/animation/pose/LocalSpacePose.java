@@ -2,12 +2,10 @@ package com.trainguy9512.locomotion.animation.pose;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
-import com.trainguy9512.locomotion.animation.joint.skeleton.BlendProfile;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
-import com.trainguy9512.locomotion.util.TimeSpan;
+import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.Transition;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,22 +43,6 @@ public class LocalSpacePose extends Pose {
         return pose;
     }
 
-    /**
-     * Creates an animation pose from a point in time within the provided animation sequence
-     * @param jointSkeleton         Template joint skeleton
-     * @param sequenceLocation      Animation sequence resource location
-     * @param time                  Point of time in the animation to get.
-     * @param looping               Whether the animation should be looped or not.
-     * @return                      New animation pose
-     */
-    public static LocalSpacePose fromAnimationSequence(JointSkeleton jointSkeleton, ResourceLocation sequenceLocation, TimeSpan time, boolean looping) {
-        LocalSpacePose pose = LocalSpacePose.of(jointSkeleton);
-        for(String joint : jointSkeleton.getJoints()){
-            pose.setJointChannel(joint, JointChannel.ofJointFromAnimationSequence(sequenceLocation, joint, time, looping));
-        }
-        return pose;
-    }
-
     public LocalSpacePose mirrored() {
         LocalSpacePose mirroredPose = new LocalSpacePose(this);
         this.jointChannels.keySet().forEach(joint -> {
@@ -85,6 +67,21 @@ public class LocalSpacePose extends Pose {
             LocalSpacePose destination
     ) {
         return this.interpolated(other, weight, null, destination);
+    }
+
+    /**
+     * Returns this animation pose interpolated between this pose and the provided pose.
+     * @param other             Animation pose to interpolate to.
+     * @param weight            Weight value, 0 is the original pose and 1 is the other pose.
+     * @param blendMask         Optional blend mask for determining which joints will interpolate.
+     * @return                  New interpolated animation pose.
+     */
+    public LocalSpacePose interpolated(
+            LocalSpacePose other,
+            float weight,
+            @Nullable BlendMask blendMask
+    ) {
+        return this.interpolated(other, weight, blendMask, this);
     }
 
     /**
@@ -117,10 +114,19 @@ public class LocalSpacePose extends Pose {
         if (weight == 0) {
             return destination;
         }
+        for (String customAttribute : this.jointSkeleton.getCustomAttributes()) {
+            float attributeWeight = weight;
+            if (blendMask != null) {
+                attributeWeight *= blendMask.getCustomAttributeProperty(customAttribute, this.jointSkeleton);
+            }
+            float customAttributeA = this.customAttributes.get(customAttribute);
+            float customAttributeB = other.customAttributes.get(customAttribute);
+            destination.customAttributes.put(customAttribute, Interpolator.FLOAT.interpolate(customAttributeA, customAttributeB, attributeWeight));
+        }
         for (String joint : this.jointSkeleton.getJoints()) {
             float jointWeight = weight;
             if (blendMask != null) {
-                jointWeight *= blendMask.getProperty(joint, this.jointSkeleton);
+                jointWeight *= blendMask.getJointProperty(joint, this.jointSkeleton);
             }
             if (jointWeight == 1f) {
                 destination.setJointChannel(joint, other.getJointChannel(joint));
@@ -129,21 +135,6 @@ public class LocalSpacePose extends Pose {
             }
         }
         return destination;
-    }
-
-    /**
-     * Returns this animation pose interpolated between this pose and the provided pose.
-     * @param other             Animation pose to interpolate to.
-     * @param weight            Weight value, 0 is the original pose and 1 is the other pose.
-     * @param blendMask         Optional blend mask for determining which joints will interpolate.
-     * @return                  New interpolated animation pose.
-     */
-    public LocalSpacePose interpolated(
-            LocalSpacePose other,
-            float weight,
-            @Nullable BlendMask blendMask
-    ) {
-        return this.interpolated(other, weight, blendMask, this);
     }
 
     /**
@@ -165,16 +156,30 @@ public class LocalSpacePose extends Pose {
         if (time == 0) {
             return destination;
         }
+        for (String customAttribute : this.jointSkeleton.getCustomAttributes()) {
+            float attributeTime = time;
+            if (transition.blendProfile() != null) {
+                attributeTime /= transition.blendProfile().getCustomAttributeProperty(customAttribute, this.jointSkeleton);
+                attributeTime = Mth.clamp(attributeTime, 0, 1);
+            }
+            attributeTime = transition.easement().ease(attributeTime);
+            if (blendMask != null) {
+                attributeTime *= blendMask.getCustomAttributeProperty(customAttribute, this.jointSkeleton);
+            }
+            float customAttributeA = this.customAttributes.get(customAttribute);
+            float customAttributeB = other.customAttributes.get(customAttribute);
+            destination.customAttributes.put(customAttribute, Interpolator.FLOAT.interpolate(customAttributeA, customAttributeB, attributeTime));
+        }
         for (String joint : this.jointSkeleton.getJoints()) {
             float jointTime = time;
             if (transition.blendProfile() != null) {
-                jointTime /= transition.blendProfile().getProperty(joint, this.jointSkeleton);
+                jointTime /= transition.blendProfile().getJointProperty(joint, this.jointSkeleton);
                 jointTime = Mth.clamp(jointTime, 0, 1);
             }
-            if (blendMask != null) {
-                jointTime *= blendMask.getProperty(joint, this.jointSkeleton);
-            }
             jointTime = transition.easement().ease(jointTime);
+            if (blendMask != null) {
+                jointTime *= blendMask.getJointProperty(joint, this.jointSkeleton);
+            }
             if (jointTime == 1f) {
                 destination.setJointChannel(joint, other.getJointChannel(joint));
             } else {

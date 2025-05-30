@@ -5,6 +5,7 @@ import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
@@ -195,7 +196,7 @@ public class MontageManager {
         }
 
         private LocalSpacePose getPose(JointSkeleton jointSkeleton, float partialTicks) {
-            LocalSpacePose pose = LocalSpacePose.fromAnimationSequence(
+            LocalSpacePose pose = AnimationSequence.samplePose(
                     jointSkeleton,
                     this.configuration.animationSequence(),
                     TimeSpan.ofTicks(this.ticksElapsed.getValueInterpolated(partialTicks)),
@@ -204,7 +205,7 @@ public class MontageManager {
             if (this.configuration.isAdditive()) {
                 // If the additive base pose and the additive subtraction poses are null, initialize them (only initialized when needed.
                 if (this.additiveBasePose == null) {
-                    this.additiveBasePose = LocalSpacePose.fromAnimationSequence(
+                    this.additiveBasePose = AnimationSequence.samplePose(
                             jointSkeleton,
                             this.additiveBasePoseLocation,
                             TimeSpan.ofTicks(0),
@@ -212,7 +213,7 @@ public class MontageManager {
                     );
                 }
                 if (this.additiveSubtractionPose == null) {
-                    this.additiveSubtractionPose = LocalSpacePose.fromAnimationSequence(
+                    this.additiveSubtractionPose = AnimationSequence.samplePose(
                             jointSkeleton,
                             this.configuration.animationSequence(),
                             this.configuration.startTimeOffset(),

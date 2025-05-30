@@ -3,7 +3,6 @@ package com.trainguy9512.locomotion.animation.joint.skeleton;
 import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import net.minecraft.client.model.geom.PartPose;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,10 +17,12 @@ public class JointSkeleton {
 
     private final Map<String, JointConfiguration> joints;
     private final String rootJoint;
+    private final Map<String, Float> customAttributeDefaults;
 
-    private JointSkeleton(Map<String, JointConfiguration> joints, String rootJoint){
+    private JointSkeleton(Map<String, JointConfiguration> joints, String rootJoint, Map<String, Float> customAttributeDefaults){
         this.joints = joints;
         this.rootJoint = rootJoint;
+        this.customAttributeDefaults = customAttributeDefaults;
     }
 
     /**
@@ -31,6 +32,18 @@ public class JointSkeleton {
      */
     public static JointSkeleton.Builder of(String rootJoint) {
         return new JointSkeleton.Builder(rootJoint);
+    }
+
+    public Map<String, Float> getCustomAttributeDefaults() {
+        return this.customAttributeDefaults;
+    }
+
+    public Set<String> getCustomAttributes() {
+        return this.customAttributeDefaults.keySet();
+    }
+
+    public boolean containsCustomAttribute(String customAttributeName) {
+        return this.customAttributeDefaults.containsKey(customAttributeName);
     }
 
     /**
@@ -100,11 +113,14 @@ public class JointSkeleton {
 
     public static class Builder {
 
-        private final Map<String, JointConfiguration> joints = Maps.newHashMap();
+        private final Map<String, JointConfiguration> joints;
         private final String rootJoint;
+        private final Map<String, Float> customAttributeDefaults;
 
         protected Builder(String rootJoint) {
+            this.joints = Maps.newHashMap();
             this.rootJoint = rootJoint;
+            this.customAttributeDefaults = Maps.newHashMap();
         }
 
         public Builder defineJoint(String jointName, JointConfiguration jointConfiguration) {
@@ -112,9 +128,14 @@ public class JointSkeleton {
             return this;
         }
 
+        public Builder defineCustomAttribute(String customAttributeName, float defaultValue) {
+            this.customAttributeDefaults.put(customAttributeName, defaultValue);
+            return this;
+        }
+
         public JointSkeleton build(){
             HashMap<String, JointConfiguration> jointsBuilt = Maps.newHashMap();
-            return new JointSkeleton(this.joints, this.rootJoint);
+            return new JointSkeleton(this.joints, this.rootJoint, this.customAttributeDefaults);
         }
     }
 

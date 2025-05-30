@@ -3,9 +3,12 @@ package com.trainguy9512.locomotion;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorRegistry;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
 import com.trainguy9512.locomotion.config.LocomotionConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class LocomotionMain {
 
+	public static final Logger DEBUG_LOGGER = LogManager.getLogger("Locomotion/Resources");
 	public static final String MOD_ID = "locomotion";
 	public static final LocomotionConfig CONFIG = new LocomotionConfig();
 

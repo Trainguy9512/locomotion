@@ -37,6 +37,7 @@ public class ApplyAdditiveFunction implements PoseFunction<LocalSpacePose> {
 
         LocalSpacePose additivePose = this.additivePoseInput.compute(context);
         additivePose.multiply(basePose, JointChannel.TransformSpace.COMPONENT);
+        additivePose.copyCustomAttributesFrom(basePose);
 
         float weight = this.alphaFunction.apply(context);
         if (weight == 1f) {

@@ -12,13 +12,13 @@ import java.util.Set;
  */
 public class BlendMask extends SkeletonPropertyDefinition<Float> {
 
-    private BlendMask(Map<String, Float> jointProperties, boolean mirrored) {
-        super(jointProperties, mirrored, 0f);
+    private BlendMask(Map<String, Float> jointProperties, Map<String, Float> customAttributeProperties, boolean mirrored) {
+        super(jointProperties, customAttributeProperties, mirrored, 0f);
     }
 
     @Override
     public SkeletonPropertyDefinition<Float> getMirrored() {
-        return new BlendMask(this.jointProperties, !this.isMirrored);
+        return new BlendMask(this.jointProperties, this.customAttributeProperties, !this.isMirrored);
     }
 
     public static Builder builder() {
@@ -26,10 +26,13 @@ public class BlendMask extends SkeletonPropertyDefinition<Float> {
     }
 
     public static class Builder {
+
         private final Map<String, Float> jointWeights;
+        private final Map<String, Float> customAttributeWeights;
 
         public Builder() {
-            jointWeights = Maps.newHashMap();
+            this.jointWeights = Maps.newHashMap();
+            this.customAttributeWeights = Maps.newHashMap();
         }
 
         /**
@@ -43,7 +46,7 @@ public class BlendMask extends SkeletonPropertyDefinition<Float> {
         }
 
         /**
-         * Defines a duration multiplier for multiple joints.
+         * Defines a weight for multiple joints.
          * @param jointNames            Set of joint names to assign the provided weight to.
          * @param weight                Weight value between 0 and 1.
          */
@@ -52,9 +55,28 @@ public class BlendMask extends SkeletonPropertyDefinition<Float> {
             return this;
         }
 
+        /**
+         * Defines a weight for the provided custom attribute.
+         * @param customAttributeName   Name of the custom attribute
+         * @param weight                Weight value between 0 and 1.
+         */
+        public Builder defineForCustomAttribute(String customAttributeName, float weight) {
+            this.jointWeights.put(customAttributeName, Mth.clamp(weight, 0f, 1f));
+            return this;
+        }
+
+        /**
+         * Defines a weight for multiple custom attributes.
+         * @param customAttributeNames  Set of custom attribute names to assign the provided weight to.
+         * @param weight                Weight value between 0 and 1.
+         */
+        public Builder defineForMultipleCustomAttributes(Set<String> customAttributeNames, float weight) {
+            customAttributeNames.forEach(jointName -> this.defineForJoint(jointName, weight));
+            return this;
+        }
 
         public BlendMask build() {
-            return new BlendMask(this.jointWeights, false);
+            return new BlendMask(this.jointWeights, this.customAttributeWeights, false);
         }
     }
 }

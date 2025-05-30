@@ -53,7 +53,6 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation GROUND_MOVEMENT_WALKING = makeAnimationSequenceResourceLocation("ground_movement/walking");
     public static final ResourceLocation GROUND_MOVEMENT_WALK_TO_STOP = makeAnimationSequenceResourceLocation("ground_movement/walk_to_stop");
     public static final ResourceLocation GROUND_MOVEMENT_JUMP = makeAnimationSequenceResourceLocation("ground_movement/jump");
-    public static final ResourceLocation GROUND_MOVEMENT_FALLING = makeAnimationSequenceResourceLocation("ground_movement/falling");
     public static final ResourceLocation GROUND_MOVEMENT_FALLING_DOWN = makeAnimationSequenceResourceLocation("ground_movement/falling_down");
     public static final ResourceLocation GROUND_MOVEMENT_FALLING_IN_PLACE = makeAnimationSequenceResourceLocation("ground_movement/falling_in_place");
     public static final ResourceLocation GROUND_MOVEMENT_FALLING_UP = makeAnimationSequenceResourceLocation("ground_movement/falling_up");

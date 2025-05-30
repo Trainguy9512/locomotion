@@ -4,6 +4,7 @@ import com.trainguy9512.locomotion.animation.driver.Driver;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -71,17 +72,17 @@ public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSp
         var ceilingEntry = this.blendSpaceEntries.ceilingEntry(interpolatedPosition);
 
         if (floorEntry == null)
-            return LocalSpacePose.fromAnimationSequence(context.driverContainer().getJointSkeleton(), ceilingEntry.getValue().animationSequence(), time, true);
+            return AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), ceilingEntry.getValue().animationSequence(), time, true);
         if (ceilingEntry == null)
-            return LocalSpacePose.fromAnimationSequence(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
+            return AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
 
         // If they're both the same frame
         if (floorEntry.getKey().equals(ceilingEntry.getKey()))
-            return LocalSpacePose.fromAnimationSequence(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
+            return AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
 
         float relativeTime = (interpolatedPosition - floorEntry.getKey()) / (ceilingEntry.getKey() - floorEntry.getKey());
-        LocalSpacePose floorPose = LocalSpacePose.fromAnimationSequence(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
-        LocalSpacePose ceilingPose = LocalSpacePose.fromAnimationSequence(context.driverContainer().getJointSkeleton(), ceilingEntry.getValue().animationSequence(), time, true);
+        LocalSpacePose floorPose = AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
+        LocalSpacePose ceilingPose = AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), ceilingEntry.getValue().animationSequence(), time, true);
 
         return floorPose.interpolated(ceilingPose, relativeTime);
     }

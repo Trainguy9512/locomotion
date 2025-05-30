@@ -1,7 +1,24 @@
 {
-    "format_version": 4,
+    "format_version": 5,
+    "joint_skeleton": "locomotion:entity/player/first_person",
     "length": 0.85,
-    "joints": {
+    "time_markers": {},
+    "custom_attributes": {
+        "crossbow_pull_property": {
+            "0.0": 0.0
+        },
+        "use_duration_property": {
+            "0.0": 20.433,
+            "0.017": 10.217,
+            "0.033": 0.0
+        },
+        "is_using_property": {
+            "0.0": 1.0,
+            "0.033": 1.0,
+            "0.05": 0.0
+        }
+    },
+    "joint_channels": {
         "arm_L_buffer_jnt": {
             "translation": {
                 "0.0": [
@@ -1938,7 +1955,5 @@
                 "0.0": true
             }
         }
-    },
-    "time_markers": {},
-    "curves": {}
+    }
 }

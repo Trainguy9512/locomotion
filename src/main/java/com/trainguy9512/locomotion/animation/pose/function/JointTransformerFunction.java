@@ -36,8 +36,8 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
 
     @Override
     public @NotNull P compute(FunctionInterpolationContext context) {
-        if(!context.driverContainer().getJointSkeleton().containsJoint(this.joint)){
-            throw new IllegalArgumentException("Cannot run joint transformer function on joint " + this.joint + ", for it is not present within the skeleton.");
+        if (!context.driverContainer().getJointSkeleton().containsJoint(this.joint)) {
+            throw new IllegalArgumentException("Cannot run joint transformer function on joint " + this.joint + ", for it is not present within the skeleton. Valid joints: " + context.driverContainer().getJointSkeleton().getJoints());
         }
 
         P pose = this.input.compute(context);

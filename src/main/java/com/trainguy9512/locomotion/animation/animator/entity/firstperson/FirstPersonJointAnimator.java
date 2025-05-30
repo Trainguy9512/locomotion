@@ -48,6 +48,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     public static final String LEFT_HAND_JOINT = "hand_L_jnt";
     public static final String LEFT_ITEM_JOINT = "item_L_jnt";
 
+    public static final String IS_USING_PROPERTY_ATTRIBUTE = "is_using_property";
+    public static final String USE_DURATION_PROPERTY_ATTRIBUTE = "use_duration_property";
+    public static final String CROSSBOW_PULL_PROPERTY_ATTRIBUTE = "crossbow_pull_property";
 
     public static final Set<String> RIGHT_SIDE_JOINTS = Set.of(
             RIGHT_ARM_BUFFER_JOINT,
@@ -171,9 +174,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 continue;
             }
             driverContainer.getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).setValue(true);
+            driverContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(interactionHand);
             driverContainer.getDriver(FirstPersonDrivers.PROJECTILE_ITEM).setValue(dataReference.getProjectile(itemInHand));
             if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
-                ItemEnchantments itemEnchantments = itemInHand.getEnchantments();
                 float chargeTime = EnchantmentHelper.modifyCrossbowChargingTime(itemInHand, dataReference, 1.25f);
                 float chargeSpeedMultiplier = 1.25f / chargeTime;
                 driverContainer.getDriver(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED).setValue(chargeSpeedMultiplier);

@@ -1,8 +1,16 @@
 package com.trainguy9512.locomotion.animation.sequence;
 
 import com.google.common.collect.Maps;
+import com.mojang.math.Axis;
+import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.joint.JointChannel;
+import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
+import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.resource.LocomotionResources;
+import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Timeline;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -13,9 +21,37 @@ public record AnimationSequence(
         Map<String, Timeline<Quaternionf>> rotationTimelines,
         Map<String, Timeline<Vector3f>> scaleTimelines,
         Map<String, Timeline<Boolean>> visibilityTimelines,
+        Map<String, Timeline<Float>> customAttributeTimelines,
         Map<String, List<TimeSpan>> timeMarkers,
+        ResourceLocation jointSkeletonLocation,
         TimeSpan length
 ) {
+
+    /**
+     * Creates an animation pose from a point in time within the provided animation sequence
+     * @param jointSkeleton         Template joint skeleton
+     * @param sequenceLocation      Animation sequence resource location
+     * @param time                  Point of time in the animation to get.
+     * @param looping               Whether the animation should be looped or not.
+     * @return                      New animation pose
+     */
+    public static LocalSpacePose samplePose(JointSkeleton jointSkeleton, ResourceLocation sequenceLocation, TimeSpan time, boolean looping) {
+        AnimationSequence animationSequence = LocomotionResources.getOrThrowAnimationSequence(sequenceLocation);
+        LocalSpacePose pose = LocalSpacePose.of(jointSkeleton);
+        for (String joint : jointSkeleton.getJoints()) {
+            JointChannel channel = JointChannel.ofTranslationRotationScaleQuaternion(
+                    animationSequence.translationTimelines().get(joint).getValueAtTime(time.inSeconds(), looping),
+                    animationSequence.rotationTimelines().get(joint).getValueAtTime(time.inSeconds(), looping),
+                    animationSequence.scaleTimelines().get(joint).getValueAtTime(time.inSeconds(), looping),
+                    animationSequence.visibilityTimelines().get(joint).getValueAtTime(time.inSeconds(), looping)
+            );
+            pose.setJointChannel(joint, channel);
+        }
+        for (String customAttribute : animationSequence.customAttributeTimelines.keySet()) {
+            pose.loadCustomAttributeValue(customAttribute, animationSequence.customAttributeTimelines.get(customAttribute).getValueAtTime(time.inSeconds()));
+        }
+        return pose;
+    }
 
     public boolean containsTimelinesForJoint(String joint) {
         return this.translationTimelines().containsKey(joint) && this.rotationTimelines().containsKey(joint) && this.scaleTimelines().containsKey(joint) && this.visibilityTimelines().containsKey(joint);
@@ -46,8 +82,37 @@ public record AnimationSequence(
         return markersToReturn;
     }
 
-    public static Builder builder(TimeSpan frameLength) {
-        return new Builder(frameLength);
+    public AnimationSequence getBaked() {
+        Builder bakedSequenceBuilder = AnimationSequence.builder(this.length, this.jointSkeletonLocation);
+        JointSkeleton jointSkeleton = LocomotionResources.getOrThrowJointSkeleton(this.jointSkeletonLocation);
+        for (String joint : jointSkeleton.getJoints()) {
+            if (this.translationTimelines.containsKey(joint)) {
+                bakedSequenceBuilder.putJointTranslationTimeline(joint, this.translationTimelines.get(joint));
+                bakedSequenceBuilder.putJointRotationTimeline(joint, this.rotationTimelines.get(joint));
+                bakedSequenceBuilder.putJointScaleTimeline(joint, this.scaleTimelines.get(joint));
+                bakedSequenceBuilder.putJointVisibilityTimeline(joint, this.visibilityTimelines.get(joint));
+            } else {
+                bakedSequenceBuilder.putJointTranslationTimeline(joint, Timeline.of(Interpolator.VECTOR_FLOAT, this.length.inSeconds()).addKeyframe(0, new Vector3f(0, 0, 0)));
+                bakedSequenceBuilder.putJointRotationTimeline(joint, Timeline.of(Interpolator.QUATERNION, this.length.inSeconds()).addKeyframe(0, Axis.XP.rotation(0f)));
+                bakedSequenceBuilder.putJointScaleTimeline(joint, Timeline.of(Interpolator.VECTOR_FLOAT, this.length.inSeconds()).addKeyframe(0, new Vector3f(0, 0, 0)));
+                bakedSequenceBuilder.putJointVisibilityTimeline(joint, Timeline.of(Interpolator.BOOLEAN_KEYFRAME, this.length.inSeconds()).addKeyframe(0, true));
+            }
+        }
+        for (String timeMarker : this.timeMarkers.keySet()) {
+            for (TimeSpan time : this.timeMarkers.get(timeMarker)) {
+                bakedSequenceBuilder.putTimeMarker(timeMarker, time);
+            }
+        }
+        for (String customAttribute : jointSkeleton.getCustomAttributeDefaults().keySet()) {
+            if (this.customAttributeTimelines.containsKey(customAttribute)) {
+                bakedSequenceBuilder.putCustomAttributeTimeline(customAttribute, this.customAttributeTimelines.get(customAttribute));
+            }
+        }
+        return bakedSequenceBuilder.build();
+    }
+
+    public static Builder builder(TimeSpan frameLength, ResourceLocation jointSkeletonLocation) {
+        return new Builder(frameLength, jointSkeletonLocation);
     }
 
     public static class Builder {
@@ -55,39 +120,53 @@ public record AnimationSequence(
         private final Map<String, Timeline<Quaternionf>> rotationTimelines;
         private final Map<String, Timeline<Vector3f>> scaleTimelines;
         private final Map<String, Timeline<Boolean>> visibilityTimelines;
+        private final Map<String, Timeline<Float>> customAttributeTimelines;
         private final Map<String, List<TimeSpan>> timeMarkers;
+        private final ResourceLocation jointSkeletonLocation;
         private final TimeSpan length;
 
-        protected Builder(TimeSpan length) {
+        protected Builder(TimeSpan length, ResourceLocation jointSkeletonLocation) {
             this.translationTimelines = Maps.newHashMap();
             this.rotationTimelines = Maps.newHashMap();
             this.scaleTimelines = Maps.newHashMap();
             this.visibilityTimelines = Maps.newHashMap();
+            this.customAttributeTimelines = Maps.newHashMap();
             this.timeMarkers = Maps.newHashMap();
+            this.jointSkeletonLocation = jointSkeletonLocation;
             this.length = length;
         }
 
-        public void putJointTranslationTimeline(String jointName, Timeline<Vector3f> timeline) {
+        public Builder putJointTranslationTimeline(String jointName, Timeline<Vector3f> timeline) {
             this.translationTimelines.put(jointName, timeline);
+            return this;
         }
 
-        public void putJointRotationTimeline(String jointName, Timeline<Quaternionf> timeline) {
+        public Builder putJointRotationTimeline(String jointName, Timeline<Quaternionf> timeline) {
             this.rotationTimelines.put(jointName, timeline);
+            return this;
         }
 
-        public void putJointScaleTimeline(String jointName, Timeline<Vector3f> timeline) {
+        public Builder putJointScaleTimeline(String jointName, Timeline<Vector3f> timeline) {
             this.scaleTimelines.put(jointName, timeline);
+            return this;
         }
 
-        public void putJointVisibilityTimeline(String jointName, Timeline<Boolean> timeline) {
+        public Builder putJointVisibilityTimeline(String jointName, Timeline<Boolean> timeline) {
             this.visibilityTimelines.put(jointName, timeline);
+            return this;
         }
 
-        public void putTimeMarker(String identifier, TimeSpan time) {
+        public Builder putCustomAttributeTimeline(String customAttributeName, Timeline<Float> timeline) {
+            this.customAttributeTimelines.put(customAttributeName, timeline);
+            return this;
+        }
+
+        public Builder putTimeMarker(String identifier, TimeSpan time) {
             if (!this.timeMarkers.containsKey(identifier)) {
                 this.timeMarkers.put(identifier, new ArrayList<>());
             }
             this.timeMarkers.get(identifier).add(time);
+            return this;
         }
 
         public AnimationSequence build() {
@@ -96,7 +175,9 @@ public record AnimationSequence(
                     this.rotationTimelines,
                     this.scaleTimelines,
                     this.visibilityTimelines,
+                    this.customAttributeTimelines,
                     this.timeMarkers,
+                    this.jointSkeletonLocation,
                     this.length
             );
         }

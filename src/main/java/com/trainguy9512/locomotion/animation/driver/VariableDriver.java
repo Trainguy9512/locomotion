@@ -111,7 +111,7 @@ public class VariableDriver<D> implements Driver<D> {
      * @param defaultValue      Default value set from the start and set upon resetting the driver.
      */
     public static <D> VariableDriver<D> ofConstant(Supplier<D> defaultValue) {
-        return VariableDriver.ofInterpolatable(defaultValue, Interpolator.constant());
+        return VariableDriver.ofInterpolatable(defaultValue, Interpolator.constantBlend());
     }
 
     /**

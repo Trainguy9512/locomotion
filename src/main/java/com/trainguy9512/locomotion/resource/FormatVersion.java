@@ -19,8 +19,8 @@ public record FormatVersion(int version) {
         return FormatVersion.of(1);
     }
 
-    public boolean isCompatible() {
-        return this.version >= 4;
+    public boolean isIncompatible() {
+        return this.version < 5;
     }
 
     public static JsonDeserializer<FormatVersion> getDeserializer() {

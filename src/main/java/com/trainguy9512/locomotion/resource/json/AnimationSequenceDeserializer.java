@@ -6,6 +6,7 @@ import com.trainguy9512.locomotion.resource.FormatVersion;
 import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Timeline;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -16,11 +17,14 @@ import java.util.Map;
 public class AnimationSequenceDeserializer implements JsonDeserializer<AnimationSequence> {
 
     private static final String LENGTH_KEY = "length";
-    private static final String JOINTS_KEY = "joints";
+    private static final String JOINT_SKELETON_KEY = "joint_skeleton";
+    private static final String JOINT_CHANNELS_KEY = "joint_channels";
+    private static final String CUSTOM_ATTRIBUTES_KEY = "custom_attributes";
+    private static final String TIME_MARKERS_KEY = "time_markers";
 
     private static final List<String> REQUIRED_KEYS = List.of(
             LENGTH_KEY,
-            JOINTS_KEY
+            JOINT_CHANNELS_KEY
     );
 
     @Override
@@ -28,7 +32,7 @@ public class AnimationSequenceDeserializer implements JsonDeserializer<Animation
         JsonObject sequenceJsonObject = jsonElement.getAsJsonObject();
 
         FormatVersion version = FormatVersion.ofAssetJsonObject(sequenceJsonObject);
-        if (!version.isCompatible()) {
+        if (version.isIncompatible()) {
             throw new JsonParseException("Animation sequence version is out of date for deserializer.");
         }
 
@@ -38,11 +42,18 @@ public class AnimationSequenceDeserializer implements JsonDeserializer<Animation
             }
         }
 
+        var potentialResourceLocation = ResourceLocation.read(sequenceJsonObject.get(JOINT_SKELETON_KEY).getAsString()).result();
+        ResourceLocation jointSkeletonLocation;
+        if (potentialResourceLocation.isPresent()) {
+            jointSkeletonLocation = potentialResourceLocation.get().withPath(string -> "skeletons/" + string + ".json");
+        } else {
+            throw new JsonParseException("Joint skeleton resource location " + sequenceJsonObject.get(JOINT_SKELETON_KEY).getAsString() + " is invalid.");
+        }
         float sequenceLength = sequenceJsonObject.get(LENGTH_KEY).getAsFloat();
-        AnimationSequence.Builder sequenceBuilder = AnimationSequence.builder(TimeSpan.ofSeconds(sequenceLength));
+        AnimationSequence.Builder sequenceBuilder = AnimationSequence.builder(TimeSpan.ofSeconds(sequenceLength), jointSkeletonLocation);
 
-        Map<String, JsonElement> jointsJsonMap = sequenceJsonObject.getAsJsonObject("joints").asMap();
-        jointsJsonMap.forEach((joint, jointElement) -> {
+        JsonObject jointChannelsJsonObject = sequenceJsonObject.getAsJsonObject(JOINT_CHANNELS_KEY);
+        jointChannelsJsonObject.asMap().forEach((joint, jointElement) -> {
             JsonObject jointJsonObject = jointElement.getAsJsonObject();
             Timeline<Vector3f> translationTimeline = deserializeTimeline(
                     context,
@@ -76,16 +87,26 @@ public class AnimationSequenceDeserializer implements JsonDeserializer<Animation
                     Interpolator.BOOLEAN_KEYFRAME,
                     sequenceLength
             );
-
             sequenceBuilder.putJointTranslationTimeline(joint, translationTimeline);
             sequenceBuilder.putJointRotationTimeline(joint, rotationTimeline);
             sequenceBuilder.putJointScaleTimeline(joint, scaleTimeline);
             sequenceBuilder.putJointVisibilityTimeline(joint, visibilityTimeline);
         });
+        JsonObject customAttributesJsonObject = sequenceJsonObject.getAsJsonObject(CUSTOM_ATTRIBUTES_KEY);
+        customAttributesJsonObject.asMap().forEach((customAttribute, customAttributeTimelineElement) -> {
+            sequenceBuilder.putCustomAttributeTimeline(customAttribute, deserializeTimeline(
+                    context,
+                    customAttributesJsonObject,
+                    customAttribute,
+                    Float.class,
+                    Interpolator.FLOAT,
+                    sequenceLength
+            ));
+        });
 
         // Load time markers from the JSON file, if it has any.
-        if (sequenceJsonObject.has("time_markers")) {
-            Map<String, JsonElement> timeMarkers = sequenceJsonObject.getAsJsonObject("time_markers").asMap();
+        if (sequenceJsonObject.has(TIME_MARKERS_KEY)) {
+            Map<String, JsonElement> timeMarkers = sequenceJsonObject.getAsJsonObject(TIME_MARKERS_KEY).asMap();
             timeMarkers.forEach((timeMarkerIdentifier, timeMarkerElement) -> {
                 JsonArray times = timeMarkerElement.getAsJsonArray();
                 times.forEach(time -> sequenceBuilder.putTimeMarker(timeMarkerIdentifier, TimeSpan.ofSeconds(time.getAsFloat())));

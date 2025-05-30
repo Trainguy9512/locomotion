@@ -50,7 +50,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
 
     @Override
     public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
-        LocalSpacePose pose = LocalSpacePose.fromAnimationSequence(
+        LocalSpacePose pose = AnimationSequence.samplePose(
                 context.driverContainer().getJointSkeleton(),
                 this.animationSequence,
                 this.getInterpolatedTimeElapsed(context),
@@ -59,7 +59,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
         AnimationSequence sequence = LocomotionResources.getOrThrowAnimationSequence(this.animationSequence);
         if (this.isAdditive) {
             if (this.additiveSubtractionPose == null) {
-                this.additiveSubtractionPose = LocalSpacePose.fromAnimationSequence(
+                this.additiveSubtractionPose = AnimationSequence.samplePose(
                         context.driverContainer().getJointSkeleton(),
                         this.animationSequence,
                         switch (additiveSubtractionReferencePoint) {

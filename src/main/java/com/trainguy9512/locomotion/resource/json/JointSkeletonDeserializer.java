@@ -10,12 +10,15 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class JointSkeletonDeserializer implements JsonDeserializer<JointSkeleton> {
 
     private static final String ROOT_KEY = "root_joint";
     private static final String JOINTS_KEY = "joints";
-    private static final String CUSTOM_ATTRIBUTE_CURVES_KEY = "custom_attribute_curves";
+    private static final String CUSTOM_ATTRIBUTE_KEY = "custom_attributes";
+    private static final String CUSTOM_ATTRIBUTE_TYPE_KEY = "type";
+    private static final String CUSTOM_ATTRIBUTE_DEFAULT_VALUE_KEY = "default_value";
 
     private static final List<String> REQUIRED_SKELETON_KEYS = List.of(
             ROOT_KEY,
@@ -38,7 +41,7 @@ public class JointSkeletonDeserializer implements JsonDeserializer<JointSkeleton
         JsonObject skeletonJsonObject = jsonElement.getAsJsonObject();
 
         FormatVersion version = FormatVersion.ofAssetJsonObject(skeletonJsonObject);
-        if (!version.isCompatible()) {
+        if (version.isIncompatible()) {
             throw new JsonParseException("Animation sequence version is out of date for deserializer.");
         }
         for (String key : REQUIRED_SKELETON_KEYS) {
@@ -55,6 +58,14 @@ public class JointSkeletonDeserializer implements JsonDeserializer<JointSkeleton
                 context,
                 skeletonBuilder
         );
+        if (skeletonJsonObject.has(CUSTOM_ATTRIBUTE_KEY)) {
+            skeletonJsonObject.get(CUSTOM_ATTRIBUTE_KEY).getAsJsonObject().asMap().forEach((customAttributeName, customAttributeJson) -> {
+                if (Objects.equals(customAttributeJson.getAsJsonObject().get(CUSTOM_ATTRIBUTE_TYPE_KEY).getAsString(), "float")) {
+                    float customAttributeDefaultValue = customAttributeJson.getAsJsonObject().get(CUSTOM_ATTRIBUTE_DEFAULT_VALUE_KEY).getAsFloat();
+                    skeletonBuilder.defineCustomAttribute(customAttributeName, customAttributeDefaultValue);
+                }
+            });
+        }
 
         return skeletonBuilder.build();
     }

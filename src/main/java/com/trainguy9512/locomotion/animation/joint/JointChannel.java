@@ -1,18 +1,13 @@
 package com.trainguy9512.locomotion.animation.joint;
 
-import com.google.gson.*;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.resource.LocomotionResources;
-import com.trainguy9512.locomotion.resource.json.GsonConfiguration;
 import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.*;
-
-import java.lang.reflect.Type;
 
 public final class JointChannel {
 
@@ -44,20 +39,6 @@ public final class JointChannel {
 
     public static JointChannel ofTranslationRotationScaleQuaternion(Vector3f translation, Quaternionf rotation, Vector3f scale, boolean visibility){
         return of(new Matrix4f().translationRotateScale(translation, rotation, scale), visibility);
-    }
-
-    public static JointChannel ofJointFromAnimationSequence(ResourceLocation sequenceLocation, String jointIdentifier, TimeSpan time, boolean looping){
-        AnimationSequence animationSequence = LocomotionResources.getOrThrowAnimationSequence(sequenceLocation);
-        if(animationSequence.containsTimelinesForJoint(jointIdentifier)){
-            return JointChannel.ofTranslationRotationScaleQuaternion(
-                    animationSequence.translationTimelines().get(jointIdentifier).getValueAtTime(time.inSeconds(), looping),
-                    animationSequence.rotationTimelines().get(jointIdentifier).getValueAtTime(time.inSeconds(), looping),
-                    animationSequence.scaleTimelines().get(jointIdentifier).getValueAtTime(time.inSeconds(), looping),
-                    animationSequence.visibilityTimelines().get(jointIdentifier).getValueAtTime(time.inSeconds(), looping)
-            );
-        } else {
-            return JointChannel.ZERO;
-        }
     }
 
     public Matrix4f getTransform() {
