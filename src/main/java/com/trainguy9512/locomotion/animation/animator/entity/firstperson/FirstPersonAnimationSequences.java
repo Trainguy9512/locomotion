@@ -40,6 +40,7 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_CROSSBOW_RAISE = makeAnimationSequenceResourceLocation("hand/crossbow/raise");
     public static final ResourceLocation HAND_CROSSBOW_RELOAD = makeAnimationSequenceResourceLocation("hand/crossbow/reload");
     public static final ResourceLocation HAND_CROSSBOW_RELOAD_FINISH = makeAnimationSequenceResourceLocation("hand/crossbow/reload_finish");
+    public static final ResourceLocation HAND_CROSSBOW_FIRE = makeAnimationSequenceResourceLocation("hand/crossbow/fire");
 
     public static final ResourceLocation HAND_SHIELD_POSE = makeAnimationSequenceResourceLocation("hand/shield/pose");
     public static final ResourceLocation HAND_SHIELD_BLOCK_IN = makeAnimationSequenceResourceLocation("hand/shield/block_in");

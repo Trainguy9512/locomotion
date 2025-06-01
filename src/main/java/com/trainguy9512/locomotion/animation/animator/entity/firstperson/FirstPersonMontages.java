@@ -25,6 +25,8 @@ public class FirstPersonMontages {
                 return handPose.basePoseLocation;
             })
             .build();
+
+
     public static final MontageConfiguration USE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("hand_use_main_hand", FirstPersonAnimationSequences.HAND_TOOL_USE)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(5))
@@ -56,5 +58,17 @@ public class FirstPersonMontages {
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(5))
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_IN_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(8)).setEasement(Easing.SINE_IN_OUT).build())
+            .build();
+
+
+    public static final MontageConfiguration CROSSBOW_FIRE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("crossbow_fire_main_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
+            .playsInSlot(MAIN_HAND_ATTACK_SLOT)
+            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
+            .build();
+    public static final MontageConfiguration CROSSBOW_FIRE_OFF_HAND_MONTAGE = MontageConfiguration.builder("crossbow_fire_off_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
+            .playsInSlot(OFF_HAND_ATTACK_SLOT)
+            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
 }

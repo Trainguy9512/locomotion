@@ -40,17 +40,17 @@ public class MixinMultiPlayerGameMode {
         }
     }
 
-//    @Inject(
-//            method = "useItem",
-//            at = @At("RETURN")
-//    )
-//    public void playUseItemMontage(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-//        if (cir.getReturnValue() instanceof InteractionResult.Success) {
-//            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-//                dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
-//            });
-//        }
-//    }
+    @Inject(
+            method = "useItem",
+            at = @At("RETURN")
+    )
+    public void triggerHasInteractedWithDriver(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
+                dataContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(hand)).trigger();
+            });
+        }
+    }
 
     @Inject(
             method = "startDestroyBlock",
