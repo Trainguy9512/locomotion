@@ -168,7 +168,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW && renderedItemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
                 if (itemInHand.has(DataComponents.CHARGED_PROJECTILES) && renderedItemInHand.has(DataComponents.CHARGED_PROJECTILES)) {
                     if (itemInHand.get(DataComponents.CHARGED_PROJECTILES).isEmpty() && !renderedItemInHand.get(DataComponents.CHARGED_PROJECTILES).isEmpty()) {
-                        if (!driverContainer.getDriver(FirstPersonDrivers.HOTBAR_SLOT).hasValueChanged()) {
+                        if (driverContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).hasBeenTriggered()) {
                             montageManager.playMontage(FirstPersonMontages.getCrossbowFireMontage(interactionHand), driverContainer);
                             FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
                         }

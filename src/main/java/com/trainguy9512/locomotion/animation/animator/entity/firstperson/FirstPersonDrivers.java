@@ -39,8 +39,8 @@ public class FirstPersonDrivers {
     public static final DriverKey<TriggerDriver> HAS_ATTACKED = DriverKey.of("has_attacked", TriggerDriver::of);
     public static final DriverKey<TriggerDriver> HAS_USED_MAIN_HAND_ITEM = DriverKey.of("has_used_main_hand_item", () -> TriggerDriver.of(2));
     public static final DriverKey<TriggerDriver> HAS_USED_OFF_HAND_ITEM = DriverKey.of("has_used_off_hand_item", () -> TriggerDriver.of(2));
-    public static final DriverKey<TriggerDriver> HAS_INTERACTED_WITH_MAIN_HAND = DriverKey.of("has_interacted_with_main_hand_item", () -> TriggerDriver.of(4));
-    public static final DriverKey<TriggerDriver> HAS_INTERACTED_WITH_OFF_HAND = DriverKey.of("has_interacted_with_off_hand_item", () -> TriggerDriver.of(4));
+    public static final DriverKey<TriggerDriver> HAS_INTERACTED_WITH_MAIN_HAND = DriverKey.of("has_interacted_with_main_hand_item", () -> TriggerDriver.of(2));
+    public static final DriverKey<TriggerDriver> HAS_INTERACTED_WITH_OFF_HAND = DriverKey.of("has_interacted_with_off_hand_item", () -> TriggerDriver.of(2));
     public static final DriverKey<TriggerDriver> HAS_BLOCKED_ATTACK = DriverKey.of("has_blocked_attack", TriggerDriver::of);
     public static final DriverKey<TriggerDriver> HAS_DROPPED_ITEM = DriverKey.of("has_dropped_item", TriggerDriver::of);
 
