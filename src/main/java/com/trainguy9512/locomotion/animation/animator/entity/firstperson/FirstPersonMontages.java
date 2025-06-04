@@ -4,6 +4,7 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfig
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
+import net.minecraft.world.InteractionHand;
 
 
 public class FirstPersonMontages {
@@ -71,4 +72,10 @@ public class FirstPersonMontages {
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
+    public static MontageConfiguration getCrossbowFireMontage(InteractionHand interactionHand) {
+        return switch (interactionHand) {
+            case MAIN_HAND -> CROSSBOW_FIRE_MAIN_HAND_MONTAGE;
+            case OFF_HAND -> CROSSBOW_FIRE_OFF_HAND_MONTAGE;
+        };
+    }
 }

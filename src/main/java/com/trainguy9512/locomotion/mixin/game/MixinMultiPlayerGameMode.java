@@ -1,14 +1,17 @@
 package com.trainguy9512.locomotion.mixin.game;
 
+import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,13 +44,13 @@ public class MixinMultiPlayerGameMode {
     }
 
     @Inject(
-            method = "useItem",
-            at = @At("RETURN")
+            method = "method_41929(Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/entity/player/Player;Lorg/apache/commons/lang3/mutable/MutableObject;I)Lnet/minecraft/network/protocol/Packet;",
+            at = @At("TAIL")
     )
-    public void triggerHasInteractedWithDriver(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+    public void triggerHasInteractedWithDriver(InteractionHand interactionHand, Player player, MutableObject mutableObject, int i, CallbackInfoReturnable<Packet> cir) {
+        if (mutableObject.getValue() instanceof InteractionResult.Success) {
             JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-                dataContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(hand)).trigger();
+                dataContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).trigger();
             });
         }
     }

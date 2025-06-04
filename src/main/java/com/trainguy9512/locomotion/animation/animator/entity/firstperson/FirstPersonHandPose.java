@@ -304,10 +304,6 @@ public enum FirstPersonHandPose {
             Transition poseToLoweringTiming,
             Transition raisingToPoseTiming
     ) {
-        DriverKey<TriggerDriver> hasUsedItemDriver = switch (interactionHand) {
-            case MAIN_HAND -> FirstPersonDrivers.HAS_USED_MAIN_HAND_ITEM;
-            case OFF_HAND -> FirstPersonDrivers.HAS_USED_OFF_HAND_ITEM;
-        };
 
         Predicate<StateTransition.TransitionContext> itemHasChanged = context -> {
             ItemStack itemPreviousTick = context.driverContainer().getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
@@ -335,7 +331,11 @@ public enum FirstPersonHandPose {
 
         Predicate<StateTransition.TransitionContext> hardSwitchCondition = (hotbarHasChanged.and(newItemIsEmpty.and(oldItemIsEmpty).negate()).or(itemHasChanged)).and(noTwoHandedOverrides);
         Predicate<StateTransition.TransitionContext> dropLastItemCondition = newItemIsEmpty.and(context -> interactionHand == InteractionHand.MAIN_HAND && context.driverContainer().getDriver(FirstPersonDrivers.HAS_DROPPED_ITEM).hasBeenTriggered());
-        Predicate<StateTransition.TransitionContext> useLastItemCondition = itemHasChanged.and(newItemIsEmpty).and(context -> context.driverContainer().getDriver(hasUsedItemDriver).hasBeenTriggered() || (interactionHand == InteractionHand.MAIN_HAND && context.driverContainer().getDriver(FirstPersonDrivers.HAS_ATTACKED).hasBeenTriggered()));
+        Predicate<StateTransition.TransitionContext> useLastItemCondition = itemHasChanged.and(newItemIsEmpty).and(context ->
+                context.driverContainer().getDriver(FirstPersonDrivers.getHasUsedItemDriver(interactionHand)).hasBeenTriggered() ||
+                        context.driverContainer().getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).hasBeenTriggered() ||
+                        (interactionHand == InteractionHand.MAIN_HAND && context.driverContainer().getDriver(FirstPersonDrivers.HAS_ATTACKED).hasBeenTriggered())
+        );
 
         Predicate<StateTransition.TransitionContext> skipRaiseAnimationCondition = StateTransition.booleanDriverPredicate(FirstPersonDrivers.getUsingItemDriver(interactionHand));
         if (interactionHand == InteractionHand.MAIN_HAND) {

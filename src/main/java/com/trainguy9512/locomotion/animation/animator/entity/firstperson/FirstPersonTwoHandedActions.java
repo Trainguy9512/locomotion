@@ -17,10 +17,10 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ChargedProjectiles;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 public class FirstPersonTwoHandedActions {
@@ -136,7 +136,14 @@ public class FirstPersonTwoHandedActions {
         PoseFunction<LocalSpacePose> crossbowFinishReloadPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_CROSSBOW_RELOAD_FINISH)
                 .build();
 
-        Predicate<StateTransition.TransitionContext> isReloadingEmptyCrossbow = StateTransition.booleanDriverPredicate(FirstPersonDrivers.getUsingItemDriver(interactionHand)).and(transitionContext -> {
+        Predicate<StateTransition.TransitionContext> isReloadingEmptyCrossbow = transitionContext -> {
+//            if (!transitionContext.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).getCurrentValue()) {
+//                return false;
+//            }
+            if (!transitionContext.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).getPreviousValue()) {
+                return false;
+            }
+
             if (transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(interactionHand)) != FirstPersonHandPose.CROSSBOW) {
                 return false;
             }
@@ -151,7 +158,7 @@ public class FirstPersonTwoHandedActions {
                 return false;
             }
             return true;
-        });
+        };
 
         if (interactionHand == InteractionHand.OFF_HAND) {
             crossbowReloadPoseFunction = MirrorFunction.of(crossbowReloadPoseFunction);

@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -145,18 +146,6 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         /*driverContainer.getDriver(HOTBAR_SLOT).setValue(dataReference.getInventory().selected);*/
 
 
-//        driverContainer.getDriver(FirstPersonDrivers.HAS_USED_MAIN_HAND_ITEM).runIfTriggered(() -> {
-//            montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE, driverContainer);
-//            if (FirstPersonHandPose.fromItemStack(driverContainer.getDriverValue(FirstPersonDrivers.RENDERED_MAIN_HAND_ITEM)) == FirstPersonHandPose.fromItemStack(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM))) {
-//                FirstPersonDrivers.updateRenderedItem(driverContainer, InteractionHand.MAIN_HAND);
-//            }
-//        });
-//        driverContainer.getDriver(FirstPersonDrivers.HAS_USED_OFF_HAND_ITEM).runIfTriggered(() -> {
-//            montageManager.playMontage(FirstPersonMontages.USE_OFF_HAND_MONTAGE, driverContainer);
-//            if (FirstPersonHandPose.fromItemStack(driverContainer.getDriverValue(FirstPersonDrivers.RENDERED_OFF_HAND_ITEM)) == FirstPersonHandPose.fromItemStack(driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_ITEM))) {
-//                FirstPersonDrivers.updateRenderedItem(driverContainer, InteractionHand.OFF_HAND);
-//            }
-//        });
         driverContainer.getDriver(FirstPersonDrivers.HAS_DROPPED_ITEM).runIfTriggered(() -> montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE, driverContainer));
         driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).runIfTriggered(() -> {
             MontageConfiguration montageConfiguration = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE).attackMontage;
@@ -167,7 +156,8 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         driverContainer.getDriver(FirstPersonDrivers.HAS_BLOCKED_ATTACK).runIfTriggered(() -> montageManager.playMontage(FirstPersonMontages.SHIELD_BLOCK_IMPACT_MONTAGE, driverContainer));
 
         for (InteractionHand interactionHand : InteractionHand.values()) {
-            ItemStack itemInHand = dataReference.getItemInHand(interactionHand);
+            ItemStack itemInHand = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
+            ItemStack renderedItemInHand = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
 
             driverContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(interactionHand)).runIfTriggered(() -> {
                 montageManager.playMontage(interactionHand == InteractionHand.MAIN_HAND ? FirstPersonMontages.USE_MAIN_HAND_MONTAGE : FirstPersonMontages.USE_OFF_HAND_MONTAGE, driverContainer);
@@ -175,6 +165,17 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                     FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
                 }
             });
+            if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW && renderedItemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
+                if (itemInHand.has(DataComponents.CHARGED_PROJECTILES) && renderedItemInHand.has(DataComponents.CHARGED_PROJECTILES)) {
+                    if (itemInHand.get(DataComponents.CHARGED_PROJECTILES).isEmpty() && !renderedItemInHand.get(DataComponents.CHARGED_PROJECTILES).isEmpty()) {
+                        if (!driverContainer.getDriver(FirstPersonDrivers.HOTBAR_SLOT).hasValueChanged()) {
+                            montageManager.playMontage(FirstPersonMontages.getCrossbowFireMontage(interactionHand), driverContainer);
+                            FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
+                        }
+                    }
+                }
+            }
+            driverContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).runIfTriggered(() -> {});
 
             driverContainer.getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).setValue(false);
             if (!dataReference.isUsingItem() || dataReference.getUsedItemHand() != interactionHand) {
