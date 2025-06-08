@@ -3,7 +3,17 @@
     "joint_skeleton": "locomotion:entity/player/first_person",
     "length": 0.033,
     "time_markers": {},
-    "custom_attributes": {},
+    "custom_attributes": {
+        "crossbow_pull_property": {
+            "0.0": 0.0
+        },
+        "use_duration_property": {
+            "0.0": 0.0
+        },
+        "is_using_property": {
+            "0.0": 0.0
+        }
+    },
     "joint_channels": {
         "arm_L_buffer_jnt": {
             "translation": {
@@ -15,7 +25,7 @@
             },
             "rotation": {
                 "0.0": [
-                    0.0,
+                    -0.0,
                     0.0,
                     -0.0
                 ]
@@ -67,7 +77,7 @@
             },
             "rotation": {
                 "0.0": [
-                    0.0,
+                    -0.0,
                     0.0,
                     -0.0
                 ]
@@ -113,13 +123,13 @@
             "translation": {
                 "0.0": [
                     -0.0,
-                    0.0,
-                    0.0
+                    -0.0,
+                    -0.0
                 ]
             },
             "rotation": {
                 "0.0": [
-                    0.0,
+                    -0.0,
                     0.0,
                     -0.0
                 ]
@@ -172,7 +182,7 @@
             "rotation": {
                 "0.0": [
                     0.0,
-                    -0.0,
+                    0.0,
                     0.0
                 ]
             },

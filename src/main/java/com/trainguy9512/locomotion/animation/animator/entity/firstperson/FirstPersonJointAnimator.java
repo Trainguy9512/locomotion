@@ -11,6 +11,7 @@ import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseConta
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
+import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.client.Minecraft;
@@ -177,17 +178,18 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             }
             driverContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).runIfTriggered(() -> {});
 
+
             driverContainer.getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).setValue(false);
-            if (!dataReference.isUsingItem() || dataReference.getUsedItemHand() != interactionHand) {
-                continue;
-            }
-            driverContainer.getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).setValue(true);
-            driverContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(interactionHand);
-            driverContainer.getDriver(FirstPersonDrivers.PROJECTILE_ITEM).setValue(dataReference.getProjectile(itemInHand));
-            if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
-                float chargeTime = EnchantmentHelper.modifyCrossbowChargingTime(itemInHand, dataReference, 1.25f);
-                float chargeSpeedMultiplier = 1.25f / chargeTime;
-                driverContainer.getDriver(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED).setValue(chargeSpeedMultiplier);
+            if (dataReference.isUsingItem() && dataReference.getUsedItemHand() == interactionHand) {
+                driverContainer.getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).setValue(true);
+                montageManager.interruptMontagesInSlot(FirstPersonMontages.getAttackSlot(interactionHand), Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build());
+                driverContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(interactionHand);
+                driverContainer.getDriver(FirstPersonDrivers.PROJECTILE_ITEM).setValue(dataReference.getProjectile(itemInHand));
+                if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
+                    float chargeTime = EnchantmentHelper.modifyCrossbowChargingTime(itemInHand, dataReference, 1.25f);
+                    float chargeSpeedMultiplier = 1.25f / chargeTime;
+                    driverContainer.getDriver(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED).setValue(chargeSpeedMultiplier);
+                }
             }
         }
 

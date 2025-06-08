@@ -224,6 +224,10 @@ public class FirstPersonTwoHandedActions {
         CROSSBOW_FINISH_RELOAD_MAIN_HAND,
         CROSSBOW_FINISH_RELOAD_OFF_HAND;
 
+        public boolean isOverriding() {
+            return this == NORMAL;
+        }
+
         private static TwoHandedActionStates getBowPullState(InteractionHand hand) {
             return switch (hand) {
                 case MAIN_HAND -> BOW_PULL_MAIN_HAND;

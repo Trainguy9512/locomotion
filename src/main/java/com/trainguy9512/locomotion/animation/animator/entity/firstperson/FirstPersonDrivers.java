@@ -3,6 +3,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.*;
+import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.util.Easing;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -52,6 +53,7 @@ public class FirstPersonDrivers {
 
     public static final DriverKey<VariableDriver<ItemStack>> PROJECTILE_ITEM = DriverKey.of("projectile_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<Float>> CROSSBOW_RELOAD_SPEED = DriverKey.of("crossbow_reload_speed", () -> VariableDriver.ofFloat(() -> 1f));
+    public static final DriverKey<VariableDriver<Float>> ITEM_CONSUMPTION_SPEED = DriverKey.of("item_consumption_speed", () -> VariableDriver.ofFloat(() -> 1f));
 
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
         driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(driverContainer.getDriverValue(getItemDriver(interactionHand)).copy());
@@ -61,6 +63,12 @@ public class FirstPersonDrivers {
             driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(FirstPersonGenericItemPose.fromItemStack(driverContainer.getDriver(getRenderedItemDriver(interactionHand)).getCurrentValue()));
         } else {
             driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(FirstPersonGenericItemPose.DEFAULT_2D_ITEM);
+        }
+    }
+
+    public static void updateRenderedItemIfNoTwoHandOverrides(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
+        if (driverContainer.getDriverValue(CURRENT_TWO_HANDED_OVERRIDE_STATE).isOverriding()) {
+            updateRenderedItem(driverContainer, interactionHand);
         }
     }
 

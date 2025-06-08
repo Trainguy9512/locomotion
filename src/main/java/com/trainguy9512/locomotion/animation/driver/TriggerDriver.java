@@ -54,7 +54,7 @@ public class TriggerDriver implements Driver<Boolean> {
 
     @Override
     public Boolean getValueInterpolated(float partialTicks) {
-        return triggerCooldown > 0;
+        return this.hasBeenTriggered();
     }
 
     @Override

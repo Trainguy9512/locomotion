@@ -13,6 +13,10 @@ public class FirstPersonMontages {
     public static final String OFF_HAND_ATTACK_SLOT = "off_hand_attack";
     public static final String SHIELD_BLOCK_SLOT = "shield_block";
 
+    public static String getAttackSlot(InteractionHand interactionHand) {
+        return interactionHand == InteractionHand.MAIN_HAND ? MAIN_HAND_ATTACK_SLOT : OFF_HAND_ATTACK_SLOT;
+    }
+
     public static final MontageConfiguration HAND_TOOL_ATTACK_PICKAXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_pickaxe", FirstPersonAnimationSequences.HAND_TOOL_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(8))

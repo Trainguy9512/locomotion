@@ -1,32 +1,37 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 
 import java.util.List;
+import java.util.Set;
 
 public enum FirstPersonGenericItemPose {
-    DEFAULT_2D_ITEM (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE, false, false),
-    BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE, true, false),
-    SMALL_BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_SMALL_BLOCK_POSE, true, false),
-    ROD (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE, false, false),
-    DOOR_BLOCK (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE, true, false),
-    BANNER (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BANNER_POSE, false, false),
-    ARROW (FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ARROW_POSE, false, true);
+    DEFAULT_2D_ITEM(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE, false, false),
+    BLOCK(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE, true, false),
+    SMALL_BLOCK(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_SMALL_BLOCK_POSE, true, false),
+    ROD(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE, false, false),
+    DOOR_BLOCK(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE, true, false),
+    BANNER(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BANNER_POSE, false, false),
+    ARROW(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ARROW_POSE, false, true);
 
     public final ResourceLocation basePoseLocation;
     public final boolean rendersBlockState;
@@ -238,21 +243,146 @@ public enum FirstPersonGenericItemPose {
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
         PoseFunction<LocalSpacePose> miningStateMachine = switch (interactionHand) {
-            case MAIN_HAND -> ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build(), MakeDynamicAdditiveFunction.of(
-                    FirstPersonMining.constructPoseFunction(
-                            cachedPoseContainer,
-                            SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(),
-                            SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_SWING)
-                                    .looping(true)
-                                    .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(20))
-                                    .setPlayRate(evaluationState -> 1.35f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier)
-                                    .build(),
-                            SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_FINISH).build(),
-                            Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_OUT).build()),
-                    SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build()));
-            case OFF_HAND -> SequenceEvaluatorFunction.builder(context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build();
+            case MAIN_HAND ->
+                    ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build(), MakeDynamicAdditiveFunction.of(
+                            FirstPersonMining.constructPoseFunction(
+                                    cachedPoseContainer,
+                                    SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(),
+                                    SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_SWING)
+                                            .looping(true)
+                                            .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(20))
+                                            .setPlayRate(evaluationState -> 1.35f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier)
+                                            .build(),
+                                    SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_FINISH).build(),
+                                    Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_OUT).build()),
+                            SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build()));
+            case OFF_HAND -> SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build();
         };
 
-        return miningStateMachine;
+        PoseFunction<LocalSpacePose> consumableStateMachine = constructConsumableStateMachine(cachedPoseContainer, interactionHand, miningStateMachine);
+        PoseFunction<LocalSpacePose> consumableStateMachineWithBasePose = ApplyAdditiveFunction.of(
+                constructBasePoseFunction(cachedPoseContainer, interactionHand),
+                MakeDynamicAdditiveFunction.of(
+                        consumableStateMachine,
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build()
+                )
+        );
+
+        return consumableStateMachineWithBasePose;
+    }
+
+    private static PoseFunction<LocalSpacePose> constructBasePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
+        return SequenceEvaluatorFunction.builder(context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build();
+    }
+
+    public enum ConsumableStates {
+        IDLE,
+        DRINKING_BEGIN,
+        DRINKING_LOOP,
+        DRINKING_FINISHED
+    }
+
+    private static PoseFunction<LocalSpacePose> constructConsumableStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand, PoseFunction<LocalSpacePose> idlePoseFunction) {
+        PoseFunction<LocalSpacePose> drinkingLoopPoseFunction = ApplyAdditiveFunction.of(
+                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_PROGRESS)
+                        .setPlayRate(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED))
+                        .build(),
+                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_LOOP)
+                        .looping(true)
+                        .setPlayRate(1f)
+                        .isAdditive(true, SequenceReferencePoint.BEGINNING)
+                        .build()
+        );
+
+        return StateMachineFunction.builder(evaluationState -> ConsumableStates.IDLE)
+                .resetsUponRelevant(true)
+                .defineState(State.builder(ConsumableStates.IDLE, idlePoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .build())
+                .defineState(State.builder(ConsumableStates.DRINKING_BEGIN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_BEGIN)
+                                .build())
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.DRINKING_LOOP)
+                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
+                                .build())
+                        .build())
+                .defineState(State.builder(ConsumableStates.DRINKING_LOOP, drinkingLoopPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .build())
+                .defineState(State.builder(ConsumableStates.DRINKING_FINISHED, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_FINISH)
+                                .build())
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
+                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
+                                .build())
+                        .build())
+                .addStateAlias(StateAlias.builder(
+                                Set.of(
+                                        ConsumableStates.DRINKING_BEGIN,
+                                        ConsumableStates.DRINKING_LOOP
+                                ))
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.DRINKING_FINISHED)
+                                .isTakenIfTrue(context -> !isDrinking(context, interactionHand))
+                                .setCanInterruptOtherTransitions(false)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
+                                .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItem(evaluationState.driverContainer(), interactionHand))
+                                .build())
+                        .build())
+                .addStateAlias(StateAlias.builder(
+                                Set.of(
+                                        ConsumableStates.DRINKING_FINISHED,
+                                        ConsumableStates.IDLE
+                                ))
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.DRINKING_BEGIN)
+                                .isTakenIfTrue(context -> isDrinking(context, interactionHand))
+                                .setCanInterruptOtherTransitions(false)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
+                                .bindToOnTransitionTaken(evaluationState -> updateConsumptionSpeed(evaluationState, interactionHand))
+                                .build())
+                        .build())
+                .addStateAlias(StateAlias.builder(
+                                Set.of(
+                                        ConsumableStates.DRINKING_BEGIN,
+                                        ConsumableStates.DRINKING_LOOP,
+                                        ConsumableStates.DRINKING_FINISHED
+                                ))
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
+                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING))
+                                .setCanInterruptOtherTransitions(true)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
+                                .bindToOnTransitionTaken(evaluationState -> updateConsumptionSpeed(evaluationState, interactionHand))
+                                .build())
+                        .build())
+                .build();
+    }
+
+    public static void updateConsumptionSpeed(PoseFunction.FunctionEvaluationState evaluationState, InteractionHand interactionHand) {
+        ItemStack item = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
+        if (!item.has(DataComponents.CONSUMABLE)) {
+            return;
+        }
+        float speed = item.get(DataComponents.CONSUMABLE).consumeSeconds();
+        speed = 1f / Math.max(speed, 0.1f);
+        evaluationState.driverContainer().getDriver(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED).setValue(speed);
+    }
+
+    private static boolean isDrinking(StateTransition.TransitionContext context, InteractionHand interactionHand) {
+        OnTickDriverContainer driverContainer = context.driverContainer();
+        if (!driverContainer.getDriverValue(FirstPersonDrivers.getUsingItemDriver(interactionHand))) {
+            return false;
+        }
+        return driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getUseAnimation() == ItemUseAnimation.DRINK;
     }
 }

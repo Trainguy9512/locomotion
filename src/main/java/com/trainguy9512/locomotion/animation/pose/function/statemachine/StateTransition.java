@@ -1,6 +1,5 @@
 package com.trainguy9512.locomotion.animation.pose.function.statemachine;
 
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.Driver;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
@@ -78,6 +77,7 @@ public record StateTransition<S extends Enum<S>>(
         private Transition transition;
         private int priority;
         private Consumer<PoseFunction.FunctionEvaluationState> onTransitionTakenListener;
+        private boolean canInterruptOtherTransitions;
         private boolean automaticTransition;
         private float automaticTransitionCrossfadeWeight;
 
@@ -87,8 +87,14 @@ public record StateTransition<S extends Enum<S>>(
             this.transition = Transition.SINGLE_TICK;
             this.priority = 50;
             this.onTransitionTakenListener = evaluationState -> {};
+            this.canInterruptOtherTransitions = true;
             this.automaticTransition = false;
             this.automaticTransitionCrossfadeWeight = 1f;
+        }
+
+        public Builder<S> setCanInterruptOtherTransitions(boolean canInterruptOtherTransitions) {
+            this.canInterruptOtherTransitions = canInterruptOtherTransitions;
+            return this;
         }
 
         /**
@@ -158,6 +164,9 @@ public record StateTransition<S extends Enum<S>>(
                 if (!this.automaticTransition) {
                     LOGGER.warn("State transition to target {}.{} has no passable conditions, and will go unused.", this.target.getClass().getSimpleName(), this.target);
                 }
+            }
+            if (!this.canInterruptOtherTransitions) {
+                this.conditionPredicate = this.conditionPredicate.and(StateTransition.CURRENT_TRANSITION_FINISHED);
             }
             if (this.automaticTransition) {
                 this.conditionPredicate = this.conditionPredicate.or(makeMostRelevantAnimationPlayerFinishedCondition(this.automaticTransitionCrossfadeWeight));
