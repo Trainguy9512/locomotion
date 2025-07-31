@@ -89,13 +89,13 @@ public class MixinDebugScreenOverlay {
 
                     if (driver.getValueInterpolated(1) instanceof ItemStack itemStack) {
                         itemStack = itemStack == ItemStack.EMPTY ? Items.BARRIER.getDefaultInstance() : itemStack;
-                        guiGraphics.pose().pushPose();
-                        guiGraphics.pose().scale(1F, 0.5F, 1F);
+                        guiGraphics.pose().pushMatrix();
+                        guiGraphics.pose().scale(1F, 0.5F);
 
                         guiGraphics.renderItem(itemStack, dataLineLeftPosition + driverDataWidth - 14, (nameLineTopPosition * 2 - 2));
 
-                        guiGraphics.pose().scale(1F, 2F, 1F);
-                        guiGraphics.pose().popPose();
+                        guiGraphics.pose().scale(1F, 2F);
+                        guiGraphics.pose().pushMatrix();
                     } else {
                         int randomColor = (dataString.hashCode() & 11184810) + 4473924;
                         guiGraphics.drawString(this.font, dataString, dataLineLeftPosition, nameLineTopPosition, driver.getValueInterpolated(1) instanceof Enum ? randomColor : valueTextColor, true);

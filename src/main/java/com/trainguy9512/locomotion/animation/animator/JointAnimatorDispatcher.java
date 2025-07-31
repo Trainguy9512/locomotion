@@ -9,12 +9,14 @@ import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.ComponentSpacePose;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.function.Function;
 
 public class JointAnimatorDispatcher {
     private static final JointAnimatorDispatcher INSTANCE = new JointAnimatorDispatcher();
@@ -117,15 +119,27 @@ public class JointAnimatorDispatcher {
     public <S extends EntityRenderState> void setupAnimWithAnimationPose(EntityModel<S> entityModel, S entityRenderState, Pose pose, EntityJointAnimator<?, S> entityJointAnimator){
         entityModel.resetPose();
         JointSkeleton jointSkeleton = pose.getJointSkeleton();
-        jointSkeleton.getJoints()
+        //? if <= 1.21.5 {
+        /*jointSkeleton.getJoints()
                 .forEach(joint -> {
-                    if(jointSkeleton.getJointConfiguration(joint).modelPartIdentifier() != null){
+                    if (jointSkeleton.getJointConfiguration(joint).modelPartIdentifier() != null) {
                         entityModel.getAnyDescendantWithName(jointSkeleton.getJointConfiguration(joint).modelPartIdentifier()).ifPresent(
                                 modelPart -> ((MatrixModelPart)(Object) modelPart).locomotion$setMatrix(pose.getJointChannel(joint).getTransform())
                         );
                     }
                 });
+        *///?} else {
+        Function<String, ModelPart> partLookup = entityModel.root().createPartLookup();
+        jointSkeleton.getJoints().forEach(joint -> {
+            String modelPartIdentifier = jointSkeleton.getJointConfiguration(joint).modelPartIdentifier();
+            if (modelPartIdentifier != null) {
+                ModelPart modelPart = partLookup.apply(modelPartIdentifier);
+                if (modelPart != null) {
+                    ((MatrixModelPart)(Object) modelPart).locomotion$setMatrix(pose.getJointChannel(joint).getTransform());
+                }
+            }
+        });
         entityJointAnimator.postProcessModelParts(entityModel, entityRenderState);
-
+        //?}
     }
 }

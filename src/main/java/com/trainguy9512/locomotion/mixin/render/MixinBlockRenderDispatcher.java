@@ -81,7 +81,11 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
         if (bakedQuad.shade()) {
             vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState));
         } else {
-            vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getChunkRenderType(blockState));
+            //? if <= 1.21.5 {
+            /*vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getChunkRenderType(blockState));
+            *///? } else {
+            vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState));
+            //? }
         }
 
         vertexConsumer.putBulkData(

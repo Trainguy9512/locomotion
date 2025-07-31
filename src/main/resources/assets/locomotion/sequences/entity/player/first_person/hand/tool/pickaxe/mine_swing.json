@@ -3,7 +3,17 @@
     "joint_skeleton": "locomotion:entity/player/first_person",
     "length": 0.433,
     "time_markers": {},
-    "custom_attributes": {},
+    "custom_attributes": {
+        "crossbow_pull_property": {
+            "0.0": 0.0
+        },
+        "use_duration_property": {
+            "0.0": 0.0
+        },
+        "is_using_property": {
+            "0.0": 0.0
+        }
+    },
     "joint_channels": {
         "arm_L_buffer_jnt": {
             "translation": {
