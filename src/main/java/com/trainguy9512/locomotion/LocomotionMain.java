@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 public class LocomotionMain {
 
-	public static final Logger DEBUG_LOGGER = LogManager.getLogger("Locomotion/Resources");
+	public static final Logger DEBUG_LOGGER = LogManager.getLogger("Locomotion/DEBUG");
 	public static final String MOD_ID = "locomotion";
 	public static final LocomotionConfig CONFIG = new LocomotionConfig();
 

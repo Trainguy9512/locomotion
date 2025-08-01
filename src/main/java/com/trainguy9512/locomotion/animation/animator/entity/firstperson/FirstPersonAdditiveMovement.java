@@ -95,7 +95,7 @@ public class FirstPersonAdditiveMovement {
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(19)).setEasement(Easing.CUBIC_OUT).build())
                                 .build())
                         // If the player lands before it can move into the falling animation, go straight to the landing animation as long as the jump state is fully transitioned.
-                        .addOutboundTransition(StateTransition.builder(GroundMovementStates.LAND)
+                        .addOutboundTransition(StateTransition.builder(GroundMovementStates.SOFT_LAND)
                                 .isTakenIfTrue(StateTransition.CURRENT_TRANSITION_FINISHED
                                         .and(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_GROUNDED))
                                 )
@@ -199,6 +199,9 @@ public class FirstPersonAdditiveMovement {
         IDLE,
         WALKING,
         STOPPING,
+        CROUCH_IDLE,
+        CROUCH_WALKING,
+        CROUCH_STOPPING,
         JUMP,
         WALK_TO_FALLING,
         FALLING,

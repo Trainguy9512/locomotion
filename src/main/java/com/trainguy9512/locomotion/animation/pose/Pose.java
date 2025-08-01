@@ -76,9 +76,8 @@ public abstract class Pose {
         return this.getCustomAttributeValue(customAttributeName) > 0.5;
     }
 
-    public <P extends Pose> P copyCustomAttributesFrom(P other) {
+    public void copyCustomAttributesFrom(Pose other) {
         this.customAttributes.putAll(other.customAttributes);
-        return (P) this;
     }
 
     protected void convertChildrenJointsToComponentSpace(String parent, PoseStack poseStack){
