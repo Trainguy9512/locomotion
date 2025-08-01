@@ -34,32 +34,36 @@ public class TimeSpan implements Comparable<TimeSpan> {
         return new TimeSpan(timeInSeconds * 20f);
     }
 
+    public static TimeSpan ofFramesPerSecond(float frames, float framesPerSecond) {
+        return new TimeSpan(20 * frames / framesPerSecond);
+    }
+
     /**
      * Creates a timespan from a time measured in frames, at 60 frames per second.
      * @return      Timespan
      */
-    public static TimeSpan of60FramesPerSecond(float timeIn60FramesPerSecond){
-        return TimeSpan.ofSeconds(timeIn60FramesPerSecond / 60f);
+    public static TimeSpan of60FramesPerSecond(float frames){
+        return TimeSpan.ofFramesPerSecond(frames, 60);
     }
 
     /**
      * Creates a timespan from a time measured in frames, at 30 frames per second.
      * @return      Timespan
      */
-    public static TimeSpan of30FramesPerSecond(float timeIn30FramesPerSecond){
-        return TimeSpan.ofSeconds(timeIn30FramesPerSecond / 30f);
+    public static TimeSpan of30FramesPerSecond(float frames){
+        return TimeSpan.ofFramesPerSecond(frames, 30);
     }
 
     /**
      * Creates a timespan from a time measured in frames, at 24 frames per second.
      * @return      Timespan
      */
-    public static TimeSpan of24FramesPerSecond(float timeIn24FramesPerSecond){
-        return TimeSpan.ofSeconds(timeIn24FramesPerSecond / 24f);
+    public static TimeSpan of24FramesPerSecond(float frames){
+        return TimeSpan.ofFramesPerSecond(frames, 24);
     }
 
     /**
-     * Retrieves the value of this timespan in ticks.
+     * Retrieves the value of this time span in ticks.
      * @return      Float time measured in ticks.
      */
     public float inTicks(){
@@ -67,11 +71,43 @@ public class TimeSpan implements Comparable<TimeSpan> {
     }
 
     /**
-     * Retrieves the value of this timespan in seconds.
+     * Retrieves the value of this time span in seconds.
      * @return      Float time measured in seconds.
      */
     public float inSeconds(){
         return this.timeInTicks / 20f;
+    }
+
+    /**
+     * Retrieves the value of this time span in the specified frame rate.
+     * @return      Float time measured in frames.
+     */
+    public float inFramesPerSecond(float framesPerSecond){
+        return this.timeInTicks * framesPerSecond / 20f;
+    }
+
+    /**
+     * Retrieves the value of this time span in frames at 60 frames per second.
+     * @return      Float time measured in 60 frames per second.
+     */
+    public float in60FramesPerSecond(){
+        return this.inFramesPerSecond(60);
+    }
+
+    /**
+     * Retrieves the value of this time span in frames at 30 frames per second.
+     * @return      Float time measured in 30 frames per second.
+     */
+    public float in30FramesPerSecond(){
+        return this.inFramesPerSecond(30);
+    }
+
+    /**
+     * Retrieves the value of this time span in frames at 24 frames per second.
+     * @return      Float time measured in 24 frames per second.
+     */
+    public float in24FramesPerSecond(){
+        return this.inFramesPerSecond(24);
     }
 
     @Override

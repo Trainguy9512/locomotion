@@ -16,6 +16,16 @@ import java.util.function.Predicate;
 
 public class FirstPersonAdditiveMovement {
 
+    public static boolean isJumpingAndCanBypassJumpAnimation(StateTransition.TransitionContext context) {
+        return isJumping(context) && context.timeElapsedInCurrentState().in60FramesPerSecond() < 12;
+    }
+
+    public static boolean isJumping(StateTransition.TransitionContext context) {
+        boolean isJumping = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_JUMPING);
+        boolean isGrounded = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_GROUNDED);
+        return isJumping && !isGrounded;
+    }
+
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer) {
 
         PoseFunction<LocalSpacePose> idleAnimationPlayer = BlendPosesFunction.builder(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_IDLE).build())
@@ -140,8 +150,7 @@ public class FirstPersonAdditiveMovement {
                                 ))
                         // Transition to the jumping animation if the player is jumping.
                         .addOutboundTransition(StateTransition.builder(GroundMovementStates.JUMP)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_JUMPING)
-                                        .and(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_GROUNDED).negate()))
+                                .isTakenIfTrue(FirstPersonAdditiveMovement::isJumping)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(60)
                                 .build())
@@ -168,6 +177,12 @@ public class FirstPersonAdditiveMovement {
                                 .isTakenIfTrue(walkingCondition)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.5f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(60)
+                                .build())
+                        // Transition to the jumping animation if the player is jumping, but the landing animation has only just begun to play.
+                        .addOutboundTransition(StateTransition.builder(GroundMovementStates.FALLING)
+                                .isTakenIfTrue(FirstPersonAdditiveMovement::isJumpingAndCanBypassJumpAnimation)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_OUT).build())
+                                .setPriority(70)
                                 .build())
                         .build())
                 .build();
