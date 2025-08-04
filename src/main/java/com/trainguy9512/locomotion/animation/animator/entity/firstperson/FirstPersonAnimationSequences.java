@@ -62,6 +62,8 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation GROUND_MOVEMENT_FALLING_IN_PLACE = makeAnimationSequenceResourceLocation("ground_movement/falling_in_place");
     public static final ResourceLocation GROUND_MOVEMENT_FALLING_UP = makeAnimationSequenceResourceLocation("ground_movement/falling_up");
     public static final ResourceLocation GROUND_MOVEMENT_LAND = makeAnimationSequenceResourceLocation("ground_movement/land");
+    public static final ResourceLocation GROUND_MOVEMENT_CROUCH_IN = makeAnimationSequenceResourceLocation("ground_movement/crouch_in");
+    public static final ResourceLocation GROUND_MOVEMENT_CROUCH_OUT = makeAnimationSequenceResourceLocation("ground_movement/crouch_out");
 
     private static ResourceLocation makeAnimationSequenceResourceLocation(String path) {
         return ResourceLocation.fromNamespaceAndPath(LocomotionMain.MOD_ID, "sequences/entity/player/first_person/".concat(path).concat(".json"));
