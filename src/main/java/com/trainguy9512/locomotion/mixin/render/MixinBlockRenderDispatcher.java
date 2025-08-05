@@ -4,10 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.trainguy9512.locomotion.access.AlternateSingleBlockRenderer;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SpecialBlockModelRenderer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
@@ -84,7 +81,7 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
             //? if <= 1.21.5 {
             /*vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getChunkRenderType(blockState));
             *///? } else {
-            vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState));
+            vertexConsumer = bufferSource.getBuffer(RenderType.cutoutMipped());
             //? }
         }
 
