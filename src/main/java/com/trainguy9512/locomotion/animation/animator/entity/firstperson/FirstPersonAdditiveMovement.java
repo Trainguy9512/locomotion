@@ -217,8 +217,8 @@ public class FirstPersonAdditiveMovement {
         PoseFunction<LocalSpacePose> crouchJumpPoseFunction = getCrouchedPose(jumpPoseFunction);
 
         // Crouch in and out animations
-        PoseFunction<LocalSpacePose> crouchInPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_CROUCH_IN).build();
-        PoseFunction<LocalSpacePose> crouchOutPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_CROUCH_OUT).build();
+        PoseFunction<LocalSpacePose> crouchInPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_CROUCH_IN).setPlayRate(0.8f).build();
+        PoseFunction<LocalSpacePose> crouchOutPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_CROUCH_OUT).setPlayRate(0.9f).build();
 
         // State machine
         PoseFunction<LocalSpacePose> movementStateMachine = StateMachineFunction.builder(evaluationState -> GroundMovementStates.IDLE)
@@ -232,7 +232,7 @@ public class FirstPersonAdditiveMovement {
                         .resetsPoseFunctionUponEntry(true)
                         // Start crouch walking if the crouch animation is finished and the player is walking.
                         .addOutboundTransition(StateTransition.builder(GroundMovementStates.CROUCH_WALKING)
-                                .isTakenIfTrue(StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING.and(FirstPersonAdditiveMovement::isWalking))
+                                .isTakenIfTrue(FirstPersonAdditiveMovement::isWalking)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(60)
                                 .build())
@@ -253,8 +253,8 @@ public class FirstPersonAdditiveMovement {
                         .resetsPoseFunctionUponEntry(true)
                         // Start walking if the crouch animation is finished and the player is walking.
                         .addOutboundTransition(StateTransition.builder(GroundMovementStates.WALKING)
-                                .isTakenIfTrue(StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING.and(FirstPersonAdditiveMovement::isWalking))
-                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
+                                .isTakenIfTrue(FirstPersonAdditiveMovement::isWalking)
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(40)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(60)
                                 .build())
                         // Start idle animation if the crouch animation is finished and no other transition occurs.
