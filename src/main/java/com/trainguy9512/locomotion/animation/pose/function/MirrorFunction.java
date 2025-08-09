@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Takes an input pose and mirrors it.
@@ -47,7 +48,7 @@ public class MirrorFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
-        return this.input.testForMostRelevantAnimationPlayer();
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        return findCondition.test(this) ? Optional.of(this) : this.input.searchDownChainForMostRelevant(findCondition);
     }
 }

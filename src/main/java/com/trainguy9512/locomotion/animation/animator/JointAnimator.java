@@ -39,7 +39,7 @@ public interface JointAnimator<T> {
         return PoseCalculationFrequency.CALCULATE_ONCE_PER_TICK;
     }
 
-    public enum PoseCalculationFrequency {
+    enum PoseCalculationFrequency {
         CALCULATE_EVERY_FRAME,
         CALCULATE_ONCE_PER_TICK
     }

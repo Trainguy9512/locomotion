@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Converts a pose from component space to local space or local space to component space
@@ -32,8 +33,8 @@ public record PoseConversionFunction<I extends Pose, O extends Pose>(PoseFunctio
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
-        return this.input.testForMostRelevantAnimationPlayer();
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        return findCondition.test(this) ? Optional.of(this) : this.input.searchDownChainForMostRelevant(findCondition);
     }
 
     /**

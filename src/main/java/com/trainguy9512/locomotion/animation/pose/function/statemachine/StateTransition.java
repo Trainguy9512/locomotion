@@ -39,7 +39,7 @@ public record StateTransition<S extends Enum<S>>(
 
     public static Predicate<TransitionContext> makeMostRelevantAnimationPlayerFinishedCondition(float crossFadeWeight) {
         return transitionContext -> {
-            var potentialPlayer = transitionContext.getMostRelevantAnimationPlayer();
+            var potentialPlayer = transitionContext.findMostRelevantAnimationPlayer();
             if (potentialPlayer.isPresent()) {
                 AnimationPlayer player = potentialPlayer.get();
                 float transitionTimeTicks = transitionContext.transitionDuration().inTicks() * crossFadeWeight;
@@ -187,8 +187,9 @@ public record StateTransition<S extends Enum<S>>(
             return new TransitionContext(dataContainer, timeElapsedInCurrentState, currentStateWeight, previousStateWeight, currentStateInput, transitionDuration);
         }
 
-        public Optional<AnimationPlayer> getMostRelevantAnimationPlayer() {
-            return this.currentStateInput.testForMostRelevantAnimationPlayer();
+        public Optional<AnimationPlayer> findMostRelevantAnimationPlayer() {
+            Optional<PoseFunction<?>> foundPoseFunction = this.currentStateInput.searchDownChainForMostRelevant(poseFunction -> poseFunction instanceof AnimationPlayer);
+            return foundPoseFunction.map(poseFunction -> (AnimationPlayer) poseFunction);
         }
     }
 }

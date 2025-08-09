@@ -1,12 +1,9 @@
 package com.trainguy9512.locomotion.animation.pose.function.statemachine;
 
 import com.google.common.collect.Maps;
-import com.trainguy9512.locomotion.LocomotionMain;
-import com.trainguy9512.locomotion.animation.driver.Driver;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
-import com.trainguy9512.locomotion.animation.pose.function.AnimationPlayer;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.TimeBasedPoseFunction;
 import com.trainguy9512.locomotion.util.TimeSpan;
@@ -17,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -220,10 +218,14 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        // Test this pose function first
+        if (findCondition.test(this)) {
+            return Optional.of(this);
+        }
         // Search for an animation player in the state blend layer stack from most active to least active.
         for (StateBlendLayer stateBlendLayer : this.stateBlendLayerStack.reversed()) {
-            var potentialPlayer = this.states.get(stateBlendLayer.identifier).inputFunction.testForMostRelevantAnimationPlayer();
+            var potentialPlayer = this.states.get(stateBlendLayer.identifier).inputFunction.searchDownChainForMostRelevant(findCondition);
             if (potentialPlayer.isPresent()) {
                 return potentialPlayer;
             }

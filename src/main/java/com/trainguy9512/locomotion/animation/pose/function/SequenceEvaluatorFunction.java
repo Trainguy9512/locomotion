@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
 
@@ -49,8 +50,8 @@ public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
-        return Optional.empty();
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        return findCondition.test(this) ? Optional.of(this) : Optional.empty();
     }
 
     public static class Builder {

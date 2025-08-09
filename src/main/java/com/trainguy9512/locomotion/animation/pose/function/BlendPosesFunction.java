@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
 
@@ -56,19 +57,23 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
-        List<Optional<AnimationPlayer>> blendAnimationPlayers = new ArrayList<>();
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        // Test this pose function first
+        if (findCondition.test(this)) {
+            return Optional.of(this);
+        }
+        List<Optional<PoseFunction<?>>> blendAnimationPlayers = new ArrayList<>();
         this.inputs.forEach(((blendInput, weightDriver) -> {
             if (weightDriver.getCurrentValue() >= 0.5f) {
-                blendAnimationPlayers.add(blendInput.inputFunction.testForMostRelevantAnimationPlayer());
+                blendAnimationPlayers.add(blendInput.inputFunction.searchDownChainForMostRelevant(findCondition));
             }
         }));
         if (!blendAnimationPlayers.isEmpty()) {
             return blendAnimationPlayers.getLast().isPresent() ?
                     blendAnimationPlayers.getLast() :
-                    this.baseFunction.testForMostRelevantAnimationPlayer();
+                    this.baseFunction.searchDownChainForMostRelevant(findCondition);
         } else {
-            return this.baseFunction.testForMostRelevantAnimationPlayer();
+            return this.baseFunction.searchDownChainForMostRelevant(findCondition);
         }
     }
 

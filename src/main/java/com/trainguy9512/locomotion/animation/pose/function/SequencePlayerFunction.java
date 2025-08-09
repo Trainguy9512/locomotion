@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose> implements AnimationPlayer {
 
@@ -102,8 +103,8 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
-        return this.ignoredByRelevancyTest ? Optional.empty() : Optional.of(this);
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        return findCondition.test(this) && !this.ignoredByRelevancyTest ? Optional.of(this) : Optional.empty();
     }
 
     public static Builder<?> builder(ResourceLocation animationSequence) {
@@ -180,7 +181,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
         }
 
         /**
-         * Marks this sequence player function to be ignored by {@link PoseFunction#testForMostRelevantAnimationPlayer()}.
+         * Marks this sequence player function to be ignored by {@link PoseFunction#findMostRelevantDownChainWithTest()}.
          * <p>
          * If multiple sequence players of equal relevance are used by a state that has an automatic out-transition, use this
          * to exclude players that shouldn't be retrieved.

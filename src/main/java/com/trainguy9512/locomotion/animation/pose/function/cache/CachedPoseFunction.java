@@ -6,6 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class CachedPoseFunction implements PoseFunction<LocalSpacePose> {
 
@@ -55,8 +56,8 @@ public class CachedPoseFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
-        return Optional.empty();
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        return findCondition.test(this) ? Optional.of(this) : Optional.empty();
     }
 
     public void clearCache() {

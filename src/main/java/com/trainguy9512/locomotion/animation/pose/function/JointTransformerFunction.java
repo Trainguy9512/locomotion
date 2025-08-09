@@ -11,6 +11,7 @@ import org.joml.Vector3f;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class JointTransformerFunction<P extends Pose> implements PoseFunction<P> {
 
@@ -73,8 +74,8 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
-        return this.input.testForMostRelevantAnimationPlayer();
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        return findCondition.test(this) ? Optional.of(this) : this.input.searchDownChainForMostRelevant(findCondition);
     }
 
     public static Builder<LocalSpacePose> localOrParentSpaceBuilder(PoseFunction<LocalSpacePose> poseFunction, String joint){

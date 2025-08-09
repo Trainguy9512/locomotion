@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Pose function that adds an additive pose to a base animation pose, based on an alpha value.
@@ -61,12 +62,17 @@ public class ApplyAdditiveFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        // Test this pose function first
+        if (findCondition.test(this)) {
+            return Optional.of(this);
+        }
+
         // Test the base pose input first. If it does not have a relevant animation player, then test the additive pose input.
-        Optional<AnimationPlayer> test = this.basePoseInput.testForMostRelevantAnimationPlayer();
+        Optional<PoseFunction<?>> test = this.basePoseInput.searchDownChainForMostRelevant(findCondition);
         if (test.isPresent()) {
             return test;
         }
-        return this.additivePoseInput.testForMostRelevantAnimationPlayer();
+        return this.additivePoseInput.searchDownChainForMostRelevant(findCondition);
     }
 }

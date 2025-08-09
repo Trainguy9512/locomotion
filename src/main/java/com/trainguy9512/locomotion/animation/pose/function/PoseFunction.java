@@ -8,6 +8,7 @@ import com.trainguy9512.locomotion.util.TimeSpan;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public interface PoseFunction<P extends Pose> {
 
@@ -36,14 +37,15 @@ public interface PoseFunction<P extends Pose> {
     PoseFunction<P> wrapUnique();
 
     /**
-     * Recursive method that goes down the chain of pose functions returns the most relevant {@link AnimationPlayer}.
+     * Recursive method that goes down the chain of pose functions returns the most relevant function that matches the condition predicate.
      * <p>
-     * If this pose function is not an {@link AnimationPlayer}, or it is set to be ignored for relevancy tests,
+     * If this pose function does not pass the test, or it is set to be ignored for relevancy tests,
      * then call this method for all inputs in order of most to least relevant.
-     * If this pose function is the end of a chain and is not an animation player, then return null.
-     * @return                  Most relevant animation player, if it exists in this part of the chain.
+     * If this pose function is the end of a chain and does not pass the test, then return null.
+     *
+     * @return                  Most pose function that passes the test, if it exists in this part of the chain.
      */
-    Optional<AnimationPlayer> testForMostRelevantAnimationPlayer();
+    Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition);
 
     record FunctionEvaluationState(OnTickDriverContainer driverContainer, MontageManager montageManager, boolean resetting, long currentTick) {
 

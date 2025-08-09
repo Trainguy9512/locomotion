@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose> {
 
@@ -93,9 +94,9 @@ public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSp
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
         // TODO: Revisit making blend spaces considered to be an animation player.
-        return Optional.empty();
+        return findCondition.test(this) ? Optional.of(this) : Optional.empty();
     }
 
     public static Builder<?> builder(Function<FunctionEvaluationState, Float> blendValueFunction) {

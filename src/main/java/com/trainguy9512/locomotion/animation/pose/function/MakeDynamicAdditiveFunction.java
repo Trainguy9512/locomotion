@@ -5,6 +5,7 @@ import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Pose function that creates an additive animation pose by subtracting a base pose from the desired additive pose.
@@ -46,12 +47,16 @@ public class MakeDynamicAdditiveFunction implements PoseFunction<LocalSpacePose>
     }
 
     @Override
-    public Optional<AnimationPlayer> testForMostRelevantAnimationPlayer() {
+    public Optional<PoseFunction<?>> searchDownChainForMostRelevant(Predicate<PoseFunction<?>> findCondition) {
+        // Test this pose function first
+        if (findCondition.test(this)) {
+            return Optional.of(this);
+        }
         // Test the additive pose input first. If it does not have a relevant animation player, then test the base pose input.
-        Optional<AnimationPlayer> test = this.additivePoseInput.testForMostRelevantAnimationPlayer();
+        Optional<PoseFunction<?>> test = this.additivePoseInput.searchDownChainForMostRelevant(findCondition);
         if (test.isPresent()) {
             return test;
         }
-        return this.basePoseInput.testForMostRelevantAnimationPlayer();
+        return this.basePoseInput.searchDownChainForMostRelevant(findCondition);
     }
 }
