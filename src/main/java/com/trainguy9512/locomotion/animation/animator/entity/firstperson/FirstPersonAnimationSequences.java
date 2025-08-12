@@ -21,6 +21,7 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_TOOL_USE = makeAnimationSequenceResourceLocation("hand/tool/use");
     public static final ResourceLocation HAND_TOOL_SWORD_SWING_LEFT = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_left");
     public static final ResourceLocation HAND_TOOL_SWORD_SWING_RIGHT = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_right");
+    public static final ResourceLocation HAND_TOOL_SWORD_SWING_DOWN = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_down");
 
     public static final ResourceLocation HAND_GENERIC_ITEM_2D_ITEM_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/2d_item_pose");
     public static final ResourceLocation HAND_GENERIC_ITEM_BLOCK_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/block_pose");
