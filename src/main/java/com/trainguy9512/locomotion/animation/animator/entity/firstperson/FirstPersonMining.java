@@ -6,6 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseConta
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 
 public class FirstPersonMining {
@@ -40,7 +41,7 @@ public class FirstPersonMining {
                         .addOutboundTransition(StateTransition.builder(MiningStates.IDLE)
                                 .isTakenIfMostRelevantAnimationPlayerFinishing(1)
                                 .setPriority(50)
-                                .setTiming(Transition.SINGLE_TICK)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(6)).build())
                                 .build())
                         .addOutboundTransition(StateTransition.builder(MiningStates.SWING)
                                 .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING).and(StateTransition.CURRENT_TRANSITION_FINISHED))
