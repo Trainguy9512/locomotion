@@ -22,22 +22,29 @@ public class FirstPersonSword {
             case MAIN_HAND -> StateMachineFunction.builder(evaluationState -> SwordSwingStates.IDLE)
                     .resetsUponRelevant(true)
                     .defineState(State.builder(SwordSwingStates.IDLE, FirstPersonHandPose.SWORD.getMiningStateMachine(cachedPoseContainer, interactionHand))
-                            .resetsPoseFunctionUponEntry(true)
-                            .addOutboundTransition(StateTransition.builder(SwordSwingStates.SWING_LEFT)
-                                    .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.HAS_ATTACKED))
-                                    .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
-                                    .build())
-                            .build())
-                    .defineState(State.builder(SwordSwingStates.SWING_LEFT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_SWORD_SWING_DOWN).build())
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(SwordSwingStates.SWING_DOWN)
+                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.HAS_ATTACKED))
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
+                                .build())
+                        .build())
+                    .defineState(State.builder(SwordSwingStates.SWING_DOWN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_SWORD_SWING_DOWN).setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(0)).build())
                             .resetsPoseFunctionUponEntry(true)
                             .addOutboundTransition(StateTransition.builder(SwordSwingStates.SWING_RIGHT)
                                     .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.HAS_ATTACKED))
                                     .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
                                     .build())
                             .build())
-                    .defineState(State.builder(SwordSwingStates.SWING_RIGHT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_SWORD_SWING_DOWN).build())
+                    .defineState(State.builder(SwordSwingStates.SWING_RIGHT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_SWORD_SWING_RIGHT).setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(10)).build())
                             .resetsPoseFunctionUponEntry(true)
                             .addOutboundTransition(StateTransition.builder(SwordSwingStates.SWING_LEFT)
+                                    .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.HAS_ATTACKED))
+                                    .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
+                                    .build())
+                            .build())
+                    .defineState(State.builder(SwordSwingStates.SWING_LEFT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_SWORD_SWING_LEFT).setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(10)).build())
+                            .resetsPoseFunctionUponEntry(true)
+                            .addOutboundTransition(StateTransition.builder(SwordSwingStates.SWING_DOWN)
                                     .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.HAS_ATTACKED))
                                     .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
                                     .build())
@@ -45,11 +52,12 @@ public class FirstPersonSword {
                     .addStateAlias(StateAlias.builder(
                                     Set.of(
                                             SwordSwingStates.SWING_LEFT,
-                                            SwordSwingStates.SWING_RIGHT
+                                            SwordSwingStates.SWING_RIGHT,
+                                            SwordSwingStates.SWING_DOWN
                                     ))
                             .addOutboundTransition(StateTransition.builder(SwordSwingStates.IDLE)
                                     .isTakenIfMostRelevantAnimationPlayerFinishing(0)
-                                    .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
+                                    .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
                                     .build())
                             .addOutboundTransition(StateTransition.builder(SwordSwingStates.IDLE)
                                     .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING))
@@ -63,6 +71,7 @@ public class FirstPersonSword {
 
     enum SwordSwingStates {
         IDLE,
+        SWING_DOWN,
         SWING_LEFT,
         SWING_RIGHT
     }
