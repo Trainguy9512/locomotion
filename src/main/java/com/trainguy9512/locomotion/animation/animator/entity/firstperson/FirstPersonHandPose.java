@@ -1,6 +1,7 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -269,23 +270,43 @@ public enum FirstPersonHandPose {
                                 ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(), MakeDynamicAdditiveFunction.of(SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).build(), SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()))
                         )
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_IN_OUT).build())
-                                .build())
                         .build())
                 .defineState(State.builder(HandPoseStates.USING_LAST_ITEM,
                                 ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(), MakeDynamicAdditiveFunction.of(SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).build(), SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()))
                         )
                         .resetsPoseFunctionUponEntry(true)
+                        .build())
+                .addStateAlias(StateAlias.builder(Set.of(HandPoseStates.DROPPING_LAST_ITEM, HandPoseStates.USING_LAST_ITEM))
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
                                 .isTakenIfMostRelevantAnimationPlayerFinishing(1)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
+//                                .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
+                                .build())
+                        .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
+                                .isTakenIfTrue(context -> shouldCancelLastItemAnimation(context, interactionHand))
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.05f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build());
 
 
         return handPoseStateMachineBuilder.build();
+    }
+
+    private static boolean shouldCancelLastItemAnimation(StateTransition.TransitionContext context, InteractionHand interactionHand) {
+        if (context.driverContainer().getDriverValue(FirstPersonDrivers.getHasUsedItemDriver(interactionHand))) {
+            if (context.timeElapsedInCurrentState().inTicks() > 2) {
+                return true;
+            }
+        }
+        if (interactionHand == InteractionHand.MAIN_HAND) {
+            if (context.driverContainer().getDriverValue(FirstPersonDrivers.HAS_ATTACKED)) {
+                return true;
+            }
+            if (context.driverContainer().getDriverValue(FirstPersonDrivers.IS_MINING)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean hasItemChanged(StateTransition.TransitionContext context, InteractionHand interactionHand) {

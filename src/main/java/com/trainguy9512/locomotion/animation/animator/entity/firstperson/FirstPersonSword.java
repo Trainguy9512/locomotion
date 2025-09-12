@@ -18,7 +18,7 @@ import java.util.Set;
 public class FirstPersonSword {
 
     public static boolean shouldPlayComboAnimation(StateTransition.TransitionContext context) {
-        return context.timeElapsedInCurrentState().inSeconds() > 0.6 && context.timeElapsedInCurrentState().inSeconds() < 0.7;
+        return context.timeElapsedInCurrentState().inSeconds() > 0.2 && context.timeElapsedInCurrentState().inSeconds() < 0.7;
     }
 
     public static PoseFunction<LocalSpacePose> handSwordPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
