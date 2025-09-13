@@ -29,7 +29,7 @@ public abstract class Pose {
     protected Pose (Pose pose) {
         this.jointSkeleton = pose.jointSkeleton;
         this.jointChannels = new HashMap<>(pose.jointChannels);
-        this.customAttributes = Maps.newHashMap(pose.customAttributes);
+        this.customAttributes = new HashMap<>(pose.customAttributes);
         this.jointParentMatrices = new HashMap<>(pose.jointParentMatrices);
     }
 
@@ -99,7 +99,7 @@ public abstract class Pose {
         this.getJointSkeleton().getDirectChildrenOfJoint(parent).forEach(child -> this.convertChildrenJointsToLocalSpace(child, this.jointParentMatrices.get(parent)));
 
         JointChannel parentJointChannel = this.getJointChannel(parent);
-        parentJointChannel.multiply(parentMatrix.invert(new Matrix4f()), JointChannel.TransformSpace.LOCAL);
+        parentJointChannel.multiply(parentMatrix.invert(new Matrix4f()), JointChannel.TransformSpace.LOCAL, JointChannel.TransformType.ADD);
         this.setJointChannel(parent, parentJointChannel);
     }
 }

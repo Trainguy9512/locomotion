@@ -222,5 +222,8 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         driverContainer.getDriver(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET).setValue(movementDirection);
         driverContainer.getDriver(FirstPersonDrivers.CAMERA_ROTATION_DAMPING).setValue(new Vector3f(dataReference.getXRot(), dataReference.getYRot(), dataReference.getYRot()).mul(Mth.DEG_TO_RAD));
 
+        // Camera rotation X
+        driverContainer.getDriver(FirstPersonDrivers.CAMERA_ROTATION_X).setValue(dataReference.getXRot());
+//        LocomotionMain.DEBUG_LOGGER.info(dataReference.getXRot());
     }
 }

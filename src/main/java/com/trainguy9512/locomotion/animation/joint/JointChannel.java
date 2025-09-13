@@ -134,14 +134,20 @@ public final class JointChannel {
         this.rotate(new Quaternionf().rotationXYZ(rotationEuler.x(), rotationEuler.y(), rotationEuler.z()), transformSpace, transformType);
     }
 
-    public void multiply(JointChannel other, TransformSpace transformSpace) {
-        this.multiply(other.transform, transformSpace);
+    public void multiply(JointChannel other, TransformSpace transformSpace, TransformType transformType) {
+        this.multiply(other.transform, transformSpace, transformType);
     }
 
-    public void multiply(Matrix4f transform, TransformSpace transformSpace) {
-        switch (transformSpace) {
-            case COMPONENT, PARENT -> this.transform.mul(transform);
-            case LOCAL -> this.transform.mulLocal(transform);
+    public void multiply(Matrix4f transform, TransformSpace transformSpace, TransformType transformType) {
+        switch (transformType) {
+            case ADD -> {
+                switch (transformSpace) {
+                    case COMPONENT, PARENT -> this.transform.mul(transform);
+//                    case LOCAL -> this.transform.mulLocal(transform);
+                    case LOCAL -> transform.mul(this.transform, this.transform);
+                }
+            }
+            case REPLACE -> this.transform.set(transform);
         }
     }
 

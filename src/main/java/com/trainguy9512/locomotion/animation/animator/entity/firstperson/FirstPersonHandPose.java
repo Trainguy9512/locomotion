@@ -89,28 +89,10 @@ public enum FirstPersonHandPose {
     public PoseFunction<LocalSpacePose> getMiningStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
         return switch (interactionHand) {
             case MAIN_HAND -> switch (this) {
-                case TOOL -> FirstPersonMining.constructPoseFunction(
-                        cachedPoseContainer,
-                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build(),
-                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_MINE_SWING)
-                                .looping(true)
-                                .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(16))
-                                .setPlayRate(evaluationState -> 1.8f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier)
-                                .build(),
-                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_MINE_FINISH).build(),
-                        Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build());
+                case TOOL -> FirstPersonMining.makePickaxeMiningPoseFunction(cachedPoseContainer);
                 default -> ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(this.basePoseLocation).build(), MakeDynamicAdditiveFunction.of(
-                        FirstPersonMining.constructPoseFunction(
-                                cachedPoseContainer,
-                                SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(),
-                                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_SWING)
-                                        .looping(true)
-                                        .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(20))
-                                        .setPlayRate(evaluationState -> 1.35f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier)
-                                        .build(),
-                                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_FINISH).build(),
-                                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build()),
-                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build()));
+                        FirstPersonMining.makePickaxeMiningPoseFunction(cachedPoseContainer),
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()));
             };
             case OFF_HAND -> SequenceEvaluatorFunction.builder(this.basePoseLocation).build();
         };

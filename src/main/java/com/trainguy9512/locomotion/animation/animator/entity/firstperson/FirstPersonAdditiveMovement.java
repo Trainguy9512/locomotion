@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -10,8 +11,12 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTra
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
+import net.minecraft.util.Mth;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class FirstPersonAdditiveMovement {
@@ -381,6 +386,32 @@ public class FirstPersonAdditiveMovement {
 
 //        return movementStateMachine;
 
+//        movementStateMachine = JointTransformerFunction.localOrParentSpaceBuilder(movementStateMachine, FirstPersonJointAnimator.CAMERA_JOINT)
+//                .setTranslation(
+//                        context -> new Vector3f(0, Mth.sin(context.gameTime().inSeconds() * 8f) * 4, 0),
+//                        JointChannel.TransformType.ADD,
+//                        JointChannel.TransformSpace.LOCAL).build();
+
+        // Making the camera animations in world space
+//        Function<PoseFunction.FunctionInterpolationContext, Float> cameraRotationFunction = context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_ROTATION_X, context.partialTicks());
+//        movementStateMachine = JointTransformerFunction.localOrParentSpaceBuilder(movementStateMachine, FirstPersonJointAnimator.CAMERA_JOINT)
+//                .setMatrix(
+//                        context -> new Matrix4f().identity().rotateX(cameraRotationFunction.apply(context) * Mth.DEG_TO_RAD),
+//                        JointChannel.TransformType.ADD,
+//                        JointChannel.TransformSpace.COMPONENT).build();
+//        movementStateMachine = JointTransformerFunction.localOrParentSpaceBuilder(movementStateMachine, FirstPersonJointAnimator.CAMERA_JOINT)
+//                .setMatrix(
+//                        context -> new Matrix4f().identity().rotateX(-cameraRotationFunction.apply(context) * Mth.DEG_TO_RAD),
+//                        JointChannel.TransformType.ADD,
+//                        JointChannel.TransformSpace.LOCAL).build();
+//        movementStateMachine = JointTransformerFunction.localOrParentSpaceBuilder(movementStateMachine, FirstPersonJointAnimator.CAMERA_JOINT)
+//                .setRotationEuler(
+//                        context -> new Vector3f(cameraRotationFunction.apply(context) * Mth.DEG_TO_RAD, 0, 0),
+//                        JointChannel.TransformType.ADD,
+//                        JointChannel.TransformSpace.PARENT).build();
+
+
+        // Making it additive at the end
         return MakeDynamicAdditiveFunction.of(
                 movementStateMachine,
                 SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build()

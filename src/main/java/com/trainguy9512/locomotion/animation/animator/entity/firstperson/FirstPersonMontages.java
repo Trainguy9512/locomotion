@@ -19,9 +19,9 @@ public class FirstPersonMontages {
 
     public static final MontageConfiguration HAND_TOOL_ATTACK_PICKAXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_pickaxe", FirstPersonAnimationSequences.HAND_TOOL_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
-            .setCooldownDuration(TimeSpan.of60FramesPerSecond(8))
-            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(1)).setEasement(Easing.SINE_OUT).build())
-            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(12)).setEasement(Easing.SINE_IN_OUT).build())
+            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(40)).setEasement(Easing.SINE_IN_OUT).build())
             .makeAdditive(driverContainer -> {
                 FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
                 if (handPose == FirstPersonHandPose.GENERIC_ITEM) {

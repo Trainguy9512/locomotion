@@ -202,7 +202,7 @@ public class LocalSpacePose extends Pose {
     }
 
     public void multiply(LocalSpacePose other, JointChannel.TransformSpace transformSpace) {
-        this.jointChannels.forEach((joint, channel) -> channel.multiply(other.jointChannels.get(joint), transformSpace));
+        this.jointChannels.forEach((joint, channel) -> channel.multiply(other.jointChannels.get(joint), transformSpace, JointChannel.TransformType.ADD));
     }
 
     public void invert() {

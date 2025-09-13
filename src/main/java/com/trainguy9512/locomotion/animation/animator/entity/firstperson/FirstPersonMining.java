@@ -1,11 +1,15 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
+import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
+import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 
@@ -41,7 +45,7 @@ public class FirstPersonMining {
                         .addOutboundTransition(StateTransition.builder(MiningStates.IDLE)
                                 .isTakenIfMostRelevantAnimationPlayerFinishing(1)
                                 .setPriority(50)
-                                .setTiming(Transition.builder(TimeSpan.ofTicks(6)).build())
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(20)).build())
                                 .build())
                         .addOutboundTransition(StateTransition.builder(MiningStates.SWING)
                                 .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING).and(StateTransition.CURRENT_TRANSITION_FINISHED))
@@ -56,5 +60,18 @@ public class FirstPersonMining {
         IDLE,
         SWING,
         FINISH
+    }
+
+    public static PoseFunction<LocalSpacePose> makePickaxeMiningPoseFunction(CachedPoseContainer cachedPoseContainer) {
+        return FirstPersonMining.constructPoseFunction(
+                cachedPoseContainer,
+                SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build(),
+                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_MINE_SWING)
+                        .looping(true)
+                        .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(16))
+                        .setPlayRate(evaluationState -> 1.8f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier)
+                        .build(),
+                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_MINE_FINISH).build(),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build());
     }
 }

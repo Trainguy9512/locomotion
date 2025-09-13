@@ -35,7 +35,7 @@ public class JointSkeleton {
     }
 
     public Map<String, Float> getCustomAttributeDefaults() {
-        return this.customAttributeDefaults;
+        return new HashMap<>(this.customAttributeDefaults);
     }
 
     public Set<String> getCustomAttributes() {
