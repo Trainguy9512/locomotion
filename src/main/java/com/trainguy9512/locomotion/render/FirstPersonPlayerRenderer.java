@@ -12,36 +12,42 @@ import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.access.AlternateSingleBlockRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.*;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.PlayerModelPart;
+import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+
 
 import java.util.List;
 import java.util.Objects;
 
-public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRenderState, PlayerModel> {
+public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRenderState, PlayerModel> {
 
     private final Minecraft minecraft;
     private final EntityRenderDispatcher entityRenderDispatcher;
@@ -64,7 +70,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
         this.jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
     }
 
-    public void render(float partialTicks, PoseStack poseStack, MultiBufferSource.BufferSource buffer, LocalPlayer playerEntity, int combinedLight) {
+    public void render(float partialTicks, PoseStack poseStack, SubmitNodeCollector nodeCollector, LocalPlayer playerEntity, int combinedLight) {
+
         CURRENT_PARTIAL_TICKS = partialTicks;
         JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
 
@@ -82,7 +89,13 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
 
 
                             AbstractClientPlayer abstractClientPlayer = this.minecraft.player;
-                            PlayerRenderer playerRenderer = (PlayerRenderer)this.entityRenderDispatcher.getRenderer(abstractClientPlayer);
+
+                            //? if >= 1.21.9 {
+                            AvatarRenderer<AbstractClientPlayer> playerRenderer = this.entityRenderDispatcher.getPlayerRenderer(abstractClientPlayer);
+                            //?} else {
+                            /*PlayerRenderer playerRenderer = (PlayerRenderer)this.entityRenderDispatcher.getRenderer(abstractClientPlayer);
+                            *///?}
+
                             PlayerModel playerModel = playerRenderer.getModel();
                             playerModel.resetPose();
 
@@ -91,8 +104,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
 
                             playerModel.body.visible = false;
 
-                            this.renderArm(abstractClientPlayer, playerModel, HumanoidArm.LEFT, poseStack, buffer, combinedLight);
-                            this.renderArm(abstractClientPlayer, playerModel, HumanoidArm.RIGHT, poseStack, buffer, combinedLight);
+                            this.renderArm(abstractClientPlayer, playerModel, HumanoidArm.LEFT, poseStack, nodeCollector, combinedLight);
+                            this.renderArm(abstractClientPlayer, playerModel, HumanoidArm.RIGHT, poseStack, nodeCollector, combinedLight);
 
                             //this.entityRenderDispatcher.render(abstractClientPlayer, 0, 0, 0, partialTicks, poseStack, buffer, combinedLight);
 
@@ -117,7 +130,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                                     ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
                                     poseStack,
                                     rightItemPose,
-                                    buffer,
+                                    nodeCollector,
                                     combinedLight,
                                     HumanoidArm.RIGHT,
                                     !leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
@@ -130,7 +143,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                                     ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
                                     poseStack,
                                     leftItemPose,
-                                    buffer,
+                                    nodeCollector,
                                     combinedLight,
                                     HumanoidArm.LEFT,
                                     leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
@@ -152,8 +165,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                         }
                 )
         );
-
-        buffer.endBatch();
     }
 
     private static ItemStack getItemStackToRender(ItemStack currentItem, ItemStack renderedItem) {
@@ -177,25 +188,36 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
         return currentItem;
     }
 
-    private void renderArm(AbstractClientPlayer abstractClientPlayer, PlayerModel playerModel, HumanoidArm arm, PoseStack poseStack, MultiBufferSource buffer, int combinedLight) {
+    private void renderArm(AbstractClientPlayer abstractClientPlayer, PlayerModel playerModel, HumanoidArm arm, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight) {
+
+        // Skin data changed in 1.21.9
         PlayerSkin skin = abstractClientPlayer.getSkin();
+        boolean isUsingSlimArms = skin.model() == PlayerModelType.SLIM;
+        boolean leftArm = arm == HumanoidArm.LEFT;
+        ResourceLocation skinTextureLocation = skin.body().texturePath();
+
+        // Getting the model parts
+        ModelPart armModelPart = leftArm ? playerModel.leftArm : playerModel.rightArm;
+        ModelPart sleeveModelPart = leftArm ? playerModel.leftSleeve : playerModel.rightSleeve;
+        PlayerModelPart sleevePlayerModelPart = leftArm ? PlayerModelPart.LEFT_SLEEVE : PlayerModelPart.RIGHT_SLEEVE;
+
+        // Translating the slim arm model part over by half a pixel to be in the middle
         poseStack.pushPose();
-        switch(arm){
-            case LEFT -> {
-                if (skin.model() == PlayerSkin.Model.SLIM) {
-                    poseStack.translate(0.5 / 16f, 0, 0);
-                }
-                playerModel.leftSleeve.visible = abstractClientPlayer.isModelPartShown(PlayerModelPart.LEFT_SLEEVE);
-                playerModel.leftArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(skin.texture())), combinedLight, OverlayTexture.NO_OVERLAY);
-            }
-            case RIGHT -> {
-                if (skin.model() == PlayerSkin.Model.SLIM) {
-                    poseStack.translate(-0.5 / 16f, 0, 0);
-                }
-                playerModel.rightSleeve.visible = abstractClientPlayer.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE);
-                playerModel.rightArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(skin.texture())), combinedLight, OverlayTexture.NO_OVERLAY);
-            }
+        if (isUsingSlimArms) {
+            poseStack.translate(0.5f / 16f * (leftArm ? 1 : -1), 0, 0);
         }
+
+        // Hiding the sleeve model part based on the player's settings and then rendering both the arm and its sleeve
+        sleeveModelPart.visible = abstractClientPlayer.isModelPartShown(sleevePlayerModelPart);
+        nodeCollector.submitModelPart(
+                armModelPart,
+                poseStack,
+                RenderType.entityTranslucent(skinTextureLocation),
+                combinedLight,
+                OverlayTexture.NO_OVERLAY,
+                null
+        );
+
         poseStack.popPose();
     }
 
@@ -205,7 +227,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             ItemDisplayContext displayContext,
             PoseStack poseStack,
             JointChannel jointChannel,
-            MultiBufferSource bufferSource,
+            SubmitNodeCollector nodeCollector,
             int combinedLight,
             HumanoidArm side,
             InteractionHand interactionHand,
@@ -225,9 +247,15 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
             }
             switch (renderType) {
                 case THIRD_PERSON_ITEM -> {
-                    //? if >= 1.21.5 {
-                    this.itemRenderer.renderStatic(entity, itemStack, displayContext, poseStack, bufferSource, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());
-                    //? } else
+                    //? if >= 1.21.9 {
+
+                    ItemStackRenderState itemStackRenderState = new ItemStackRenderState();
+                    this.itemModelResolver.updateForTopItem(itemStackRenderState, itemStack, displayContext, entity.level(), entity, entity.getId() + displayContext.ordinal());
+                    itemStackRenderState.submit(poseStack, nodeCollector, combinedLight, OverlayTexture.NO_OVERLAY, 0);
+
+                    //?} else if >= 1.21.5 {
+                    /*this.itemRenderer.renderStatic(entity, itemStack, displayContext, poseStack, bufferSource, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());
+                    *///?} else
                     /*this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, side == HumanoidArm.LEFT, poseStack, buffer, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());*/
                 }
                 case DEFAULT_BLOCK_STATE -> {
@@ -245,18 +273,20 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
                         poseStack.mulPose(Axis.XP.rotation(Mth.PI));
                     }
 
-                    if (block instanceof WallBlock) {
-                        this.renderWallBlock(blockState, poseStack, bufferSource, combinedLight);
-                    } else if (block instanceof FenceBlock) {
-                        this.renderFenceBlock(blockState, poseStack, bufferSource, combinedLight);
-                    } else if (block instanceof BedBlock) {
-                        this.renderBedBlock(blockState, poseStack, bufferSource, combinedLight);
-                    } else if (block instanceof DoorBlock) {
-                        this.renderDoorBlock(blockState, poseStack, bufferSource, combinedLight);
-                    } else {
-                        ((AlternateSingleBlockRenderer)(this.blockRenderer)).locomotion$renderSingleBlockWithEmission(blockState, poseStack, bufferSource, combinedLight);
+                    nodeCollector.submitBlock(poseStack, blockState, combinedLight, OverlayTexture.NO_OVERLAY, 0);
+//                    if (block instanceof WallBlock) {
+//                        this.renderWallBlock(blockState, poseStack, nodeCollector, combinedLight);
+//                    } else if (block instanceof FenceBlock) {
+//                        this.renderFenceBlock(blockState, poseStack, nodeCollector, combinedLight);
+//                    } else if (block instanceof BedBlock) {
+//                        this.renderBedBlock(blockState, poseStack, nodeCollector, combinedLight);
+//                    } else if (block instanceof DoorBlock) {
+//                        this.renderDoorBlock(blockState, poseStack, nodeCollector, combinedLight);
+//                    } else {
+
+//                        ((AlternateSingleBlockRenderer)(this.blockRenderer)).locomotion$renderSingleBlockWithEmission(blockState, poseStack, nodeCollector, combinedLight);
 //                        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
-                    }
+//                    }
                 }
             }
             SHOULD_FLIP_ITEM_TRANSFORM = false;
@@ -283,22 +313,22 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
     private void renderBedBlock(
             BlockState blockState,
             PoseStack poseStack,
-            MultiBufferSource bufferSource,
+            MultiBufferSource multiVersionRenderData,
             int combinedLight
     ) {
         poseStack.translate(1f, -0.25f, 0.5f);
         poseStack.mulPose(Axis.YP.rotation(Mth.PI));
-        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
+//        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
     }
 
     private void renderDoorBlock(
             BlockState blockState,
             PoseStack poseStack,
-            MultiBufferSource bufferSource,
+            MultiBufferSource multiVersionRenderData,
             int combinedLight
     ) {
-        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
-        this.renderUpperHalfBlock(blockState, poseStack, bufferSource, combinedLight);
+//        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
+//        this.renderUpperHalfBlock(blockState, poseStack, bufferSource, combinedLight);
     }
 
     private void renderFenceBlock(
@@ -351,7 +381,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<PlayerRender
 
     @Override
     public @NotNull PlayerModel getModel() {
-        return ((PlayerRenderer)entityRenderDispatcher.getRenderer(minecraft.player)).getModel();
+        assert minecraft.player != null;
+        return entityRenderDispatcher.getPlayerRenderer(minecraft.player).getModel();
     }
 
     private enum ItemRenderType {

@@ -6,7 +6,7 @@ import com.trainguy9512.locomotion.access.FirstPersonPlayerRendererGetter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,15 +25,10 @@ public class MixinItemInHandRenderer {
             cancellable = true
     )
     public void overrideFirstPersonRendering(
-            float partialTicks,
-            PoseStack poseStack,
-            MultiBufferSource.BufferSource buffer,
-            LocalPlayer playerEntity,
-            int combinedLight,
-            CallbackInfo ci
+            float partialTicks, PoseStack poseStack, SubmitNodeCollector nodeCollector, LocalPlayer player, int packedLight, CallbackInfo ci
     ) {
         if (LocomotionMain.CONFIG.data().firstPersonPlayer.enableRenderer) {
-            ((FirstPersonPlayerRendererGetter) this.minecraft.getEntityRenderDispatcher()).locomotion$getFirstPersonPlayerRenderer().ifPresent(firstPersonPlayerRenderer -> firstPersonPlayerRenderer.render(partialTicks, poseStack, buffer, playerEntity, combinedLight));
+            ((FirstPersonPlayerRendererGetter) this.minecraft.getEntityRenderDispatcher()).locomotion$getFirstPersonPlayerRenderer().ifPresent(firstPersonPlayerRenderer -> firstPersonPlayerRenderer.render(partialTicks, poseStack, nodeCollector, player, packedLight));
             ci.cancel();
         }
     }

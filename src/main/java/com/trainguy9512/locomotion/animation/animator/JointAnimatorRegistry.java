@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator;
 import com.trainguy9512.locomotion.animation.animator.entity.LivingEntityJointAnimator;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
@@ -14,7 +14,7 @@ import java.util.Optional;
 public class JointAnimatorRegistry {
 
     private static final HashMap<EntityType<?>, EntityJointAnimator<?, ?>> THIRD_PERSON_ENTITY_JOINT_ANIMATORS = Maps.newHashMap();
-    private static LivingEntityJointAnimator<LocalPlayer, PlayerRenderState> FIRST_PERSON_PLAYER_JOINT_ANIMATOR = null;
+    private static LivingEntityJointAnimator<LocalPlayer, AvatarRenderState> FIRST_PERSON_PLAYER_JOINT_ANIMATOR = null;
 
     private JointAnimatorRegistry(){
 
@@ -30,7 +30,7 @@ public class JointAnimatorRegistry {
     }
 
 
-    public static void registerFirstPersonPlayerJointAnimator(LivingEntityJointAnimator<LocalPlayer, PlayerRenderState> firstPersonPlayerJointAnimator){
+    public static void registerFirstPersonPlayerJointAnimator(LivingEntityJointAnimator<LocalPlayer, AvatarRenderState> firstPersonPlayerJointAnimator){
         FIRST_PERSON_PLAYER_JOINT_ANIMATOR = firstPersonPlayerJointAnimator;
     }
 
@@ -47,7 +47,7 @@ public class JointAnimatorRegistry {
     /**
      * Returns the first person player joint animator, if it has been registered. If not, it returns null.
      */
-    public static Optional<LivingEntityJointAnimator<LocalPlayer, PlayerRenderState>> getFirstPersonPlayerJointAnimator(){
+    public static Optional<LivingEntityJointAnimator<LocalPlayer, AvatarRenderState>> getFirstPersonPlayerJointAnimator(){
         return Optional.ofNullable(FIRST_PERSON_PLAYER_JOINT_ANIMATOR);
     }
 }

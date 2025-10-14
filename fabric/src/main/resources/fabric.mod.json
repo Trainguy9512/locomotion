@@ -6,7 +6,12 @@
   "name": "${mod_name}",
   "description": "${mod_description}",
   "authors": [
-    "Trainguy9512"
+    "James Pelter (Trainguy)"
+  ],
+  "contributors": [
+    "Micah Preciado (Animation help)",
+    "The Panda Oliver (Multi-version project setup)",
+    "Marvin \"MineToBlend\" (Original keyframe structure and easement class help)"
   ],
   "contact": {
     "homepage": "https://github.com/Trainguy9512/trainguys-animation-overhaul/",

@@ -42,8 +42,8 @@ public class MixinModelPart implements MatrixModelPart {
         }
     }
 
-    @Inject(method = "copyFrom", at = @At("HEAD"))
-    public void copyMatrixFrom(ModelPart modelPart, CallbackInfo ci){
-        this.locomotion$matrix4f = ((MatrixModelPart)(Object)modelPart).locomotion$getMatrix();
-    }
+//    @Inject(method = "copyFrom", at = @At("HEAD"))
+//    public void copyMatrixFrom(ModelPart modelPart, CallbackInfo ci){
+//        this.locomotion$matrix4f = ((MatrixModelPart)(Object)modelPart).locomotion$getMatrix();
+//    }
 }

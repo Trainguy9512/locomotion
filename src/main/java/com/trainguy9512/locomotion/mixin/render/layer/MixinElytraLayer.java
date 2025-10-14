@@ -17,12 +17,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+
 @Mixin(WingsLayer.class)
 public abstract class MixinElytraLayer<T extends LivingEntity, S extends HumanoidRenderState, M extends EntityModel<S>> extends RenderLayer<S, M> {
     public MixinElytraLayer(RenderLayerParent<S, M> renderLayerParent) {
         super(renderLayerParent);
     }
 
+    /*
     @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;FF)V", at = @At("HEAD"))
     private void transformElytra(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, S humanoidRenderState, float f, float g, CallbackInfo ci){
         if(this.getParentModel() instanceof HumanoidModel && isValidForElytraTransformation(humanoidRenderState)){
@@ -38,6 +40,7 @@ public abstract class MixinElytraLayer<T extends LivingEntity, S extends Humanoi
             poseStack.popPose();
         }
     }
+     */
 
     private boolean isValidForElytraTransformation(LivingEntityRenderState livingEntityRenderState){
         return ((LivingEntityRenderStateAccess)livingEntityRenderState).animationOverhaul$getInterpolatedAnimationPose() != null;

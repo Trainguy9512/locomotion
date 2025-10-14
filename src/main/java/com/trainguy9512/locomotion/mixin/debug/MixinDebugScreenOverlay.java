@@ -22,6 +22,11 @@ import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.Map;
 
+/*
+
+//TODO: This needs to be rewritten entirely with the UI rendering changes.
+
+
 @Mixin(DebugScreenOverlay.class)
 public class MixinDebugScreenOverlay {
     @Shadow @Final private Minecraft minecraft;
@@ -114,3 +119,6 @@ public class MixinDebugScreenOverlay {
         }
     }
 }
+
+
+ */

@@ -69,7 +69,6 @@ public enum FirstPersonGenericItemPose {
 
     public static final List<Item> BLOCK_2D_OVERRIDE_ITEMS = List.of(
             Items.IRON_BARS,
-            Items.CHAIN,
             Items.GLASS_PANE,
             Items.WHITE_STAINED_GLASS_PANE,
             Items.ORANGE_STAINED_GLASS_PANE,
@@ -187,7 +186,8 @@ public enum FirstPersonGenericItemPose {
             ItemTags.VILLAGER_PLANTABLE_SEEDS,
             ItemTags.SAPLINGS,
             ItemTags.SIGNS,
-            ItemTags.HANGING_SIGNS
+            ItemTags.HANGING_SIGNS,
+            ItemTags.CHAINS
     );
 
     public static FirstPersonGenericItemPose fromItemStack(ItemStack itemStack) {

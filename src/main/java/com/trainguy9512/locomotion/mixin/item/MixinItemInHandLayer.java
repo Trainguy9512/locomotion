@@ -26,9 +26,9 @@ public abstract class MixinItemInHandLayer<T extends LivingEntity, S extends Arm
         super(renderLayerParent);
     }
 
-    @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemStackRenderState;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V"))
-    private void transformItemInHandLayer(S armedEntityRenderState, ItemStackRenderState itemStackRenderState, HumanoidArm humanoidArm, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci){
-        if(shouldTransformItemInHand(armedEntityRenderState)){
+//    @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemStackRenderState;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V"))
+//    private void transformItemInHandLayer(S armedEntityRenderState, ItemStackRenderState itemStackRenderState, HumanoidArm humanoidArm, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci){
+//        if(shouldTransformItemInHand(armedEntityRenderState)){
 
 
             //TODO: Redo how hand stuff works, add override functions to living entity animators. (2025 update: what does this mean?)
@@ -52,8 +52,8 @@ public abstract class MixinItemInHandLayer<T extends LivingEntity, S extends Arm
             poseStack.translate(0, 2/16F, -2/16F);
 
              */
-        }
-    }
+//        }
+//    }
     private boolean shouldTransformItemInHand(LivingEntityRenderState livingEntityRenderState){
         return false;
         /*

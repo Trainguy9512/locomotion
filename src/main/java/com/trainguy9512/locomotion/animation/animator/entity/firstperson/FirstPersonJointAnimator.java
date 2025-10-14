@@ -17,7 +17,7 @@ import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -34,7 +34,7 @@ import org.joml.Vector3f;
 
 import java.util.Set;
 
-public class FirstPersonJointAnimator implements LivingEntityJointAnimator<LocalPlayer, PlayerRenderState> {
+public class FirstPersonJointAnimator implements LivingEntityJointAnimator<LocalPlayer, AvatarRenderState> {
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator");
 
@@ -73,7 +73,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             .build();
 
     @Override
-    public void postProcessModelParts(EntityModel<PlayerRenderState> entityModel, PlayerRenderState entityRenderState) {
+    public void postProcessModelParts(EntityModel<AvatarRenderState> entityModel, AvatarRenderState entityRenderState) {
     }
 
     @Override
@@ -143,9 +143,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         //? if >= 1.21.5 {
         driverContainer.getDriver(FirstPersonDrivers.HOTBAR_SLOT).setValue(dataReference.getInventory().getSelectedSlot());
-        //? } else {
+        //?} else {
         /*driverContainer.getDriver(HOTBAR_SLOT).setValue(dataReference.getInventory().selected);*/
-        //? }
+        //?}
 
 
         driverContainer.getDriver(FirstPersonDrivers.HAS_DROPPED_ITEM).runIfTriggered(() -> montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE, driverContainer));

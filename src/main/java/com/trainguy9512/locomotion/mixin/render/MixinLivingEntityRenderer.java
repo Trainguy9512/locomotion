@@ -48,6 +48,7 @@ public abstract class MixinLivingEntityRenderer<S extends EntityRenderState, R e
         );
     }
 
+    /*
     @SuppressWarnings("unchecked")
     @Redirect(method = "render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;setupAnim(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;)V"))
     private void redirectSetupAnim(EntityModel<S> entityModel, S livingEntityRenderState){
@@ -131,6 +132,8 @@ public abstract class MixinLivingEntityRenderer<S extends EntityRenderState, R e
 
 
     }
+
+     */
 
     @Unique
     private static float sleepDirectionToRotation(Direction direction) {

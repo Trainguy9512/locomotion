@@ -34,7 +34,7 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
     @Shadow @Final private Supplier<SpecialBlockModelRenderer> specialBlockModelRenderer;
 
     @Unique
-    public void locomotion$renderSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight) {
+    public void locomotion$renderSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, MultiBufferSource bufferSource, SubmitNodeCollector nodeCollector, int combinedLight) {
         RenderShape renderShape = blockState.getRenderShape();
         // Don't do anything more if the render shape is nothing.
         if (renderShape == RenderShape.INVISIBLE) {
@@ -59,7 +59,7 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
             }
         }
         // Render the block through the special block renderer if it has one (skulls, beds, banners)
-        this.specialBlockModelRenderer.get().renderByBlock(blockState.getBlock(), ItemDisplayContext.NONE, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
+        this.specialBlockModelRenderer.get().renderByBlock(blockState.getBlock(), ItemDisplayContext.NONE, poseStack, nodeCollector, combinedLight, OverlayTexture.NO_OVERLAY, 0);
     }
 
     @Unique
@@ -80,9 +80,9 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
         } else {
             //? if <= 1.21.5 {
             /*vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getChunkRenderType(blockState));
-            *///? } else {
+            *///?} else {
             vertexConsumer = bufferSource.getBuffer(RenderType.cutoutMipped());
-            //? }
+            //?}
         }
 
         vertexConsumer.putBulkData(
