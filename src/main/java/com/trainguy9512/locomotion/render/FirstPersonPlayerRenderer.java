@@ -15,6 +15,7 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -22,6 +23,7 @@ import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
@@ -299,7 +301,22 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
     }
 
     private void renderBlock(SubmitNodeCollector nodeCollector, PoseStack poseStack, BlockState blockState, int combinedLight) {
-        nodeCollector.submitBlock(poseStack, blockState, combinedLight, OverlayTexture.NO_OVERLAY, 0);
+
+        // Render the block through the special block renderer if it has one (skulls, beds, banners)
+
+        nodeCollector.submitBlockModel(
+                poseStack,
+                ItemBlockRenderTypes.getRenderType(blockState),
+                this.blockRenderer.getBlockModel(blockState),
+                1.0F,
+                1.0F,
+                1.0F,
+                combinedLight,
+                OverlayTexture.NO_OVERLAY,
+                0
+        );
+//        nodeCollector.submitBlockModel(poseStack, RenderType.entitySolidZOffsetForward(TextureAtlas.LOCATION_BLOCKS), this.blockRenderer.getBlockModel(blockState), );
+//        nodeCollector.submitBlock(poseStack, blockState, combinedLight, OverlayTexture.NO_OVERLAY, 0);
     }
 
     private BlockState getDefaultBlockState(Block block) {

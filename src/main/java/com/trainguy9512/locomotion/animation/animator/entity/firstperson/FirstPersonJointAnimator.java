@@ -113,7 +113,11 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                                 JointChannel.TransformSpace.COMPONENT
                         )
                         .setRotationEuler(
-                                context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING, context.partialTicks()).mul(-0.15f, -0.15f, 0, new Vector3f()),
+                                context -> {
+                                    Vector3f main_rotation = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING, context.partialTicks());
+                                    float z_rotation = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_Z_ROTATION_DAMPING, context.partialTicks());
+                                    return new Vector3f(main_rotation.x, main_rotation.y, z_rotation).mul(-0.15f, -0.15f, -0.08f, new Vector3f());
+                                },
                                 JointChannel.TransformType.ADD,
                                 JointChannel.TransformSpace.COMPONENT
                         )
@@ -221,6 +225,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         );
         driverContainer.getDriver(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET).setValue(movementDirection);
         driverContainer.getDriver(FirstPersonDrivers.CAMERA_ROTATION_DAMPING).setValue(new Vector3f(dataReference.getXRot(), dataReference.getYRot(), dataReference.getYRot()).mul(Mth.DEG_TO_RAD));
+        driverContainer.getDriver(FirstPersonDrivers.CAMERA_Z_ROTATION_DAMPING).setValue(driverContainer.getDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING).y);
 
         // Camera rotation X
         driverContainer.getDriver(FirstPersonDrivers.CAMERA_ROTATION_X).setValue(dataReference.getXRot());

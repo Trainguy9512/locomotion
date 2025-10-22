@@ -37,7 +37,8 @@ public enum FirstPersonHandPose {
     SWORD (HandPoseStates.SWORD_RAISE, HandPoseStates.SWORD_LOWER, HandPoseStates.SWORD, FirstPersonAnimationSequences.HAND_TOOL_POSE, null),
     SHIELD (HandPoseStates.SHIELD_RAISE, HandPoseStates.SHIELD_LOWER, HandPoseStates.SHIELD, FirstPersonAnimationSequences.HAND_SHIELD_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
     BOW (HandPoseStates.BOW_RAISE, HandPoseStates.BOW_LOWER, HandPoseStates.BOW, FirstPersonAnimationSequences.HAND_BOW_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    CROSSBOW (HandPoseStates.CROSSBOW_RAISE, HandPoseStates.CROSSBOW_LOWER, HandPoseStates.CROSSBOW, FirstPersonAnimationSequences.HAND_CROSSBOW_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE);
+    CROSSBOW (HandPoseStates.CROSSBOW_RAISE, HandPoseStates.CROSSBOW_LOWER, HandPoseStates.CROSSBOW, FirstPersonAnimationSequences.HAND_CROSSBOW_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
+    TRIDENT (HandPoseStates.TRIDENT_RAISE, HandPoseStates.TRIDENT_LOWER, HandPoseStates.TRIDENT, FirstPersonAnimationSequences.HAND_TRIDENT_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE);
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator/HandPose");
 
@@ -65,6 +66,9 @@ public enum FirstPersonHandPose {
     public static FirstPersonHandPose fromItemStack(ItemStack itemStack) {
         if (itemStack.isEmpty()) {
             return EMPTY;
+        }
+        if (itemStack.getUseAnimation() == ItemUseAnimation.SPEAR) {
+            return TRIDENT;
         }
         if (itemStack.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
             return CROSSBOW;
@@ -121,7 +125,10 @@ public enum FirstPersonHandPose {
         BOW_LOWER,
         CROSSBOW,
         CROSSBOW_RAISE,
-        CROSSBOW_LOWER
+        CROSSBOW_LOWER,
+        TRIDENT,
+        TRIDENT_RAISE,
+        TRIDENT_LOWER
     }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
@@ -218,6 +225,23 @@ public enum FirstPersonHandPose {
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
                 ),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_CROSSBOW_RAISE).build(),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build()
+        );
+        addStatesForHandPose(
+                handPoseStateMachineBuilder,
+                fromLoweringAliasBuilder,
+                interactionHand,
+                FirstPersonHandPose.TRIDENT,
+                FirstPersonHandPose.TRIDENT.getMiningStateMachine(cachedPoseContainer, interactionHand),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_POSE).build(),
+                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
+                ),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_POSE).build(),
+                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
+                ),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build()
         );
