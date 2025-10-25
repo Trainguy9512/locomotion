@@ -28,4 +28,9 @@ public interface Driver<D> {
      * Called once per tick after data extraction and after pose function tick.
      */
     void postTick();
+
+    /**
+     * Returns the chat formatted value of this driver, for debugging purposes.
+     */
+    String getChatFormattedString();
 }

@@ -3,6 +3,9 @@ package com.trainguy9512.locomotion;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorRegistry;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
 import com.trainguy9512.locomotion.config.LocomotionConfig;
+import com.trainguy9512.locomotion.debug.DebugEntryFirstPersonDrivers;
+import net.minecraft.client.gui.components.debug.DebugScreenEntries;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,8 +17,9 @@ public class LocomotionMain {
 
 	public static void initialize() {
 		CONFIG.load();
+
 		registerEntityAnimators();
-		//registerBlockRenderers();
+		registerDebugEntries();
 	}
 
 	/*
@@ -31,8 +35,12 @@ public class LocomotionMain {
 	 */
 
 
-	private static void registerEntityAnimators(){
+	private static void registerEntityAnimators() {
 		JointAnimatorRegistry.registerFirstPersonPlayerJointAnimator(new FirstPersonJointAnimator());
+	}
+
+	private static void registerDebugEntries() {
+		DebugScreenEntries.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "first_person_drivers"), new DebugEntryFirstPersonDrivers());
 	}
 
 	/*

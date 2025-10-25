@@ -3,11 +3,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.*;
-import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
-import com.trainguy9512.locomotion.util.Easing;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3f;
 
@@ -57,6 +53,7 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<ItemStack>> PROJECTILE_ITEM = DriverKey.of("projectile_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<Float>> CROSSBOW_RELOAD_SPEED = DriverKey.of("crossbow_reload_speed", () -> VariableDriver.ofFloat(() -> 1f));
     public static final DriverKey<VariableDriver<Float>> ITEM_CONSUMPTION_SPEED = DriverKey.of("item_consumption_speed", () -> VariableDriver.ofFloat(() -> 1f));
+    public static final DriverKey<VariableDriver<Boolean>> IS_IN_RIPTIDE = DriverKey.of("is_in_riptide", () -> VariableDriver.ofBoolean(() -> false));
 
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
         driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(driverContainer.getDriverValue(getItemDriver(interactionHand)).copy());

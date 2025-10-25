@@ -1,6 +1,7 @@
 package com.trainguy9512.locomotion.animation.driver;
 
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import net.minecraft.ChatFormatting;
 
 import java.util.function.Consumer;
 
@@ -72,5 +73,10 @@ public class TriggerDriver implements Driver<Boolean> {
     @Override
     public String toString() {
         return this.hasBeenTriggered() ? "Triggered!" : "Waiting...";
+    }
+
+    @Override
+    public String getChatFormattedString() {
+        return (this.hasBeenTriggered() ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.BLUE) + this.toString();
     }
 }

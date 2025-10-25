@@ -8,7 +8,6 @@ import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.util.Easing;
@@ -26,7 +25,6 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Quaternionf;
@@ -206,6 +204,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             montageManager.interruptMontagesInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT, Transition.builder(TimeSpan.ofTicks(2)).build());
         }
 
+        driverContainer.getDriver(FirstPersonDrivers.IS_IN_RIPTIDE).setValue(dataReference.isAutoSpinAttack());
         driverContainer.getDriver(FirstPersonDrivers.IS_MOVING).setValue(dataReference.input.keyPresses.forward() || dataReference.input.keyPresses.backward() || dataReference.input.keyPresses.left() || dataReference.input.keyPresses.right());
         driverContainer.getDriver(FirstPersonDrivers.IS_GROUNDED).setValue(dataReference.onGround());
         driverContainer.getDriver(FirstPersonDrivers.IS_JUMPING).setValue(dataReference.input.keyPresses.jump());

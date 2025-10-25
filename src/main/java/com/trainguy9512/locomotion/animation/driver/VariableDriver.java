@@ -4,6 +4,7 @@ import com.trainguy9512.locomotion.util.Interpolator;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import java.text.DecimalFormat;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -148,6 +149,22 @@ public class VariableDriver<D> implements Driver<D> {
 
     @Override
     public String toString() {
-        return this.currentValue.toString();
+        String currentValueString = this.currentValue.toString();
+
+        DecimalFormat format = new DecimalFormat("0.00");
+        if (this.currentValue instanceof Float value) {
+            currentValueString = format.format(value);
+        } else if (this.currentValue instanceof Vector3f value) {
+            currentValueString = "("
+                    + format.format(value.x) + " "
+                    + format.format(value.y) + " "
+                    + format.format(value.z) + ")";
+        }
+        return currentValueString;
+    }
+
+    @Override
+    public String getChatFormattedString() {
+        return this.toString();
     }
 }
