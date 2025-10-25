@@ -31,6 +31,12 @@ public class FirstPersonMontages {
             })
             .build();
 
+    public static final MontageConfiguration HAND_TRIDENT_JAB_MONTAGE = MontageConfiguration.builder("hand_trident_jab", FirstPersonAnimationSequences.HAND_TRIDENT_JAB)
+            .playsInSlot(MAIN_HAND_ATTACK_SLOT)
+            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
+            .build();
 
     public static final MontageConfiguration USE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("hand_use_main_hand", FirstPersonAnimationSequences.HAND_TOOL_USE)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)

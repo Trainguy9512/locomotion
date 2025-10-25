@@ -38,7 +38,7 @@ public enum FirstPersonHandPose {
     SHIELD (HandPoseStates.SHIELD_RAISE, HandPoseStates.SHIELD_LOWER, HandPoseStates.SHIELD, FirstPersonAnimationSequences.HAND_SHIELD_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
     BOW (HandPoseStates.BOW_RAISE, HandPoseStates.BOW_LOWER, HandPoseStates.BOW, FirstPersonAnimationSequences.HAND_BOW_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
     CROSSBOW (HandPoseStates.CROSSBOW_RAISE, HandPoseStates.CROSSBOW_LOWER, HandPoseStates.CROSSBOW, FirstPersonAnimationSequences.HAND_CROSSBOW_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    TRIDENT (HandPoseStates.TRIDENT_RAISE, HandPoseStates.TRIDENT_LOWER, HandPoseStates.TRIDENT, FirstPersonAnimationSequences.HAND_TRIDENT_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE);
+    TRIDENT (HandPoseStates.TRIDENT_RAISE, HandPoseStates.TRIDENT_LOWER, HandPoseStates.TRIDENT, FirstPersonAnimationSequences.HAND_TRIDENT_POSE, FirstPersonMontages.HAND_TRIDENT_JAB_MONTAGE);
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator/HandPose");
 
@@ -233,7 +233,7 @@ public enum FirstPersonHandPose {
                 fromLoweringAliasBuilder,
                 interactionHand,
                 FirstPersonHandPose.TRIDENT,
-                FirstPersonHandPose.TRIDENT.getMiningStateMachine(cachedPoseContainer, interactionHand),
+                FirstPersonTrident.handTridentPoseFunction(cachedPoseContainer, interactionHand),
                 ApplyAdditiveFunction.of(
                         SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_POSE).build(),
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
