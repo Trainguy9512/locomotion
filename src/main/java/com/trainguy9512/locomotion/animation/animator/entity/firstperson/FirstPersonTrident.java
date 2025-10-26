@@ -7,12 +7,15 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.world.InteractionHand;
+
+import java.util.Set;
 
 public class FirstPersonTrident {
 
@@ -23,29 +26,48 @@ public class FirstPersonTrident {
                 .resetsUponRelevant(true)
                 .defineState(State.builder(TridentStates.IDLE, FirstPersonHandPose.TRIDENT.getMiningStateMachine(cachedPoseContainer, interactionHand))
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(TridentStates.CHARGE_THROW)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(usingItemDriverKey))
-                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
-                                .build())
                         .build())
                 .defineState(State.builder(TridentStates.CHARGE_THROW, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_CHARGE_THROW).build())
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(TridentStates.RIPTIDE)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(usingItemDriverKey).negate().and(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_IN_RIPTIDE)))
-                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_IN_OUT).build())
-                                .setPriority(60)
-                                .build())
-                        .addOutboundTransition(StateTransition.builder(TridentStates.IDLE)
-                                .isTakenIfTrue(context -> shouldCancelChargeThrow(context, interactionHand))
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.25f)).setEasement(Easing.SINE_OUT).build())
+                        .addOutboundTransition(StateTransition.builder(TridentStates.RIPTIDE_END)
+                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(usingItemDriverKey).negate())
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(15)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(50)
                                 .build())
                         .build())
                 .defineState(State.builder(TridentStates.RIPTIDE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RIPTIDE).build())
                         .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(TridentStates.RIPTIDE_END)
+                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_IN_RIPTIDE).negate())
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(8)).setEasement(Easing.SINE_IN_OUT).build())
+                                .build())
+                        .build())
+                .defineState(State.builder(TridentStates.RIPTIDE_END, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RIPTIDE_END).build())
+                        .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(TridentStates.IDLE)
                                 .isTakenIfMostRelevantAnimationPlayerFinishing(1)
-                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(25)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(8)).setEasement(Easing.SINE_IN_OUT).build())
+                                .build())
+                        .build())
+                .addStateAlias(StateAlias.builder(Set.of(
+                                TridentStates.IDLE,
+                                TridentStates.RIPTIDE_END,
+                                TridentStates.RIPTIDE
+                        ))
+                        .addOutboundTransition(StateTransition.builder(TridentStates.CHARGE_THROW)
+                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(usingItemDriverKey))
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
+                                .build())
+                        .build())
+                .addStateAlias(StateAlias.builder(Set.of(
+                                TridentStates.IDLE,
+                                TridentStates.RIPTIDE_END
+                        ))
+                        .addOutboundTransition(StateTransition.builder(TridentStates.RIPTIDE)
+                                .isTakenIfTrue(context -> shouldPlayRiptideAnimation(context, interactionHand))
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setPriority(60)
                                 .build())
                         .build())
                 .build();
@@ -56,11 +78,13 @@ public class FirstPersonTrident {
     enum TridentStates {
         IDLE,
         CHARGE_THROW,
-        RIPTIDE
+        RIPTIDE,
+        RIPTIDE_END
     }
 
-    public static boolean shouldCancelChargeThrow(StateTransition.TransitionContext context, InteractionHand interactionHand) {
-        DriverKey<VariableDriver<Boolean>> usingItemDriverKey = FirstPersonDrivers.getUsingItemDriver(interactionHand);
-        return !context.driverContainer().getDriver(usingItemDriverKey).getPreviousValue();
+    private static boolean shouldPlayRiptideAnimation(StateTransition.TransitionContext context, InteractionHand interactionHand) {
+        boolean isInRiptide = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_IN_RIPTIDE);
+        InteractionHand lastUsedHand = context.driverContainer().getDriverValue(FirstPersonDrivers.LAST_USED_HAND);
+        return isInRiptide && lastUsedHand == interactionHand;
     }
 }

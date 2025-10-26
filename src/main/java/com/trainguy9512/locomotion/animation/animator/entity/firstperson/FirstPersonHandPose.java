@@ -1,7 +1,5 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
-import com.trainguy9512.locomotion.LocomotionMain;
-import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -105,6 +103,7 @@ public enum FirstPersonHandPose {
     public enum HandPoseStates {
         DROPPING_LAST_ITEM,
         USING_LAST_ITEM,
+        THROWING_TRIDENT,
         EMPTY,
         EMPTY_RAISE,
         EMPTY_LOWER,
@@ -282,11 +281,20 @@ public enum FirstPersonHandPose {
                         )
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .addStateAlias(StateAlias.builder(Set.of(HandPoseStates.DROPPING_LAST_ITEM, HandPoseStates.USING_LAST_ITEM))
+                .defineState(State.builder(HandPoseStates.THROWING_TRIDENT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RELEASE_THROW).build())
+                        .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY_RAISE)
+                                .isTakenIfMostRelevantAnimationPlayerFinishing(0)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(1)).build())
+                                .build())
+                        .resetsPoseFunctionUponEntry(true)
+                        .build())
+                .addStateAlias(StateAlias.builder(Set.of(
+                                HandPoseStates.DROPPING_LAST_ITEM,
+                                HandPoseStates.USING_LAST_ITEM
+                        ))
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
                                 .isTakenIfMostRelevantAnimationPlayerFinishing(1)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
-//                                .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
                                 .build())
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
                                 .isTakenIfTrue(context -> shouldCancelLastItemAnimation(context, interactionHand))
@@ -382,7 +390,7 @@ public enum FirstPersonHandPose {
         return context.driverContainer().getDriver(FirstPersonDrivers.HAS_DROPPED_ITEM).hasBeenTriggered();
     }
 
-    private static boolean shouldUseLastItemTransition(StateTransition.TransitionContext context, InteractionHand interactionHand) {
+    private static boolean shouldTakeUseLastItemTransition(StateTransition.TransitionContext context, InteractionHand interactionHand) {
         // Required conditions for the "use last item" transition
         if (!isNewItemEmpty(context, interactionHand)) {
             return false;
@@ -398,6 +406,24 @@ public enum FirstPersonHandPose {
             return true;
         }
         return interactionHand == InteractionHand.MAIN_HAND && context.driverContainer().getDriver(FirstPersonDrivers.HAS_ATTACKED).hasBeenTriggered();
+    }
+
+    private static boolean shouldTakeThrowTridentTransition(StateTransition.TransitionContext context, InteractionHand interactionHand) {
+        // Required conditions for the "throw trident" transition
+        if (!isNewItemEmpty(context, interactionHand)) {
+            return false;
+        }
+        if (isOldItemEmpty(context, interactionHand)) {
+            return false;
+        }
+        if (!context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).getPreviousValue()) {
+            return false;
+        }
+        if (context.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getCurrentValue().getUseAnimation() != ItemUseAnimation.SPEAR) {
+            return false;
+        }
+        // If any of these conditions are met, use the "throw trident" transition
+        return true;
     }
 
     private static boolean shouldSkipRaiseAnimation(StateTransition.TransitionContext context, InteractionHand interactionHand) {
@@ -469,9 +495,16 @@ public enum FirstPersonHandPose {
                                 .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
                                 .build())
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.USING_LAST_ITEM)
-                                .isTakenIfTrue(context -> shouldUseLastItemTransition(context, interactionHand))
+                                .isTakenIfTrue(context -> shouldTakeUseLastItemTransition(context, interactionHand))
                                 .setPriority(60)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
+                                .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), interactionHand))
+                                .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
+                                .build())
+                        .addOutboundTransition(StateTransition.builder(HandPoseStates.THROWING_TRIDENT)
+                                .isTakenIfTrue(context -> shouldTakeThrowTridentTransition(context, interactionHand))
+                                .setPriority(70)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(1)).build())
                                 .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), interactionHand))
                                 .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
                                 .build())
