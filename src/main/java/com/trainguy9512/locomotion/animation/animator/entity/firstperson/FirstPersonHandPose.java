@@ -416,9 +416,9 @@ public enum FirstPersonHandPose {
         if (isOldItemEmpty(context, interactionHand)) {
             return false;
         }
-        if (!context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).getPreviousValue()) {
-            return false;
-        }
+//        if (!context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).getPreviousValue()) {
+//            return false;
+//        }
         if (context.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getCurrentValue().getUseAnimation() != ItemUseAnimation.SPEAR) {
             return false;
         }
