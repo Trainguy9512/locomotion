@@ -6,11 +6,12 @@
   "name": "${mod_name}",
   "description": "${mod_description}",
   "authors": [
-    "James Pelter (Trainguy)"
+    "James Pelter AKA Trainguy9512"
   ],
   "contributors": [
     "Scott Smoker (Animation help)",
     "Micah Preciado (Animation help)",
+    "Austan Todd (Animation help)",
     "The Panda Oliver (Multi-version project setup)",
     "Marvin \"MineToBlend\" (Original keyframe structure and easement class help)"
   ],

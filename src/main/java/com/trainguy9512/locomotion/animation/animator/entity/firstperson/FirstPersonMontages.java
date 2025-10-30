@@ -30,6 +30,14 @@ public class FirstPersonMontages {
                 return handPose.basePoseLocation;
             })
             .build();
+    public static final MontageConfiguration HAND_TOOL_ATTACK_AXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_axe", FirstPersonAnimationSequences.HAND_TOOL_AXE_ATTACK)
+            .playsInSlot(MAIN_HAND_ATTACK_SLOT)
+            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(15)).setEasement(Easing.SINE_IN_OUT).build())
+            .build();
+
+
 
     public static final MontageConfiguration HAND_TRIDENT_JAB_MONTAGE = MontageConfiguration.builder("hand_trident_jab", FirstPersonAnimationSequences.HAND_TRIDENT_JAB)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)

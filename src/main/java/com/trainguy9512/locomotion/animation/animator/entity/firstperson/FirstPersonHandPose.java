@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -27,16 +28,17 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 public enum FirstPersonHandPose {
-    EMPTY (HandPoseStates.EMPTY_RAISE, HandPoseStates.EMPTY_LOWER, HandPoseStates.EMPTY, FirstPersonAnimationSequences.HAND_EMPTY_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    GENERIC_ITEM (HandPoseStates.GENERIC_ITEM_RAISE, HandPoseStates.GENERIC_ITEM_LOWER, HandPoseStates.GENERIC_ITEM, FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    TOOL (HandPoseStates.TOOL_RAISE, HandPoseStates.TOOL_LOWER, HandPoseStates.TOOL, FirstPersonAnimationSequences.HAND_TOOL_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    SWORD (HandPoseStates.SWORD_RAISE, HandPoseStates.SWORD_LOWER, HandPoseStates.SWORD, FirstPersonAnimationSequences.HAND_TOOL_POSE, null),
-    SHIELD (HandPoseStates.SHIELD_RAISE, HandPoseStates.SHIELD_LOWER, HandPoseStates.SHIELD, FirstPersonAnimationSequences.HAND_SHIELD_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    BOW (HandPoseStates.BOW_RAISE, HandPoseStates.BOW_LOWER, HandPoseStates.BOW, FirstPersonAnimationSequences.HAND_BOW_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    CROSSBOW (HandPoseStates.CROSSBOW_RAISE, HandPoseStates.CROSSBOW_LOWER, HandPoseStates.CROSSBOW, FirstPersonAnimationSequences.HAND_CROSSBOW_POSE, FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    TRIDENT (HandPoseStates.TRIDENT_RAISE, HandPoseStates.TRIDENT_LOWER, HandPoseStates.TRIDENT, FirstPersonAnimationSequences.HAND_TRIDENT_POSE, FirstPersonMontages.HAND_TRIDENT_JAB_MONTAGE);
+    EMPTY (HandPoseStates.EMPTY_RAISE, HandPoseStates.EMPTY_LOWER, HandPoseStates.EMPTY, FirstPersonAnimationSequences.HAND_EMPTY_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
+    GENERIC_ITEM (HandPoseStates.GENERIC_ITEM_RAISE, HandPoseStates.GENERIC_ITEM_LOWER, HandPoseStates.GENERIC_ITEM, FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
+    TOOL (HandPoseStates.TOOL_RAISE, HandPoseStates.TOOL_LOWER, HandPoseStates.TOOL, FirstPersonAnimationSequences.HAND_TOOL_POSE, FirstPersonHandPose::getToolMontage),
+    SWORD (HandPoseStates.SWORD_RAISE, HandPoseStates.SWORD_LOWER, HandPoseStates.SWORD, FirstPersonAnimationSequences.HAND_TOOL_POSE, driverContainer -> null),
+    SHIELD (HandPoseStates.SHIELD_RAISE, HandPoseStates.SHIELD_LOWER, HandPoseStates.SHIELD, FirstPersonAnimationSequences.HAND_SHIELD_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
+    BOW (HandPoseStates.BOW_RAISE, HandPoseStates.BOW_LOWER, HandPoseStates.BOW, FirstPersonAnimationSequences.HAND_BOW_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
+    CROSSBOW (HandPoseStates.CROSSBOW_RAISE, HandPoseStates.CROSSBOW_LOWER, HandPoseStates.CROSSBOW, FirstPersonAnimationSequences.HAND_CROSSBOW_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
+    TRIDENT (HandPoseStates.TRIDENT_RAISE, HandPoseStates.TRIDENT_LOWER, HandPoseStates.TRIDENT, FirstPersonAnimationSequences.HAND_TRIDENT_POSE, driverContainer -> FirstPersonMontages.HAND_TRIDENT_JAB_MONTAGE);
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator/HandPose");
 
@@ -44,14 +46,20 @@ public enum FirstPersonHandPose {
     public final HandPoseStates loweringState;
     public final HandPoseStates poseState;
     public final ResourceLocation basePoseLocation;
-    public final MontageConfiguration attackMontage;
+    public final Function<OnTickDriverContainer, MontageConfiguration> attackMontageFunction;
 
-    FirstPersonHandPose(HandPoseStates raisingState, HandPoseStates loweringState, HandPoseStates poseState, ResourceLocation basePoseLocation, MontageConfiguration attackMontage) {
+    FirstPersonHandPose(
+            HandPoseStates raisingState,
+            HandPoseStates loweringState,
+            HandPoseStates poseState,
+            ResourceLocation basePoseLocation,
+            Function<OnTickDriverContainer, MontageConfiguration> attackMontageFunction
+    ) {
         this.raisingState = raisingState;
         this.loweringState = loweringState;
         this.poseState = poseState;
         this.basePoseLocation = basePoseLocation;
-        this.attackMontage = attackMontage;
+        this.attackMontageFunction = attackMontageFunction;
     }
 
     private static final List<TagKey<Item>> TOOL_ITEM_TAGS = List.of(
@@ -86,6 +94,13 @@ public enum FirstPersonHandPose {
             }
         }
         return GENERIC_ITEM;
+    }
+
+    public static MontageConfiguration getToolMontage(OnTickDriverContainer driverContainer) {
+        if (driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM).is(ItemTags.AXES)) {
+            return FirstPersonMontages.HAND_TOOL_ATTACK_AXE_MONTAGE;
+        }
+        return FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE;
     }
 
     public PoseFunction<LocalSpacePose> getMiningStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {

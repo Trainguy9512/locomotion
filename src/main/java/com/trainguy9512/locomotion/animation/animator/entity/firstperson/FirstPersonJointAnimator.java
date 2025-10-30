@@ -69,6 +69,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     public static final BlendMask LEFT_SIDE_MASK = BlendMask.builder()
             .defineForMultipleJoints(LEFT_SIDE_JOINTS, 1)
             .build();
+    public static final BlendMask CAMERA_MASK = BlendMask.builder()
+            .defineForJoint(CAMERA_JOINT, 1f)
+            .build();
 
     @Override
     public void postProcessModelParts(EntityModel<AvatarRenderState> entityModel, AvatarRenderState entityRenderState) {
@@ -92,19 +95,32 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         PoseFunction<LocalSpacePose> mainHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.MAIN_HAND);
         PoseFunction<LocalSpacePose> offHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.OFF_HAND);
+        cachedPoseContainer.register("main_hand_pose", mainHandPose, false);
+        cachedPoseContainer.register("off_hand_pose", MirrorFunction.of(offHandPose), false);
 
-        PoseFunction<LocalSpacePose> combinedHandPoseFunction = BlendPosesFunction.builder(mainHandPose)
-                .addBlendInput(MirrorFunction.of(offHandPose), evaluationState -> 1f, LEFT_SIDE_MASK)
+        // Getting the additive camera pose from the off hand
+        PoseFunction<LocalSpacePose> composedCameraPoseFunction = ApplyAdditiveFunction.of(
+                cachedPoseContainer.getOrThrow("main_hand_pose"),
+                MakeDynamicAdditiveFunction.of(
+                        cachedPoseContainer.getOrThrow("off_hand_pose"),
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build()
+                ));
+
+        PoseFunction<LocalSpacePose> combinedHandPoseFunction = BlendPosesFunction.builder(cachedPoseContainer.getOrThrow("main_hand_pose"))
+                .addBlendInput(cachedPoseContainer.getOrThrow("off_hand_pose"), evaluationState -> 1f, LEFT_SIDE_MASK)
+                .addBlendInput(composedCameraPoseFunction, evaluationState -> 1f, CAMERA_MASK)
                 .build();
 
         PoseFunction<LocalSpacePose> twoHandedActionPoseFunction = FirstPersonTwoHandedActions.constructPoseFunction(combinedHandPoseFunction, cachedPoseContainer);
 
         PoseFunction<LocalSpacePose> handPoseWithAdditive = ApplyAdditiveFunction.of(twoHandedActionPoseFunction, cachedPoseContainer.getOrThrow(ADDITIVE_GROUND_MOVEMENT_CACHE));
 
-        PoseFunction<LocalSpacePose> mirroredBasedOnHandednessPose = MirrorFunction.of(handPoseWithAdditive, context -> Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT);
+
+        PoseFunction<LocalSpacePose> mirroredHandednessPose = MirrorFunction.of(handPoseWithAdditive, context -> Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT);
+
 
         PoseFunction<LocalSpacePose> movementDirectionOffsetTransformer =
-                JointTransformerFunction.localOrParentSpaceBuilder(mirroredBasedOnHandednessPose, ARM_BUFFER_JOINT)
+                JointTransformerFunction.localOrParentSpaceBuilder(mirroredHandednessPose, ARM_BUFFER_JOINT)
                         .setTranslation(
                                 context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET, context.partialTicks()).mul(1.5f, new Vector3f()),
                                 JointChannel.TransformType.ADD,
@@ -152,7 +168,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         driverContainer.getDriver(FirstPersonDrivers.HAS_DROPPED_ITEM).runIfTriggered(() -> montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE, driverContainer));
         driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).runIfTriggered(() -> {
-            MontageConfiguration montageConfiguration = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE).attackMontage;
+            MontageConfiguration montageConfiguration = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE).attackMontageFunction.apply(driverContainer);
             if (montageConfiguration != null) {
                 montageManager.playMontage(montageConfiguration, driverContainer);
             }

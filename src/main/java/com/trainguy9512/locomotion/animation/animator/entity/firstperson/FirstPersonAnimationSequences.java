@@ -18,6 +18,7 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_TOOL_PICKAXE_MINE_SWING = makeAnimationSequenceResourceLocation("hand/tool/pickaxe/mine_swing");
     public static final ResourceLocation HAND_TOOL_PICKAXE_MINE_FINISH = makeAnimationSequenceResourceLocation("hand/tool/pickaxe/mine_finish");
     public static final ResourceLocation HAND_TOOL_ATTACK = makeAnimationSequenceResourceLocation("hand/tool/attack");
+    public static final ResourceLocation HAND_TOOL_AXE_ATTACK = makeAnimationSequenceResourceLocation("hand/tool/axe_attack");
     public static final ResourceLocation HAND_TOOL_USE = makeAnimationSequenceResourceLocation("hand/tool/use");
     public static final ResourceLocation HAND_TOOL_SWORD_SWING_LEFT = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_left");
     public static final ResourceLocation HAND_TOOL_SWORD_SWING_RIGHT = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_right");
