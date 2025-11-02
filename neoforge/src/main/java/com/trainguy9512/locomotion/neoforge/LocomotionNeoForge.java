@@ -27,7 +27,7 @@ public class LocomotionNeoForge {
     }
 
     public void onResourceReload(AddClientReloadListenersEvent event) {
-        event.addListener(LocomotionResources.RELOADER_IDENTIFIER, LocomotionResources::reload);
+        event.addListener(LocomotionResources.RELOADER_IDENTIFIER, new LocomotionResources());
     }
 
 }

@@ -24,7 +24,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class LocomotionResources {
+public class LocomotionResources implements PreparableReloadListener {
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/Resources");
 
@@ -63,9 +63,10 @@ public class LocomotionResources {
         }
     }
 
-    public static CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier barrier, ResourceManager manager, Executor backgroundExecutor, Executor gameExecutor) {
-        CompletableFuture<Map<ResourceLocation, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(manager, backgroundExecutor);
-        CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(manager, backgroundExecutor);
+    @Override
+    public CompletableFuture<Void> reload(SharedState sharedState, Executor exectutor, PreparationBarrier barrier, Executor applyExectutor) {
+        CompletableFuture<Map<ResourceLocation, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(sharedState.resourceManager(), exectutor);
+        CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(sharedState.resourceManager(), exectutor);
 
         return CompletableFuture.allOf(loadedJointSkeletons, loadedAnimationSequences)
                 .thenCompose(barrier::wait)
@@ -78,6 +79,22 @@ public class LocomotionResources {
                     LOGGER.info("Cleared and replaced Locomotion resource data.");
                 }));
     }
+
+//    public static CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier barrier, ResourceManager manager, Executor backgroundExecutor, Executor gameExecutor) {
+//        CompletableFuture<Map<ResourceLocation, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(manager, backgroundExecutor);
+//        CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(manager, backgroundExecutor);
+//
+//        return CompletableFuture.allOf(loadedJointSkeletons, loadedAnimationSequences)
+//                .thenCompose(barrier::wait)
+//                .thenCompose(voided -> CompletableFuture.runAsync(() -> {
+//                    JOINT_SKELETONS.clear();
+//                    JOINT_SKELETONS.putAll(loadedJointSkeletons.join());
+//                    ANIMATION_SEQUENCES.clear();
+//                    ANIMATION_SEQUENCES.putAll(loadedAnimationSequences.join());
+//                    ANIMATION_SEQUENCES.replaceAll((resourceLocation, animationSequence) -> animationSequence.getBaked());
+//                    LOGGER.info("Cleared and replaced Locomotion resource data.");
+//                }));
+//    }
 
     private static CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadAnimationSequences(ResourceManager manager, Executor backgroundExecutor) {
         return loadJsonResources(
