@@ -69,7 +69,7 @@ public class FirstPersonMining {
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_MINE_SWING)
                         .looping(true)
                         .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(16))
-                        .setPlayRate(evaluationState -> 1.25f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier)
+                        .setPlayRate(evaluationState -> 1.5f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier)
                         .build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_MINE_FINISH).build(),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build());
