@@ -69,6 +69,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     public static final BlendMask LEFT_SIDE_MASK = BlendMask.builder()
             .defineForMultipleJoints(LEFT_SIDE_JOINTS, 1)
             .build();
+
     public static final BlendMask CAMERA_MASK = BlendMask.builder()
             .defineForJoint(CAMERA_JOINT, 1f)
             .build();
