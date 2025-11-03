@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Environment(EnvType.CLIENT)
 @Mixin(ItemInHandLayer.class)
 public abstract class MixinItemInHandLayer<T extends LivingEntity, S extends ArmedEntityRenderState, M extends EntityModel<S>> extends RenderLayer<S, M> {
 

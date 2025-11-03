@@ -380,7 +380,13 @@ public enum FirstPersonHandPose {
         }
         // Duct-tape solution for hand pose functions like consumables not being able to update the rendered item before the hard switch condition is updated.
         if (context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).getPreviousValue()) {
-            return false;
+            ItemUseAnimation useAnimation = context.driverContainer().getDriver(FirstPersonDrivers.getItemDriver(interactionHand)).getPreviousValue().getUseAnimation();
+            if (useAnimation == ItemUseAnimation.EAT) {
+                return false;
+            }
+            if (useAnimation == ItemUseAnimation.DRINK) {
+                return false;
+            }
         }
         if (hasItemChanged(context, interactionHand)) {
             return true;
@@ -425,19 +431,29 @@ public enum FirstPersonHandPose {
 
     private static boolean shouldTakeThrowTridentTransition(StateTransition.TransitionContext context, InteractionHand interactionHand) {
         // Required conditions for the "throw trident" transition
+        // Don't play the throw animation if the new item is not empty
         if (!isNewItemEmpty(context, interactionHand)) {
             return false;
         }
+        // Don't play the throw animation if the old item is empty
         if (isOldItemEmpty(context, interactionHand)) {
+            return false;
+        }
+        // Don't play the throw animation if the hotbar slot just changed
+        if (hasSelectedHotbarSlotChanged(context, interactionHand)) {
+            return false;
+        }
+        // Don't play the throw animation if the player has just swapped items
+        if (context.driverContainer().getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).hasBeenTriggered()) {
             return false;
         }
 //        if (!context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).getPreviousValue()) {
 //            return false;
 //        }
-        if (context.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getCurrentValue().getUseAnimation() != ItemUseAnimation.SPEAR) {
-            return false;
-        }
         // If any of these conditions are met, use the "throw trident" transition
+        if (context.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getCurrentValue().getUseAnimation() == ItemUseAnimation.SPEAR) {
+            return true;
+        }
         return true;
     }
 

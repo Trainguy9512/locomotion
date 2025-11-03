@@ -19,7 +19,6 @@ public class LocomotionMain {
 		CONFIG.load();
 
 		registerEntityAnimators();
-		registerDebugEntries();
 	}
 
 	/*
@@ -37,10 +36,6 @@ public class LocomotionMain {
 
 	private static void registerEntityAnimators() {
 		JointAnimatorRegistry.registerFirstPersonPlayerJointAnimator(new FirstPersonJointAnimator());
-	}
-
-	private static void registerDebugEntries() {
-		DebugScreenEntries.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "first_person_drivers"), new DebugEntryFirstPersonDrivers());
 	}
 
 	/*

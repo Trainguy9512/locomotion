@@ -45,6 +45,16 @@ public abstract class MixinMinecraft {
     }
 
     @Inject(
+            method = "handleKeybinds",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;send(Lnet/minecraft/network/protocol/Packet;)V", ordinal = 0)
+    )
+    public void playSwapItemAnimation(CallbackInfo ci) {
+        JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
+            dataContainer.getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).trigger();
+        });
+    }
+
+    @Inject(
             method = "startAttack",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V"))
     public void injectStartAttackHitEntity(CallbackInfoReturnable<Boolean> cir) {

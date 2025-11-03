@@ -96,8 +96,8 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         PoseFunction<LocalSpacePose> mainHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.MAIN_HAND);
         PoseFunction<LocalSpacePose> offHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.OFF_HAND);
-        cachedPoseContainer.register("main_hand_pose", mainHandPose, false);
-        cachedPoseContainer.register("off_hand_pose", MirrorFunction.of(offHandPose), false);
+        cachedPoseContainer.register("main_hand_pose", mainHandPose, true);
+        cachedPoseContainer.register("off_hand_pose", MirrorFunction.of(offHandPose), true);
 
         // Getting the additive camera pose from the off hand
         PoseFunction<LocalSpacePose> composedCameraPoseFunction = ApplyAdditiveFunction.of(
