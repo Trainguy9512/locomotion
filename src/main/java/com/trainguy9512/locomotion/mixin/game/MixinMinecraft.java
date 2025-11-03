@@ -1,6 +1,7 @@
 package com.trainguy9512.locomotion.mixin.game;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import net.minecraft.client.Minecraft;
@@ -50,7 +51,7 @@ public abstract class MixinMinecraft {
     )
     public void playSwapItemAnimation(CallbackInfo ci) {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-            dataContainer.getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).trigger();
+//            dataContainer.getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).trigger();
         });
     }
 
