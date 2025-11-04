@@ -454,7 +454,7 @@ public enum FirstPersonHandPose {
         if (context.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getCurrentValue().getUseAnimation() == ItemUseAnimation.SPEAR) {
             return true;
         }
-        return true;
+        return false;
     }
 
     private static boolean shouldSkipRaiseAnimation(StateTransition.TransitionContext context, InteractionHand interactionHand) {
@@ -520,21 +520,21 @@ public enum FirstPersonHandPose {
                                 .build())
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.DROPPING_LAST_ITEM)
                                 .isTakenIfTrue(context -> shouldTakeDropLastItemTransition(context, interactionHand))
-                                .setPriority(60)
+                                .setPriority(80)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
                                 .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), interactionHand))
                                 .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
                                 .build())
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.USING_LAST_ITEM)
                                 .isTakenIfTrue(context -> shouldTakeUseLastItemTransition(context, interactionHand))
-                                .setPriority(60)
+                                .setPriority(70)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
                                 .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), interactionHand))
                                 .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
                                 .build())
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.THROWING_TRIDENT)
                                 .isTakenIfTrue(context -> shouldTakeThrowTridentTransition(context, interactionHand))
-                                .setPriority(70)
+                                .setPriority(60)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(1)).build())
                                 .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), interactionHand))
                                 .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))

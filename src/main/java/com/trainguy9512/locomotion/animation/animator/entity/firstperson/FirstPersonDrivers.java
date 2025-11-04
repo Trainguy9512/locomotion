@@ -43,7 +43,7 @@ public class FirstPersonDrivers {
     public static final DriverKey<TriggerDriver> HAS_INTERACTED_WITH_OFF_HAND = DriverKey.of("has_interacted_with_off_hand_item", () -> TriggerDriver.of(2));
     public static final DriverKey<TriggerDriver> HAS_BLOCKED_ATTACK = DriverKey.of("has_blocked_attack", TriggerDriver::of);
     public static final DriverKey<TriggerDriver> HAS_DROPPED_ITEM = DriverKey.of("has_dropped_item", TriggerDriver::of);
-    public static final DriverKey<TriggerDriver> HAS_SWAPPED_ITEMS = DriverKey.of("has_swapped_items", TriggerDriver::of);
+    public static final DriverKey<TriggerDriver> HAS_SWAPPED_ITEMS = DriverKey.of("has_swapped_items", () -> TriggerDriver.of(3));
 
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_MAIN_HAND_ITEM = DriverKey.of("is_using_main_hand_item", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_OFF_HAND_ITEM = DriverKey.of("is_using_off_hand_item", () -> VariableDriver.ofBoolean(() -> false));
@@ -84,6 +84,13 @@ public class FirstPersonDrivers {
         return switch (interactionHand) {
             case MAIN_HAND -> MAIN_HAND_GENERIC_ITEM_POSE;
             case OFF_HAND -> OFF_HAND_GENERIC_ITEM_POSE;
+        };
+    }
+
+    public static DriverKey<VariableDriver<Boolean>> getItemOnCooldownDriver(InteractionHand interactionHand) {
+        return switch (interactionHand) {
+            case MAIN_HAND -> IS_MAIN_HAND_ON_COOLDOWN;
+            case OFF_HAND -> IS_OFF_HAND_ON_COOLDOWN;
         };
     }
 

@@ -47,11 +47,11 @@ public abstract class MixinMinecraft {
 
     @Inject(
             method = "handleKeybinds",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;send(Lnet/minecraft/network/protocol/Packet;)V", ordinal = 0)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getConnection()Lnet/minecraft/client/multiplayer/ClientPacketListener;", ordinal = 0)
     )
     public void playSwapItemAnimation(CallbackInfo ci) {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-//            dataContainer.getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).trigger();
+            dataContainer.getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).trigger();
         });
     }
 
