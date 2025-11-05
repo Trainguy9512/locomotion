@@ -2,7 +2,7 @@
 
 (Formerly known as Trainguy's Animation Overhaul)
 
-Locomotion is a mod/animation API for Minecraft centered around giving the game's entities and blocks complex gameplay-driven animations through a real-time animation system inspired by Unreal Engine's Animation Blueprints. Currently included in the Moonflower suite of mods.
+Locomotion is a Minecraft: Java mod centered around giving the game's entities and blocks complex gameplay-driven animations through a real-time animation system inspired by Unreal Engine's Animation Blueprints. Currently included in the Moonflower suite of mods.
 
 > **Warning!**
 > This project is still in heavy development! You are free to compile yourself and try it out, but keep in mind that there will be missing animations, placeholders, and debugging visuals that will not look correct in a normal gameplay context.
@@ -12,7 +12,7 @@ Locomotion is a mod/animation API for Minecraft centered around giving the game'
 - 🟩 Complete
 - 🟨 High Priority
 - 🟥 Low Priority
-- ❌ Currently out-of-scope (not permanently though!)
+- ❌ Currently out-of-scope
 
 | Feature                         | Status | Notes                                                                                                                                                                                         |
 |:--------------------------------|:-------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -39,6 +39,10 @@ Locomotion is a mod/animation API for Minecraft centered around giving the game'
 ## 📘 Credits
 - Development, Rigging, Animation
   - [James Pelter (Trainguy9512)](https://x.com/Trainguy9512)
+- Animators
+  - [Scott Smoker](https://x.com/Cloud_____X) - Trident animations
+  - [Micah Preciado](https://x.com/ZAMinationM) - Sword attack animations
+  - [Austan Todd](https://x.com/XoriakOfficial) - Axe attack animation
 - Contributors
   - [Marvin Schürz](https://twitter.com/minetoblend) - Timeline and easing system
   - [The Panda Oliver](https://github.com/ThePandaOliver) - [Multi-loader template](https://github.com/ThePandaOliver/Multiloader-Template)
@@ -58,18 +62,18 @@ Locomotion is a mod/animation API for Minecraft centered around giving the game'
 ## 🔍 FAQ
 
 - What versions of the game will this mod support?
-> For right now, the mod is being worked on in the latest release version of Minecraft: Java Edition. Minecraft: Bedrock Edition will not be supported due to it having a fundamentally different modding API. 
+> For right now, the mod is being worked on in the latest release version of Minecraft: Java Edition. Minecraft: Bedrock Edition will not be supported. 
 > 
-> Closer to release, the plan is to gear the project towards supporting multiple game versions and mod loaders at once. Whether or not there will be backports is TBD, but if there's the demand for particular versions please let me know.
+> Currently backports to versions such as 1.20 and 1.21.1 are not planned due to the wide changes to the game's rendering system throughout the 1.21.x drops.
 - What mod loaders will this mod be compatible with?
-> Right now this is being developed with Fabric, for the sake of easy prototyping, but I would like to expand it to Quilt, NeoForge, and Forge further along in development.
+> Right now both Fabric and NeoForge are supported.
 - What will the mod require as a dependency?
-> Right now, just the Fabric API. This may change though as I'm not using that much fabric-specific functionality.
+> For the fabric version, just Fabric API. Mod Loader and YACL are optional dependencies for both Fabric and NeoForge for the configuration interface.
 - What is this mod compatible with?
-> Currently there is no official list of what will or will not work, but generally most cosmetic vanilla-friendly mods like Essential, 3D Skin Layers, and other cosmetic mods should work perfectly fine. I'm looking into adding support for mods that use the playerAnimator library like Better Combat or Emotecraft. 
+> Currently there is no list of what will or will not work, but generally most cosmetic vanilla-friendly mods like Essential, 3D Skin Layers, and other cosmetic mods should work perfectly fine.
 >
 > Additionally, right now there are no plans to implement compatibility with heavier content mods which would have their own player interaction animations (depends on the implementation).
 > 
 > Resource packs that change animations like Fresh Animations should be compatible, but animations added for the same kind of thing by both this mod and a resource pack will not work together.
 
-If you feel this FAQ is missing anything or you have any additional questions, please let me know by sending a message request to my Discord account, `Trainguy9512`
+If you feel this FAQ is missing anything or you have any additional questions, please let me know by sending me a message through my discord server.
