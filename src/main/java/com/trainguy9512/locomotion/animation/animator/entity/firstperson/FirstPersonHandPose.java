@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
@@ -317,8 +318,17 @@ public enum FirstPersonHandPose {
                                 .build())
                         .build());
 
+        PoseFunction<LocalSpacePose> pose = handPoseStateMachineBuilder.build();
+        // Camera shake intensity for item interaction animations
+        pose = BlendPosesFunction.builder(pose)
+                .addBlendInput(
+                        EmptyPoseFunction.of(),
+                        functionEvaluationState -> 1 - LocomotionMain.CONFIG.data().firstPersonPlayer.cameraShakeItemInteractionIntensity,
+                        FirstPersonJointAnimator.CAMERA_MASK
+                )
+                .build();
 
-        return handPoseStateMachineBuilder.build();
+        return pose;
     }
 
     private static boolean shouldCancelLastItemAnimation(StateTransition.TransitionContext context, InteractionHand interactionHand) {

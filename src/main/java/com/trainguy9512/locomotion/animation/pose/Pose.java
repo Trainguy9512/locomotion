@@ -22,7 +22,7 @@ public abstract class Pose {
         this.jointParentMatrices = Maps.newHashMap();
 
         for(String joint : jointSkeleton.getJoints()){
-            this.setJointChannel(joint, JointChannel.ZERO);
+            this.setJointChannel(joint, jointSkeleton.getJointConfiguration(joint).referencePose());
         }
     }
 

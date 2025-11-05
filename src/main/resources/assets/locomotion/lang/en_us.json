@@ -8,8 +8,21 @@
   "locomotion.config.category.general.tooltip": "General settings for all animations",
   "locomotion.config.category.first_person_player.name": "First Person Player",
   "locomotion.config.category.first_person_player.tooltip": "Settings for first person player animations",
+
   "locomotion.config.option.enable_first_person_renderer.name": "First Person Animations",
   "locomotion.config.option.enable_first_person_renderer.description": "Whether Locomotion's first person player animations should be used or not. Unlike most other animations provided, this one has its own separate renderer that completely overwrites Vanilla's first person renderer. Disable this to show Vanilla's first person player renderer, or for compatibility with mods that integrate into Vanilla's first person renderer.",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "Enabled",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "Disabled",
+
+  "locomotion.config.group.first_person_camera_shake.name": "Camera Shake",
+  "locomotion.config.group.first_person_camera_shake.description": "Settings for adjusting how intense the camera shake animations are.",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "Master Intensity",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "Controls the intensity of all camera shake animations.",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "Movement Intensity",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "Controls the intensity of camera shaking from the movement animations, including view bobbing.",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "Item Interaction Intensity",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "Controls the intensity of camera shaking from the item interaction animations, including attacking and mining.",
+
   "locomotion.config.group.first_person_arm_camera_damping.name": "Camera Rotation Arm Damping",
   "locomotion.config.group.first_person_arm_camera_damping.description": "Settings for adjusting how the arms are rotated when the camera is moved around.",
   "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Enabled",

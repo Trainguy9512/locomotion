@@ -75,10 +75,15 @@ public class LocomotionConfig {
 
         public static class FirstPersonPlayer {
             public boolean enableRenderer = true;
+
             public boolean enableCameraRotationDamping = true;
             public float cameraRotationStiffnessFactor = 0.3f;
             public float cameraRotationDampingFactor = 0.65f;
             public float miningAnimationSpeedMultiplier = 1f;
+
+            public float cameraShakeMasterIntensity = 1f;
+            public float cameraShakeMovementIntensity = 1f;
+            public float cameraShakeItemInteractionIntensity = 0.5f;
         }
     }
 

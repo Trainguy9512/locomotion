@@ -91,39 +91,52 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     }
 
     public static final String ADDITIVE_GROUND_MOVEMENT_CACHE = "additive_ground_movement";
+    public static final String MAIN_HAND_POSE_CACHE = "main_hand_pose";
+    public static final String OFF_HAND_POSE_CACHE = "off_hand_pose";
 
     @Override
     public PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer) {
-        cachedPoseContainer.register(ADDITIVE_GROUND_MOVEMENT_CACHE, com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAdditiveMovement.constructPoseFunction(cachedPoseContainer), false);
+        cachedPoseContainer.register(ADDITIVE_GROUND_MOVEMENT_CACHE, FirstPersonAdditiveMovement.constructPoseFunction(cachedPoseContainer), false);
 
         PoseFunction<LocalSpacePose> mainHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.MAIN_HAND);
         PoseFunction<LocalSpacePose> offHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.OFF_HAND);
-        cachedPoseContainer.register("main_hand_pose", mainHandPose, true);
-        cachedPoseContainer.register("off_hand_pose", MirrorFunction.of(offHandPose), true);
+        cachedPoseContainer.register(MAIN_HAND_POSE_CACHE, mainHandPose, true);
+        cachedPoseContainer.register(OFF_HAND_POSE_CACHE, MirrorFunction.of(offHandPose), true);
 
         // Getting the additive camera pose from the off hand
         PoseFunction<LocalSpacePose> composedCameraPoseFunction = ApplyAdditiveFunction.of(
-                cachedPoseContainer.getOrThrow("main_hand_pose"),
+                cachedPoseContainer.getOrThrow(MAIN_HAND_POSE_CACHE),
                 MakeDynamicAdditiveFunction.of(
-                        cachedPoseContainer.getOrThrow("off_hand_pose"),
+                        cachedPoseContainer.getOrThrow(OFF_HAND_POSE_CACHE),
                         SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build()
                 ));
 
-        PoseFunction<LocalSpacePose> combinedHandPoseFunction = BlendPosesFunction.builder(cachedPoseContainer.getOrThrow("main_hand_pose"))
-                .addBlendInput(cachedPoseContainer.getOrThrow("off_hand_pose"), evaluationState -> 1f, LEFT_SIDE_MASK)
+        PoseFunction<LocalSpacePose> pose = BlendPosesFunction.builder(cachedPoseContainer.getOrThrow(MAIN_HAND_POSE_CACHE))
+                .addBlendInput(cachedPoseContainer.getOrThrow(OFF_HAND_POSE_CACHE), evaluationState -> 1f, LEFT_SIDE_MASK)
                 .addBlendInput(composedCameraPoseFunction, evaluationState -> 1f, CAMERA_MASK)
                 .build();
 
-        PoseFunction<LocalSpacePose> twoHandedActionPoseFunction = FirstPersonTwoHandedActions.constructPoseFunction(combinedHandPoseFunction, cachedPoseContainer);
+        // Adding the additive ground movement
+        pose = ApplyAdditiveFunction.of(
+                FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer),
+                cachedPoseContainer.getOrThrow(ADDITIVE_GROUND_MOVEMENT_CACHE)
+        );
 
-        PoseFunction<LocalSpacePose> handPoseWithAdditive = ApplyAdditiveFunction.of(twoHandedActionPoseFunction, cachedPoseContainer.getOrThrow(ADDITIVE_GROUND_MOVEMENT_CACHE));
+        // Master camera shake intensity
+        pose = BlendPosesFunction.builder(pose)
+                .addBlendInput(
+                        EmptyPoseFunction.of(),
+                        functionEvaluationState -> 1 - LocomotionMain.CONFIG.data().firstPersonPlayer.cameraShakeMasterIntensity,
+                        FirstPersonJointAnimator.CAMERA_MASK
+                )
+                .build();
 
-
-        PoseFunction<LocalSpacePose> mirroredHandednessPose = MirrorFunction.of(handPoseWithAdditive, context -> Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT);
+        // Mirroring the pose function if left handed
+        pose = MirrorFunction.of(pose, context -> Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT);
 
 
         PoseFunction<LocalSpacePose> movementDirectionOffsetTransformer =
-                JointTransformerFunction.localOrParentSpaceBuilder(mirroredHandednessPose, ARM_BUFFER_JOINT)
+                JointTransformerFunction.localOrParentSpaceBuilder(pose, ARM_BUFFER_JOINT)
                         .setTranslation(
                                 context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET, context.partialTicks()).mul(1.5f, new Vector3f()),
                                 JointChannel.TransformType.ADD,
