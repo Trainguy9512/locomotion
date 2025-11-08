@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.mixin.render;
 
+import com.mojang.blaze3d.Blaze3D;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
@@ -45,21 +46,33 @@ public abstract class MixinFishingHookRenderer {
             if (entityRenderDispatcher.options.getCameraType().isFirstPerson() && player == Minecraft.getInstance().player) {
                 JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
                 jointAnimatorDispatcher.getFirstPersonPlayerDataContainer().flatMap(dataContainer -> jointAnimatorDispatcher.getInterpolatedFirstPersonPlayerPose()).ifPresent(animationPose -> {
-                    float fovScale = entityRenderDispatcher.options.fov().get() / 70f;
+                    float fovScale = (entityRenderDispatcher.options.fov().get() - 70f) * 13.7142857143f + 70f + 1f;
+                    fovScale = 960f / entityRenderDispatcher.options.fov().get();
+                    LocomotionMain.DEBUG_LOGGER.info(fovScale);
 
                     HumanoidArm fishingRodArm = getHoldingArm(player);
                     String itemJoint = fishingRodArm == HumanoidArm.LEFT ? FirstPersonJointAnimator.LEFT_ITEM_JOINT : FirstPersonJointAnimator.RIGHT_ITEM_JOINT;
-                    Matrix4f itemScaleMatrix = new Matrix4f().scale(1f/16f * fovScale).scale(1, -1, -1);
-                    Matrix4f itemTransform = itemScaleMatrix.mul(animationPose.getJointChannel(itemJoint).getTransform());
+                    Matrix4f itemTransform = new Matrix4f()
+                            .scale(1f/16f)
+                            .scale(fovScale)
+                            .scale(1, -1, -1)
+                            .mul(animationPose.getJointChannel(itemJoint).getTransform())
+                            .translate(0, 10, 5);
 
                     assert entityRenderDispatcher.camera != null;
                     Vector3f playerEyePosition = player.getEyePosition(partialTick).toVector3f();
                     float playerRotationX = player.getXRot(partialTick) * Mth.DEG_TO_RAD;
                     float playerRotationY = player.getYRot(partialTick) * -Mth.DEG_TO_RAD;
                     Quaternionf playerRotation = new Quaternionf().rotateY(playerRotationY).rotateX(playerRotationX);
-                    Matrix4f playerTransform = new Matrix4f().translate(playerEyePosition).rotate(playerRotation);
+                    Matrix4f playerTransform = new Matrix4f()
+//                            .translate(player.getPosition(partialTick).toVector3f())
+                            .translate(entityRenderDispatcher.camera.getPosition().toVector3f())
+                            .rotate(playerRotation);
 
-                    Vector3f cameraPosition = entityRenderDispatcher.camera.getPosition().toVector3f();
+//                    float cameraFovScale = 960f / entityRenderDispatcher.options.fov().get();
+//                    Vec3 cameraNearPlaneCenter = entityRenderDispatcher.camera.getNearPlane().getPointOnPlane(0f, 0f).scale(cameraFovScale);
+
+                    Vector3f cameraPosition = entityRenderDispatcher.camera.getPosition().add(player.getEyePosition(partialTick)).toVector3f();
                     Quaternionf cameraRotation = entityRenderDispatcher.camera.rotation();
                     Matrix4f cameraTransform = new Matrix4f().translate(cameraPosition);
 
@@ -67,6 +80,7 @@ public abstract class MixinFishingHookRenderer {
                             .translate(itemTransform.getTranslation(new Vector3f()))
                             .rotate(itemTransform.getNormalizedRotation(new Quaternionf()))
                             .getTranslation(new Vector3f());
+
                     cir.setReturnValue(new Vec3(fishingLinePosition));
 
 //                    entityRenderDispatcher.camera.getPosition() .getNearPlane().getPointOnPlane((float)i * 0.525F, -0.1F).scale(l);
