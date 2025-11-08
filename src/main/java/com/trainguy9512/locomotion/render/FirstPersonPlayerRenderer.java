@@ -193,7 +193,14 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         return currentItem;
     }
 
-    private void renderArm(AbstractClientPlayer abstractClientPlayer, PlayerModel playerModel, HumanoidArm arm, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight) {
+    private void renderArm(
+            AbstractClientPlayer abstractClientPlayer,
+            PlayerModel playerModel,
+            HumanoidArm arm,
+            PoseStack poseStack,
+            SubmitNodeCollector nodeCollector,
+            int combinedLight
+    ) {
 
         // Skin data changed in 1.21.9
         PlayerSkin skin = abstractClientPlayer.getSkin();

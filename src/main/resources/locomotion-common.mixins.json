@@ -16,6 +16,7 @@
     "item.property.MixinUseDuration",
     "render.MixinBlockRenderDispatcher",
     "render.MixinEntityRenderDispatcher",
+    "render.MixinFishingHookRenderer",
     "render.MixinGameRenderer",
     "render.MixinItemInHandRenderer",
     "render.MixinLivingEntityRenderState",
