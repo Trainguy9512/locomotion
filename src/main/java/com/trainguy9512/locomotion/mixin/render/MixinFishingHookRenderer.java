@@ -46,7 +46,12 @@ public abstract class MixinFishingHookRenderer {
             if (entityRenderDispatcher.options.getCameraType().isFirstPerson() && player == Minecraft.getInstance().player) {
                 JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
                 jointAnimatorDispatcher.getFirstPersonPlayerDataContainer().flatMap(dataContainer -> jointAnimatorDispatcher.getInterpolatedFirstPersonPlayerPose()).ifPresent(animationPose -> {
-                    float fovScale = (entityRenderDispatcher.options.fov().get() - 70f) / 70f * 1.1f + 1f;
+                    float fovScale = entityRenderDispatcher.options.fov().get() * Mth.DEG_TO_RAD / 2f;
+                    fovScale = (float) (-0.7f / Math.tan(fovScale)) + 2;
+//                    fovScale -= 3.7032f;
+//                    fovScale = (fovScale - 1f) * -1.5f + 1f;
+//                    fovScale = 1 + 1 - fovScale;
+
 //                    fovScale = 960f / entityRenderDispatcher.options.fov().get();
 
                     assert entityRenderDispatcher.camera != null;
@@ -57,36 +62,35 @@ public abstract class MixinFishingHookRenderer {
                     String itemJoint = fishingRodArm == HumanoidArm.LEFT ? FirstPersonJointAnimator.LEFT_ITEM_JOINT : FirstPersonJointAnimator.RIGHT_ITEM_JOINT;
                     Matrix4f itemTransform = new Matrix4f()
                             .scale(1f/16f)
-                            .scale(fovScale, fovScale, 1)
+//                            .scale(fovScale, fovScale, 1)
                             .scale(1, -1, -1)
                             .mul(animationPose.getJointChannel(itemJoint).getTransform())
                             .translate(0, 10, 5);
 
-                    Vector3f playerEyePosition = player.getEyePosition(partialTick).toVector3f();
                     float playerRotationX = player.getXRot(partialTick) * Mth.DEG_TO_RAD;
                     float playerRotationY = player.getYRot(partialTick) * -Mth.DEG_TO_RAD;
                     Quaternionf playerRotation = new Quaternionf().rotateY(playerRotationY).rotateX(playerRotationX);
                     Matrix4f playerTransform = new Matrix4f()
-//                            .translate(player.getPosition(partialTick).toVector3f())
                             .translate(entityRenderDispatcher.camera.getPosition().toVector3f())
                             .rotate(playerRotation);
 
 //                    entityRenderDispatcher.camera.getNearPlane().
 
-                    float cameraFovScale = 960f / entityRenderDispatcher.options.fov().get();
-                    Vec3 cameraNearPlaneCenter = entityRenderDispatcher.camera.getNearPlane().getPointOnPlane(0f, 0f).scale(cameraFovScale);
                     Matrix4f cameraCenterTransform = new Matrix4f()
-                            .translate(entityRenderDispatcher.camera.getPosition().toVector3f())
-                            .translate(cameraNearPlaneCenter.toVector3f())
-                            .rotate(playerRotation);
+                            .scale(1f/16f)
+                            .scale(1, -1, -1)
+                            .mul(animationPose.getJointChannel(FirstPersonJointAnimator.CAMERA_JOINT).getTransform())
+                            .translate(0, 0, -5);
 
                     Vector3f cameraPosition = entityRenderDispatcher.camera.getPosition().add(player.getEyePosition(partialTick)).toVector3f();
                     Quaternionf cameraRotation = entityRenderDispatcher.camera.rotation();
                     Matrix4f cameraTransform = new Matrix4f().translate(cameraPosition);
 
-                    Vector3f fishingLinePosition = cameraCenterTransform
-                            .translate(itemTransform.getTranslation(new Vector3f()))
-                            .rotate(itemTransform.getNormalizedRotation(new Quaternionf()))
+                    Matrix4f blendedFovItemTransform = cameraCenterTransform.lerp(itemTransform, fovScale);
+
+                    Vector3f fishingLinePosition = playerTransform
+                            .translate(blendedFovItemTransform.getTranslation(new Vector3f()))
+                            .rotate(blendedFovItemTransform.getNormalizedRotation(new Quaternionf()))
                             .getTranslation(new Vector3f());
 
                     cir.setReturnValue(new Vec3(fishingLinePosition));
