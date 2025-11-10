@@ -92,6 +92,13 @@ public record StateTransition<S extends Enum<S>>(
             this.automaticTransitionCrossfadeWeight = 1f;
         }
 
+        /**
+         * Determines whether this transition can be taken if other transitions are still active.
+         * <p>
+         * Useful for states where you can have a lot of back and forth with resetting states that are faster than the transitions themselves.
+         *
+         * @param canInterruptOtherTransitions If true, this transition will not be taken if another transition is still in progress.
+         */
         public Builder<S> setCanInterruptOtherTransitions(boolean canInterruptOtherTransitions) {
             this.canInterruptOtherTransitions = canInterruptOtherTransitions;
             return this;

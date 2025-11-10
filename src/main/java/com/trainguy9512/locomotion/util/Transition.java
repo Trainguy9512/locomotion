@@ -19,7 +19,7 @@ import com.trainguy9512.locomotion.animation.joint.skeleton.BlendProfile;
  */
 public record Transition(TimeSpan duration, Easing easement, BlendProfile blendProfile) {
 
-    public static final Transition INSTANT = Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.CONSTANT).build();
+    public static final Transition INSTANT = Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.INSTANT).build();
     public static final Transition SINGLE_TICK = Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.LINEAR).build();
 
     /**

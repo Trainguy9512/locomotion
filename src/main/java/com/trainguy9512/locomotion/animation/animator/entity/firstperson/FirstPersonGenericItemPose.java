@@ -282,6 +282,7 @@ public enum FirstPersonGenericItemPose {
         DRINKING_BEGIN,
         DRINKING_LOOP,
         DRINKING_FINISHED,
+        EATING_BEGIN,
         EATING_LOOP
     }
 
@@ -297,19 +298,22 @@ public enum FirstPersonGenericItemPose {
                         .build()
         );
 
+        // Eating pose functions
         PoseFunction<LocalSpacePose> eatingLoopPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_EAT_LOOP)
-                .setPlayRate(2)
+                .setPlayRate(1.5f)
                 .looping(true)
                 .build();
+        PoseFunction<LocalSpacePose> eatingBeginPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_EAT_BEGIN).build();
 
         return StateMachineFunction.builder(evaluationState -> ConsumableStates.IDLE)
                 .resetsUponRelevant(true)
                 .defineState(State.builder(ConsumableStates.IDLE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_LOOP)
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_BEGIN)
                                 .isTakenIfTrue(context -> isEating(context, interactionHand))
                                 .build())
                         .build())
+                // Drinking
                 .defineState(State.builder(ConsumableStates.DRINKING_BEGIN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_BEGIN)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
@@ -332,12 +336,6 @@ public enum FirstPersonGenericItemPose {
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
                                 .build())
-                        .build())
-                .defineState(State.builder(ConsumableStates.EATING_LOOP, eatingLoopPoseFunction)
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
-                                .isTakenIfTrue(context -> !isEating(context, interactionHand))
-                                .build())
-                        .resetsPoseFunctionUponEntry(true)
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
@@ -380,6 +378,29 @@ public enum FirstPersonGenericItemPose {
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
                                 .bindToOnTransitionTaken(evaluationState -> updateConsumptionSpeed(evaluationState, interactionHand))
+                                .build())
+                        .build())
+                // Eating
+                .defineState(State.builder(ConsumableStates.EATING_BEGIN, eatingBeginPoseFunction)
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_LOOP)
+                                .isTakenIfMostRelevantAnimationPlayerFinishing(0)
+                                .build())
+                        .resetsPoseFunctionUponEntry(true)
+                        .build())
+                .defineState(State.builder(ConsumableStates.EATING_LOOP, eatingLoopPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .build())
+                .addStateAlias(StateAlias.builder(
+                                Set.of(
+                                        ConsumableStates.EATING_BEGIN,
+                                        ConsumableStates.EATING_LOOP
+                                ))
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
+                                .isTakenIfTrue(context -> !isEating(context, interactionHand))
+                                .setCanInterruptOtherTransitions(false)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
+                                        .setEasement(Easing.EXPONENTIAL_OUT)
+                                        .build())
                                 .build())
                         .build())
                 .build();

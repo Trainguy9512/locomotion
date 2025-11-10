@@ -8,51 +8,60 @@ import net.minecraft.util.Mth;
 @FunctionalInterface
 public interface Easing {
 
+    /**
+     * Takes in a time value from 0 to 1 and returns and eased version.
+     * @param time Input value
+     * @return Eased value
+     */
     float ease(float time);
 
     Easing LINEAR = time -> time;
-    Easing CONSTANT = time -> 1;
+    Easing INSTANT = time -> 1;
 
     // Preset cubic beziers
     // https://easings.net/
 
-    Easing SINE_IN = Easing.easeIn(time -> (float) (1f - Math.cos((time * Math.PI) / 2f)));
-    Easing SINE_OUT = Easing.easeOutFromEaseIn(SINE_IN);
-    Easing SINE_IN_OUT = Easing.easeInOutFromEaseIn(SINE_IN);
+    Easing SINE_IN = time -> (float) (1f - Math.cos((time * Math.PI) / 2f));
+    Easing SINE_OUT = inverse(SINE_IN);
+    Easing SINE_IN_OUT = composeEaseInOut(SINE_IN);
 
-    Easing QUAD_IN = Easing.easeIn(time -> time * time);
-    Easing QUAD_OUT = Easing.easeOutFromEaseIn(QUAD_IN);
-    Easing QUAD_IN_OUT = Easing.easeInOutFromEaseIn(QUAD_IN);
+    Easing QUAD_IN = time -> time * time;
+    Easing QUAD_OUT = inverse(QUAD_IN);
+    Easing QUAD_IN_OUT = composeEaseInOut(QUAD_IN);
 
-    Easing CUBIC_IN = Easing.easeIn(time -> time * time * time);
-    Easing CUBIC_OUT = Easing.easeOutFromEaseIn(CUBIC_IN);
-    Easing CUBIC_IN_OUT = Easing.easeInOutFromEaseIn(CUBIC_IN);
+    Easing CUBIC_IN = time -> time * time * time;
+    Easing CUBIC_OUT = inverse(CUBIC_IN);
+    Easing CUBIC_IN_OUT = composeEaseInOut(CUBIC_IN);
 
-    Easing QUART_IN = Easing.easeIn(time -> time * time * time * time);
-    Easing QUART_OUT = Easing.easeOutFromEaseIn(QUART_IN);
-    Easing QUART_IN_OUT = Easing.easeInOutFromEaseIn(QUART_IN);
+    Easing QUART_IN = time -> time * time * time * time;
+    Easing QUART_OUT = inverse(QUART_IN);
+    Easing QUART_IN_OUT = composeEaseInOut(QUART_IN);
 
-    Easing QUINT_IN = Easing.easeIn(time -> time * time * time * time * time);
-    Easing QUINT_OUT = Easing.easeOutFromEaseIn(QUINT_IN);
-    Easing QUINT_IN_OUT = Easing.easeInOutFromEaseIn(QUINT_IN);
+    Easing QUINT_IN = time -> time * time * time * time * time;
+    Easing QUINT_OUT = inverse(QUINT_IN);
+    Easing QUINT_IN_OUT = composeEaseInOut(QUINT_IN);
 
-    Easing POW_IN = Easing.easeIn(time -> time == 0 ? 0 : (float) Math.pow(2, 10 * time - 10));
-    Easing POW_OUT = Easing.easeOutFromEaseIn(POW_IN);
-    Easing POW_IN_OUT = Easing.easeInOutFromEaseIn(POW_IN);
+    Easing EXPONENTIAL_IN = time -> time == 0 ? 0 : (float) Math.pow(2, 10 * time - 10);
+    Easing EXPONENTIAL_OUT = inverse(EXPONENTIAL_IN);
+    Easing EXPONENTIAL_IN_OUT = composeEaseInOut(EXPONENTIAL_IN);
 
-    Easing CIRC_IN = Easing.easeIn(time -> (float) Math.sqrt(1 - Math.pow(time - 1, 2)));
-    Easing CIRC_OUT = Easing.easeOutFromEaseIn(CIRC_IN);
-    Easing CIRC_IN_OUT = Easing.easeInOutFromEaseIn(CIRC_IN);
+    Easing CIRC_IN = time -> (float) Math.sqrt(1 - Math.pow(time - 1, 2));
+    Easing CIRC_OUT = inverse(CIRC_IN);
+    Easing CIRC_IN_OUT = composeEaseInOut(CIRC_IN);
 
-    Easing BACK_IN = Easing.easeIn(Easing.CubicBezier.easeInOf(0.36f, 0f, 0.66f, -0.56f));
-    Easing BACK_OUT = Easing.easeOutFromEaseIn(BACK_IN);
-    Easing BACK_IN_OUT = Easing.easeInOutFromEaseIn(BACK_IN);
+    Easing BACK_IN = CubicBezier.of(0.36f, 0f, 0.66f, -0.56f);
+    Easing BACK_OUT = inverse(BACK_IN);
+    Easing BACK_IN_OUT = composeEaseInOut(BACK_IN);
 
-    Easing ELASTIC_IN = Easing.easeIn(Easing.Elastic.easeInOf(18, 3f));
-    Easing ELASTIC_OUT = Easing.easeOutFromEaseIn(ELASTIC_IN);
-    Easing ELASTIC_IN_OUT = Easing.easeInOutFromEaseIn(ELASTIC_IN);
+    Easing ELASTIC_IN = Elastic.of(18, 3f);
+    Easing ELASTIC_OUT = inverse(ELASTIC_IN);
+    Easing ELASTIC_IN_OUT = composeEaseInOut(ELASTIC_IN);
 
-    Easing BOUNCE_IN = Easing.easeIn(Easing.inverse(time -> {
+    Easing BOUNCE_IN = Easing::bounceEaseIn;
+    Easing BOUNCE_OUT = inverse(BOUNCE_IN);
+    Easing BOUNCE_IN_OUT = composeEaseInOut(BOUNCE_IN);
+
+    private static float bounceEaseIn(float time) {
         float n1 = 7.5625f;
         float d1 = 2.75f;
 
@@ -65,11 +74,9 @@ public interface Easing {
         } else {
             return n1 * (time -= 2.625f / d1) * time + 0.984375f;
         }
-    }));
-    Easing BOUNCE_OUT = Easing.easeOutFromEaseIn(BOUNCE_IN);
-    Easing BOUNCE_IN_OUT = Easing.easeInOutFromEaseIn(BOUNCE_IN);
+    }
 
-    public static class Elastic implements Easing {
+    class Elastic implements Easing {
 
         private final float bounceFactor;
         private final float falloffExponent;
@@ -86,7 +93,7 @@ public interface Easing {
          * @param bounceFactor      Value that controls the number of waves in the elastic shape.
          * @param falloffExponent   Exponent that controls how sharp the falloff is. The higher the exponent, the faster the falloff. Default is 2.
          */
-        public static Elastic easeInOf(float bounceFactor, float falloffExponent){
+        public static Elastic of(float bounceFactor, float falloffExponent){
             return new Elastic(bounceFactor, falloffExponent);
         }
 
@@ -96,7 +103,7 @@ public interface Easing {
         }
     }
 
-    public static class CubicBezier implements Easing {
+    class CubicBezier implements Easing {
 
         float cx;
         float bx;
@@ -209,7 +216,7 @@ public interface Easing {
          * @param point2X   X of point 2
          * @param point2Y   Y of point 2
          */
-        public static CubicBezier easeInOf(float point1X, float point1Y, float point2X, float point2Y){
+        public static CubicBezier of(float point1X, float point1Y, float point2X, float point2Y){
             return new CubicBezier(point1X, point1Y, point2X, point2Y);
         }
     }
@@ -217,26 +224,8 @@ public interface Easing {
     /**
      * Returns the inverse for the provided easing.
      */
-    public static Easing inverse(Easing easing){
+    static Easing inverse(Easing easing){
         return time -> 1 - easing.ease(1 - time);
-    }
-
-    /**
-     * Returns the ease-in equivalent of the provided ease-in function, which by default is itself.
-     * @param easeIn    Ease-in function
-     * @return          Ease-in function
-     */
-    public static Easing easeIn(Easing easeIn){
-        return value -> easeIn.ease(Math.clamp(value, 0, 1));
-    }
-
-    /**
-     * Returns the ease-out equivalent of the provided ease-in function.
-     * @param easeIn    Ease-in function
-     * @return          Ease-out function
-     */
-    public static Easing easeOutFromEaseIn(Easing easeIn){
-        return Easing.inverse(easeIn);
     }
 
     /**
@@ -244,10 +233,13 @@ public interface Easing {
      * @param easeIn    Ease-in function
      * @return          Ease-in-out function
      */
-    public static Easing easeInOutFromEaseIn(Easing easeIn){
-        return time -> time < 0.5f ?
-                Easing.easeIn(easeIn).ease(time * 2f) / 2f :
-                Easing.easeOutFromEaseIn(easeIn).ease(time * 2f - 1f) / 2f + 0.5f;
+    static Easing composeEaseInOut(Easing easeIn){
+        return time -> {
+            if (time < 0.5f) {
+                return easeIn.ease(time * 2f) / 2f;
+            } else {
+                return inverse(easeIn).ease(time * 2f - 1f) / 2f + 0.5f;
+            }
+        };
     }
-
 }
