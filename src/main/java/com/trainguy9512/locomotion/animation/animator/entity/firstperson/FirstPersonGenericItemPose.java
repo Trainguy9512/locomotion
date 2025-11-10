@@ -281,7 +281,8 @@ public enum FirstPersonGenericItemPose {
         IDLE,
         DRINKING_BEGIN,
         DRINKING_LOOP,
-        DRINKING_FINISHED
+        DRINKING_FINISHED,
+        EATING_LOOP
     }
 
     private static PoseFunction<LocalSpacePose> constructConsumableStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand, PoseFunction<LocalSpacePose> idlePoseFunction) {
@@ -296,10 +297,18 @@ public enum FirstPersonGenericItemPose {
                         .build()
         );
 
+        PoseFunction<LocalSpacePose> eatingLoopPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_EAT_LOOP)
+                .setPlayRate(2)
+                .looping(true)
+                .build();
+
         return StateMachineFunction.builder(evaluationState -> ConsumableStates.IDLE)
                 .resetsUponRelevant(true)
                 .defineState(State.builder(ConsumableStates.IDLE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_LOOP)
+                                .isTakenIfTrue(context -> isEating(context, interactionHand))
+                                .build())
                         .build())
                 .defineState(State.builder(ConsumableStates.DRINKING_BEGIN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_BEGIN)
                                 .build())
@@ -323,6 +332,12 @@ public enum FirstPersonGenericItemPose {
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
                                 .build())
+                        .build())
+                .defineState(State.builder(ConsumableStates.EATING_LOOP, eatingLoopPoseFunction)
+                        .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
+                                .isTakenIfTrue(context -> !isEating(context, interactionHand))
+                                .build())
+                        .resetsPoseFunctionUponEntry(true)
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
@@ -386,5 +401,13 @@ public enum FirstPersonGenericItemPose {
             return false;
         }
         return driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getUseAnimation() == ItemUseAnimation.DRINK;
+    }
+
+    private static boolean isEating(StateTransition.TransitionContext context, InteractionHand interactionHand) {
+        OnTickDriverContainer driverContainer = context.driverContainer();
+        if (!driverContainer.getDriverValue(FirstPersonDrivers.getUsingItemDriver(interactionHand))) {
+            return false;
+        }
+        return driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getUseAnimation() == ItemUseAnimation.EAT;
     }
 }
