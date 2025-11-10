@@ -46,10 +46,13 @@ public abstract class MixinFishingHookRenderer {
             if (entityRenderDispatcher.options.getCameraType().isFirstPerson() && player == Minecraft.getInstance().player) {
                 JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
                 jointAnimatorDispatcher.getFirstPersonPlayerDataContainer().flatMap(dataContainer -> jointAnimatorDispatcher.getInterpolatedFirstPersonPlayerPose()).ifPresent(animationPose -> {
-                    float fovScale = entityRenderDispatcher.options.fov().get() * Mth.DEG_TO_RAD / 2f;
-                    fovScale = (float) (-0.7f / Math.tan(fovScale)) + 2;
+                    float fovScale = 0;
+                    fovScale = entityRenderDispatcher.options.fov().get() * (Mth.PI / (70f * 4f));
+                    fovScale = (float) Math.tan(fovScale);
+                    fovScale = (fovScale - 1f) * 1.2f + 1f;
+//                    float fovScale = entityRenderDispatcher.options.fov().get() * Mth.DEG_TO_RAD / 2f;
+//                    fovScale = (float) (-0.7f / Math.tan(fovScale)) + 2;
 //                    fovScale -= 3.7032f;
-//                    fovScale = (fovScale - 1f) * -1.5f + 1f;
 //                    fovScale = 1 + 1 - fovScale;
 
 //                    fovScale = 960f / entityRenderDispatcher.options.fov().get();
