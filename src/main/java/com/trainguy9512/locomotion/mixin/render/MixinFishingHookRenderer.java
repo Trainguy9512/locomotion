@@ -49,7 +49,10 @@ public abstract class MixinFishingHookRenderer {
                     float fovScale = 0;
                     fovScale = entityRenderDispatcher.options.fov().get() * (Mth.PI / (70f * 4f));
                     fovScale = (float) Math.tan(fovScale);
-                    fovScale = (fovScale - 1f) * 1.2f + 1f;
+
+
+                    fovScale = entityRenderDispatcher.options.fov().get();
+                    fovScale = ((1 / 70f) / 70f) * (fovScale * fovScale);
 //                    float fovScale = entityRenderDispatcher.options.fov().get() * Mth.DEG_TO_RAD / 2f;
 //                    fovScale = (float) (-0.7f / Math.tan(fovScale)) + 2;
 //                    fovScale -= 3.7032f;
