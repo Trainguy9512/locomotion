@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.util;
 
+import com.trainguy9512.locomotion.LocomotionMain;
 import net.minecraft.util.Mth;
 
 /**
@@ -22,43 +23,43 @@ public interface Easing {
     // https://easings.net/
 
     Easing SINE_IN = time -> (float) (1f - Math.cos((time * Math.PI) / 2f));
-    Easing SINE_OUT = inverse(SINE_IN);
+    Easing SINE_OUT = invert(SINE_IN);
     Easing SINE_IN_OUT = composeEaseInOut(SINE_IN);
 
     Easing QUAD_IN = time -> time * time;
-    Easing QUAD_OUT = inverse(QUAD_IN);
+    Easing QUAD_OUT = invert(QUAD_IN);
     Easing QUAD_IN_OUT = composeEaseInOut(QUAD_IN);
 
     Easing CUBIC_IN = time -> time * time * time;
-    Easing CUBIC_OUT = inverse(CUBIC_IN);
+    Easing CUBIC_OUT = invert(CUBIC_IN);
     Easing CUBIC_IN_OUT = composeEaseInOut(CUBIC_IN);
 
     Easing QUART_IN = time -> time * time * time * time;
-    Easing QUART_OUT = inverse(QUART_IN);
+    Easing QUART_OUT = invert(QUART_IN);
     Easing QUART_IN_OUT = composeEaseInOut(QUART_IN);
 
     Easing QUINT_IN = time -> time * time * time * time * time;
-    Easing QUINT_OUT = inverse(QUINT_IN);
+    Easing QUINT_OUT = invert(QUINT_IN);
     Easing QUINT_IN_OUT = composeEaseInOut(QUINT_IN);
 
     Easing EXPONENTIAL_IN = time -> time == 0 ? 0 : (float) Math.pow(2, 10 * time - 10);
-    Easing EXPONENTIAL_OUT = inverse(EXPONENTIAL_IN);
+    Easing EXPONENTIAL_OUT = invert(EXPONENTIAL_IN);
     Easing EXPONENTIAL_IN_OUT = composeEaseInOut(EXPONENTIAL_IN);
 
     Easing CIRC_IN = time -> (float) Math.sqrt(1 - Math.pow(time - 1, 2));
-    Easing CIRC_OUT = inverse(CIRC_IN);
+    Easing CIRC_OUT = invert(CIRC_IN);
     Easing CIRC_IN_OUT = composeEaseInOut(CIRC_IN);
 
     Easing BACK_IN = CubicBezier.of(0.36f, 0f, 0.66f, -0.56f);
-    Easing BACK_OUT = inverse(BACK_IN);
+    Easing BACK_OUT = invert(BACK_IN);
     Easing BACK_IN_OUT = composeEaseInOut(BACK_IN);
 
-    Easing ELASTIC_IN = Elastic.of(18, 3f);
-    Easing ELASTIC_OUT = inverse(ELASTIC_IN);
+    Easing ELASTIC_IN = Elastic.of(10, false);
+    Easing ELASTIC_OUT = Elastic.of(10, true);
     Easing ELASTIC_IN_OUT = composeEaseInOut(ELASTIC_IN);
 
     Easing BOUNCE_IN = Easing::bounceEaseIn;
-    Easing BOUNCE_OUT = inverse(BOUNCE_IN);
+    Easing BOUNCE_OUT = invert(BOUNCE_IN);
     Easing BOUNCE_IN_OUT = composeEaseInOut(BOUNCE_IN);
 
     private static float bounceEaseIn(float time) {
@@ -79,27 +80,38 @@ public interface Easing {
     class Elastic implements Easing {
 
         private final float bounceFactor;
-        private final float falloffExponent;
 
-        private Elastic(float bounceFactor, float falloffExponent){
+        private Elastic(float bounceFactor) {
             this.bounceFactor = bounceFactor;
-            this.falloffExponent = falloffExponent;
         }
 
         /**
          * Returns an ease-in elastic function using the given bounce factor.
          * <p>
-         * Bounce factor preview graph: <a href="https://www.desmos.com/calculator/rtycpc7igu">Desmos</a>
-         * @param bounceFactor      Value that controls the number of waves in the elastic shape.
-         * @param falloffExponent   Exponent that controls how sharp the falloff is. The higher the exponent, the faster the falloff. Default is 2.
+         * Bounce factor preview graph: <a href="https://www.desmos.com/calculator/bpyu7zywur">Desmos</a>
+         * @param bounceFactor      Value that controls the number of waves in the elastic shape. In the Desmos graph, this is variable "o".
          */
-        public static Elastic of(float bounceFactor, float falloffExponent){
-            return new Elastic(bounceFactor, falloffExponent);
+        public static Easing of(float bounceFactor, boolean inverted) {
+            Easing elasticEasing = new Elastic(bounceFactor);
+            if (inverted) {
+                return invert(elasticEasing);
+            }
+            return elasticEasing;
         }
 
         @Override
         public float ease(float time) {
-            return time == 0 ? 0 : time == 1 ? 1 : (float) (Math.pow(time, falloffExponent) * ((2 * Math.sin(1 - time) * this.bounceFactor) / this.bounceFactor + Math.cos((1 - time) * this.bounceFactor)));
+            if (time == 0) {
+                return 0;
+            }
+            if (time == 1) {
+                return 1;
+            }
+            float a = Mth.TWO_PI / 3f;
+            float b = (float) -Math.pow(2, 10 * time - 10);
+            float c = (this.bounceFactor * time) - this.bounceFactor - 0.75f;
+            float d = (float) (b * Math.sin(c * a));
+            return d;
         }
     }
 
@@ -224,7 +236,7 @@ public interface Easing {
     /**
      * Returns the inverse for the provided easing.
      */
-    static Easing inverse(Easing easing){
+    static Easing invert(Easing easing){
         return time -> 1 - easing.ease(1 - time);
     }
 
@@ -238,7 +250,7 @@ public interface Easing {
             if (time < 0.5f) {
                 return easeIn.ease(time * 2f) / 2f;
             } else {
-                return inverse(easeIn).ease(time * 2f - 1f) / 2f + 0.5f;
+                return invert(easeIn).ease(time * 2f - 1f) / 2f + 0.5f;
             }
         };
     }

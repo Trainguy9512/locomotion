@@ -39,7 +39,8 @@ public enum FirstPersonHandPose {
     SHIELD (HandPoseStates.SHIELD_RAISE, HandPoseStates.SHIELD_LOWER, HandPoseStates.SHIELD, FirstPersonAnimationSequences.HAND_SHIELD_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
     BOW (HandPoseStates.BOW_RAISE, HandPoseStates.BOW_LOWER, HandPoseStates.BOW, FirstPersonAnimationSequences.HAND_BOW_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
     CROSSBOW (HandPoseStates.CROSSBOW_RAISE, HandPoseStates.CROSSBOW_LOWER, HandPoseStates.CROSSBOW, FirstPersonAnimationSequences.HAND_CROSSBOW_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE),
-    TRIDENT (HandPoseStates.TRIDENT_RAISE, HandPoseStates.TRIDENT_LOWER, HandPoseStates.TRIDENT, FirstPersonAnimationSequences.HAND_TRIDENT_POSE, driverContainer -> FirstPersonMontages.HAND_TRIDENT_JAB_MONTAGE);
+    TRIDENT (HandPoseStates.TRIDENT_RAISE, HandPoseStates.TRIDENT_LOWER, HandPoseStates.TRIDENT, FirstPersonAnimationSequences.HAND_TRIDENT_POSE, driverContainer -> FirstPersonMontages.HAND_TRIDENT_JAB_MONTAGE),
+    BRUSH (HandPoseStates.BRUSH_RAISE, HandPoseStates.BRUSH_LOWER, HandPoseStates.BRUSH, FirstPersonAnimationSequences.HAND_BRUSH_POSE, driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE);
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator/HandPose");
 
@@ -73,6 +74,9 @@ public enum FirstPersonHandPose {
     public static FirstPersonHandPose fromItemStack(ItemStack itemStack) {
         if (itemStack.isEmpty()) {
             return EMPTY;
+        }
+        if (itemStack.getUseAnimation() == ItemUseAnimation.BRUSH) {
+            return BRUSH;
         }
         if (itemStack.getUseAnimation() == ItemUseAnimation.SPEAR) {
             return TRIDENT;
@@ -143,7 +147,10 @@ public enum FirstPersonHandPose {
         CROSSBOW_LOWER,
         TRIDENT,
         TRIDENT_RAISE,
-        TRIDENT_LOWER
+        TRIDENT_LOWER,
+        BRUSH,
+        BRUSH_RAISE,
+        BRUSH_LOWER
     }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
@@ -255,6 +262,23 @@ public enum FirstPersonHandPose {
                 ),
                 ApplyAdditiveFunction.of(
                         SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_POSE).build(),
+                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
+                ),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build()
+        );
+        addStatesForHandPose(
+                handPoseStateMachineBuilder,
+                fromLoweringAliasBuilder,
+                interactionHand,
+                FirstPersonHandPose.BRUSH,
+                FirstPersonBrush.handBrushPoseFunction(cachedPoseContainer, interactionHand),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_BRUSH_POSE).build(),
+                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
+                ),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_BRUSH_POSE).build(),
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
                 ),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),

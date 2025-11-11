@@ -274,7 +274,11 @@ public enum FirstPersonGenericItemPose {
     }
 
     private static PoseFunction<LocalSpacePose> constructBasePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        return SequenceEvaluatorFunction.builder(context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build();
+        return SequenceEvaluatorFunction.builder(context ->
+                        context.driverContainer()
+                        .getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1)
+                        .basePoseLocation)
+                .build();
     }
 
     public enum ConsumableStates {
@@ -383,7 +387,8 @@ public enum FirstPersonGenericItemPose {
                 // Eating
                 .defineState(State.builder(ConsumableStates.EATING_BEGIN, eatingBeginPoseFunction)
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_LOOP)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(0)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
+                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .build())
@@ -398,8 +403,8 @@ public enum FirstPersonGenericItemPose {
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
                                 .isTakenIfTrue(context -> !isEating(context, interactionHand))
                                 .setCanInterruptOtherTransitions(false)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
-                                        .setEasement(Easing.EXPONENTIAL_OUT)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.8f))
+                                        .setEasement(Easing.Elastic.of(4, true))
                                         .build())
                                 .build())
                         .build())

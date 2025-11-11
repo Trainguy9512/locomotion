@@ -13,6 +13,7 @@
     "item.MixinItemTransform",
     "item.property.MixinCrossbowPull",
     "item.property.MixinIsUsingItem",
+    "item.property.MixinUseCycle",
     "item.property.MixinUseDuration",
     "render.MixinBlockRenderDispatcher",
     "render.MixinEntityRenderDispatcher",

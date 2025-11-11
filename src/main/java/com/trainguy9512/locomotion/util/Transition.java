@@ -31,7 +31,7 @@ public record Transition(TimeSpan duration, Easing easement, BlendProfile blendP
     }
 
     public Transition withInverseEasing() {
-        return new Transition(this.duration, Easing.inverse(this.easement), this.blendProfile);
+        return new Transition(this.duration, Easing.invert(this.easement), this.blendProfile);
     }
 
     public static class Builder {
