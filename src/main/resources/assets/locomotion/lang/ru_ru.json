@@ -23,8 +23,8 @@
   "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "Интенсивность при взаимодействии с предметами",
   "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "Задает интенсивность тряски камеры от анимаций взаимодействия с предметами, в том числе атаку и копание.",
 
-  "locomotion.config.group.first_person_arm_camera_damping.name": "Сглаживание вращения рук при повороте камеры",
-  "locomotion.config.group.first_person_arm_camera_damping.description": "Настройки вращения рук при перемещении камеры.",
+  "locomotion.config.group.first_person_arm_camera_damping.name": "Сглаживание вращения рук при движении камеры",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "Настройки вращения рук при движении камеры.",
   "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Включено",
   "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Определяет, включено ли сглаживание вращения рук от первого лица. Отключение этой опции полностью останавливает движение рук при повороте камеры.",
   "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Коэффициент сглаживания",
