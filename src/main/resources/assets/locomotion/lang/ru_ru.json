@@ -26,7 +26,7 @@
   "locomotion.config.group.first_person_arm_camera_damping.name": "Сглаживание вращения рук при повороте камеры",
   "locomotion.config.group.first_person_arm_camera_damping.description": "Настройки вращения рук при перемещении камеры.",
   "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Включено",
-  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Включено ли сглаживание вращения рук от первого лица. Отключение этой опции полностью останавливает движение рук при повороте камеры.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Определяет, включено ли сглаживание вращения рук от первого лица. Отключение этой опции полностью останавливает движение рук при повороте камеры.",
   "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Коэффициент сглаживания",
   "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Определяет, насколько плавно движение рук останавливается. Чем выше значение, тем меньше руки \"раскачиваются\" после резкого движения.",
   "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Коэффициент жесткости",
