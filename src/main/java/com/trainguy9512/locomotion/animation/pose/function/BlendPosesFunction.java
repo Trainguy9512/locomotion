@@ -13,17 +13,17 @@ import java.util.function.Predicate;
 
 public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
 
-    private final PoseFunction<LocalSpacePose> baseFunction;
+    private final PoseFunction<LocalSpacePose> basePoseFunction;
     private final Map<BlendInput, VariableDriver<Float>> inputs;
 
-    public BlendPosesFunction(PoseFunction<LocalSpacePose> baseFunction, Map<BlendInput, VariableDriver<Float>> inputs){
-        this.baseFunction = baseFunction;
+    public BlendPosesFunction(PoseFunction<LocalSpacePose> basePoseFunction, Map<BlendInput, VariableDriver<Float>> inputs){
+        this.basePoseFunction = basePoseFunction;
         this.inputs = inputs;
     }
 
     @Override
     public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
-        LocalSpacePose pose = this.baseFunction.compute(context);
+        LocalSpacePose pose = this.basePoseFunction.compute(context);
         for(BlendInput blendInput : this.inputs.keySet()) {
             float weight = this.inputs.get(blendInput).getValueInterpolated(context.partialTicks());
             if(weight != 0f){
@@ -35,7 +35,7 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
 
     @Override
     public void tick(FunctionEvaluationState evaluationState) {
-        this.baseFunction.tick(evaluationState);
+        this.basePoseFunction.tick(evaluationState);
         this.inputs.forEach((blendInput, weightDriver) -> {
             weightDriver.pushCurrentToPrevious();
             float weight = blendInput.weightFunction.apply(evaluationState);
@@ -49,7 +49,7 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
 
     @Override
     public PoseFunction<LocalSpacePose> wrapUnique() {
-        Builder builder = BlendPosesFunction.builder(this.baseFunction.wrapUnique());
+        Builder builder = BlendPosesFunction.builder(this.basePoseFunction.wrapUnique());
         for(BlendInput blendInput : this.inputs.keySet()){
             builder.addBlendInput(blendInput.inputFunction.wrapUnique(), blendInput.weightFunction, blendInput.blendMask);
         }
@@ -71,15 +71,15 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
         if (!blendAnimationPlayers.isEmpty()) {
             return blendAnimationPlayers.getLast().isPresent() ?
                     blendAnimationPlayers.getLast() :
-                    this.baseFunction.searchDownChainForMostRelevant(findCondition);
+                    this.basePoseFunction.searchDownChainForMostRelevant(findCondition);
         } else {
-            return this.baseFunction.searchDownChainForMostRelevant(findCondition);
+            return this.basePoseFunction.searchDownChainForMostRelevant(findCondition);
         }
     }
 
 
-    public static Builder builder(PoseFunction<LocalSpacePose> base){
-        return new Builder(base);
+    public static Builder builder(PoseFunction<LocalSpacePose> basePoseFunction){
+        return new Builder(basePoseFunction);
     }
 
     public static class Builder {

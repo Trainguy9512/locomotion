@@ -67,6 +67,10 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_TRIDENT_RIPTIDE = makeAnimationSequenceResourceLocation("hand/trident/riptide");
     public static final ResourceLocation HAND_TRIDENT_RIPTIDE_END = makeAnimationSequenceResourceLocation("hand/trident/riptide_end");
 
+    public static final ResourceLocation HAND_MACE_POSE = makeAnimationSequenceResourceLocation("hand/mace/pose");
+    public static final ResourceLocation HAND_MACE_FALL_ANTICIPATION = makeAnimationSequenceResourceLocation("hand/mace/fall_anticipation");
+    public static final ResourceLocation HAND_MACE_ATTACK = makeAnimationSequenceResourceLocation("hand/mace/attack");
+
     public static final ResourceLocation GROUND_MOVEMENT_POSE = makeAnimationSequenceResourceLocation("ground_movement/pose");
     public static final ResourceLocation GROUND_MOVEMENT_IDLE = makeAnimationSequenceResourceLocation("ground_movement/idle");
     public static final ResourceLocation GROUND_MOVEMENT_WALKING = makeAnimationSequenceResourceLocation("ground_movement/walking");
