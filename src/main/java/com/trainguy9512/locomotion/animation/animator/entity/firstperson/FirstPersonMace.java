@@ -21,14 +21,11 @@ public class FirstPersonMace {
         if (context.driverContainer().getDriverValue(FirstPersonDrivers.IS_GROUNDED)) {
             return false;
         }
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED) < -0.1f;
+        return context.driverContainer().getDriverValue(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED) < -0.5f;
     }
 
     private static boolean isNoLongerFalling(StateTransition.TransitionContext context) {
-        if (context.driverContainer().getDriverValue(FirstPersonDrivers.IS_GROUNDED)) {
-            return true;
-        }
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED) >= -0.1f;
+        return !isFalling(context);
     }
 
     public static PoseFunction<LocalSpacePose> handMacePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
@@ -63,6 +60,7 @@ public class FirstPersonMace {
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
                                         .setEasement(Easing.EXPONENTIAL_OUT)
                                         .build())
+                                .setCanInterruptOtherTransitions(false)
                                 .build())
                         .build())
                 .build();
