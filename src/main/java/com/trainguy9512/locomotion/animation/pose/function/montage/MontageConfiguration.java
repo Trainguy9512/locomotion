@@ -54,6 +54,33 @@ public record MontageConfiguration(
         return new Builder(identifier, animationSequence);
     }
 
+    /**
+     * Makes a copy of this montage with a different identifier and slot it's being played in.
+     * @param identifier            New identifier to give the montage copy.
+     * @param animationSequence     Animation sequence to play as the montage.
+     * @return New montage configuration builder.
+     */
+    public Builder makeBuilderCopy(String identifier, ResourceLocation animationSequence) {
+        Builder builder = MontageConfiguration.builder(identifier, animationSequence)
+                .setPlayRate(this.playRateFunction)
+                .setBlendMask(this.blendMask)
+                .setTransitionIn(this.transitionIn)
+                .setTransitionOut(this.transitionOut)
+                .setStartTimeOffset(this.startTimeOffset)
+                .setTransitionOutCrossfadeWeight(this.transitionOutCrossfadeWeight)
+                .setCooldownDuration(this.cooldownDuration);
+        for (String slot : this.slots) {
+            builder.playsInSlot(slot);
+        }
+        for (Map.Entry<String, Consumer<PoseFunction.FunctionEvaluationState>> entry : this.timeMarkerBindings.entrySet()) {
+            builder.bindToTimeMarker(entry.getKey(), entry.getValue());
+        }
+        if (this.isAdditive) {
+            builder.makeAdditive(this.additiveBasePoseProvider);
+        }
+        return builder;
+    }
+
     public static class Builder {
 
         private final String identifier;

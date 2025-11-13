@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.animation.pose.function.montage;
 
+import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
@@ -17,9 +18,11 @@ import java.util.Objects;
 
 public class MontageManager {
 
+    private final AnimationDataContainer animationDataContainer;
     private final List<MontageInstance> montageStack;
 
-    public MontageManager() {
+    public MontageManager(AnimationDataContainer animationDataContainer) {
+        this.animationDataContainer = animationDataContainer;
         this.montageStack = new ArrayList<>();
     }
 
@@ -34,16 +37,15 @@ public class MontageManager {
         });
     }
 
-    public static MontageManager of() {
-        return new MontageManager();
+    public static MontageManager of(AnimationDataContainer animationDataContainer) {
+        return new MontageManager(animationDataContainer);
     }
 
     /**
      * Plays a montage of the given configuration.
      * @param configuration         Montage configuration to use as the template for the montage.
-     * @param driverContainer       Driver container to use for getting the play rate.
      */
-    public void playMontage(MontageConfiguration configuration, OnTickDriverContainer driverContainer) {
+    public void playMontage(MontageConfiguration configuration) {
         for (MontageInstance instance : this.montageStack) {
             if (Objects.equals(instance.configuration.identifier(), configuration.identifier())) {
                 if (instance.ticksElapsed.getCurrentValue() < configuration.cooldownDuration().inTicks()) {
@@ -51,7 +53,7 @@ public class MontageManager {
                 }
             }
         }
-        this.montageStack.addLast(MontageInstance.of(configuration, driverContainer));
+        this.montageStack.addLast(MontageInstance.of(configuration, this.animationDataContainer));
     }
 
     /**

@@ -1,10 +1,13 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
+import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 
 
 public class FirstPersonMontages {
@@ -64,11 +67,9 @@ public class FirstPersonMontages {
                 return handPose.basePoseLocation;
             })
             .build();
-    public static final MontageConfiguration USE_OFF_HAND_MONTAGE = MontageConfiguration.builder("hand_use_off_hand", FirstPersonAnimationSequences.HAND_TOOL_USE)
+
+    public static final MontageConfiguration USE_OFF_HAND_MONTAGE = USE_MAIN_HAND_MONTAGE.makeBuilderCopy("hand_use_off_hand", USE_MAIN_HAND_MONTAGE.animationSequence())
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
-            .setCooldownDuration(TimeSpan.of60FramesPerSecond(5))
-            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
-            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(16)).setEasement(Easing.SINE_IN_OUT).build())
             .makeAdditive(driverContainer -> {
                 FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_POSE);
                 if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
@@ -77,6 +78,7 @@ public class FirstPersonMontages {
                 return handPose.basePoseLocation;
             })
             .build();
+
     public static final MontageConfiguration SHIELD_BLOCK_IMPACT_MONTAGE = MontageConfiguration.builder("shield_block_impact", FirstPersonAnimationSequences.HAND_SHIELD_IMPACT)
             .playsInSlot(SHIELD_BLOCK_SLOT)
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(5))
@@ -84,21 +86,41 @@ public class FirstPersonMontages {
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(8)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
 
-
     public static final MontageConfiguration CROSSBOW_FIRE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("crossbow_fire_main_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
-    public static final MontageConfiguration CROSSBOW_FIRE_OFF_HAND_MONTAGE = MontageConfiguration.builder("crossbow_fire_off_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
+
+    public static final MontageConfiguration CROSSBOW_FIRE_OFF_HAND_MONTAGE = CROSSBOW_FIRE_MAIN_HAND_MONTAGE.makeBuilderCopy("crossbow_fire_off_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
-            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
-            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
+
     public static MontageConfiguration getCrossbowFireMontage(InteractionHand interactionHand) {
         return switch (interactionHand) {
             case MAIN_HAND -> CROSSBOW_FIRE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> CROSSBOW_FIRE_OFF_HAND_MONTAGE;
         };
+    }
+
+    public static void playAttackMontage(OnTickDriverContainer driverContainer, MontageManager montageManager) {
+        FirstPersonHandPose firstPersonHandPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
+        MontageConfiguration montage = firstPersonHandPose.getAttackMontage(driverContainer);
+        montageManager.playMontage(montage);
+    }
+
+    public static void playUseMontage(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
+        MontageConfiguration montageConfiguration = switch (interactionHand) {
+            case MAIN_HAND -> USE_MAIN_HAND_MONTAGE;
+            case OFF_HAND -> USE_OFF_HAND_MONTAGE;
+        };
+        montageManager.playMontage(montageConfiguration);
+
+        // If the first person hand pose has not changed, update the rendered item.
+        ItemStack renderedItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
+        ItemStack actualItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
+        if (FirstPersonHandPose.fromItemStack(renderedItemStack) == FirstPersonHandPose.fromItemStack(actualItemStack)) {
+            FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
+        }
     }
 }
