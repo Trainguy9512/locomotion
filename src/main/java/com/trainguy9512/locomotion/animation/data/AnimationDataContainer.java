@@ -31,7 +31,7 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
         this.drivers = Maps.newHashMap();
         this.savedCachedPoseContainer = CachedPoseContainer.of();
         this.poseFunction = jointAnimator.constructPoseFunction(savedCachedPoseContainer).wrapUnique();
-        this.montageManager = MontageManager.of();
+        this.montageManager = MontageManager.of(this);
 
         this.jointSkeleton = LocomotionResources.getOrThrowJointSkeleton(jointAnimator.getJointSkeleton());
         this.perTickCalculatedPoseDriverKey = DriverKey.of("per_tick_calculated_pose", () -> VariableDriver.ofInterpolatable(() -> LocalSpacePose.of(jointSkeleton), Interpolator.LOCAL_SPACE_POSE));
