@@ -43,6 +43,9 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_BRUSH_POSE = makeAnimationSequenceResourceLocation("hand/brush/pose");
     public static final ResourceLocation HAND_BRUSH_SIFT_LOOP = makeAnimationSequenceResourceLocation("hand/brush/sift_loop");
 
+    public static final ResourceLocation HAND_SPYGLASS_POSE = makeAnimationSequenceResourceLocation("hand/spyglass/pose");
+    public static final ResourceLocation HAND_SPYGLASS_LOOKING_EXIT = makeAnimationSequenceResourceLocation("hand/spyglass/looking_exit");
+
     public static final ResourceLocation HAND_BOW_POSE = makeAnimationSequenceResourceLocation("hand/bow/pose");
     public static final ResourceLocation HAND_BOW_PULL = makeAnimationSequenceResourceLocation("hand/bow/pull");
     public static final ResourceLocation HAND_BOW_RELEASE = makeAnimationSequenceResourceLocation("hand/bow/release");
