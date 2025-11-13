@@ -7,6 +7,7 @@ import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 
 
 public class FirstPersonMontages {
@@ -106,5 +107,20 @@ public class FirstPersonMontages {
         FirstPersonHandPose firstPersonHandPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
         MontageConfiguration montage = firstPersonHandPose.getAttackMontage(driverContainer);
         montageManager.playMontage(montage);
+    }
+
+    public static void playUseMontage(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
+        MontageConfiguration montageConfiguration = switch (interactionHand) {
+            case MAIN_HAND -> USE_MAIN_HAND_MONTAGE;
+            case OFF_HAND -> USE_OFF_HAND_MONTAGE;
+        };
+        montageManager.playMontage(montageConfiguration);
+
+        // If the first person hand pose has not changed, update the rendered item.
+        ItemStack renderedItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
+        ItemStack actualItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
+        if (FirstPersonHandPose.fromItemStack(renderedItemStack) == FirstPersonHandPose.fromItemStack(actualItemStack)) {
+            FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
+        }
     }
 }
