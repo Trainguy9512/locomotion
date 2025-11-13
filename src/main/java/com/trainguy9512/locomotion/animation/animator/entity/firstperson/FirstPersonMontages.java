@@ -106,7 +106,9 @@ public class FirstPersonMontages {
     public static void playAttackMontage(OnTickDriverContainer driverContainer, MontageManager montageManager) {
         FirstPersonHandPose firstPersonHandPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
         MontageConfiguration montage = firstPersonHandPose.getAttackMontage(driverContainer);
-        montageManager.playMontage(montage);
+        if (montage != null) {
+            montageManager.playMontage(montage);
+        }
     }
 
     public static void playUseMontage(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
