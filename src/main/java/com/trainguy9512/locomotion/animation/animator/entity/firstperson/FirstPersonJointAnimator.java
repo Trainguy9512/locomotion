@@ -135,8 +135,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         pose = MirrorFunction.of(pose, context -> Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT);
 
 
-        PoseFunction<LocalSpacePose> movementDirectionOffsetTransformer =
-                JointTransformerFunction.localOrParentSpaceBuilder(pose, ARM_BUFFER_JOINT)
+        pose = JointTransformerFunction.localOrParentSpaceBuilder(pose, ARM_BUFFER_JOINT)
                         .setTranslation(
                                 context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET, context.partialTicks()).mul(1.5f, new Vector3f()),
                                 JointChannel.TransformType.ADD,
@@ -154,7 +153,11 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                         .setWeight(interpolationContext -> LocomotionMain.CONFIG.data().firstPersonPlayer.enableCameraRotationDamping ? 1f : 0f)
                         .build();
 
-        return movementDirectionOffsetTransformer;
+        // Scaling the whole arms based on whether a spyglass is being used or not.
+        pose = FirstPersonSpyglass.getHiddenArmsSpyglassPose(pose);
+
+
+        return pose;
     }
 
     @Override

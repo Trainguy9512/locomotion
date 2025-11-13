@@ -103,6 +103,13 @@ public enum FirstPersonHandPose {
             HandPoseStates.MACE,
             FirstPersonAnimationSequences.HAND_MACE_POSE,
             driverContainer -> FirstPersonMontages.HAND_MACE_ATTACK_MONTAGE
+    ),
+    SPYGLASS (
+            HandPoseStates.SPYGLASS_RAISE,
+            HandPoseStates.SPYGLASS_LOWER,
+            HandPoseStates.SPYGLASS,
+            FirstPersonAnimationSequences.HAND_SPYGLASS_POSE,
+            driverContainer -> FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE
     );
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator/HandPose");
@@ -142,6 +149,7 @@ public enum FirstPersonHandPose {
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.CROSSBOW, CROSSBOW);
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.BOW, BOW);
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.BLOCK, SHIELD);
+        POSES_BY_USE_ANIMATION.put(ItemUseAnimation.SPYGLASS, SPYGLASS);
     }
 
     public static FirstPersonHandPose fromItemStack(ItemStack itemStack) {
@@ -218,7 +226,10 @@ public enum FirstPersonHandPose {
         BRUSH_LOWER,
         MACE,
         MACE_RAISE,
-        MACE_LOWER
+        MACE_LOWER,
+        SPYGLASS,
+        SPYGLASS_RAISE,
+        SPYGLASS_LOWER
     }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
@@ -364,6 +375,23 @@ public enum FirstPersonHandPose {
                 ),
                 ApplyAdditiveFunction.of(
                         SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_MACE_POSE).build(),
+                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
+                ),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build()
+        );
+        addStatesForHandPose(
+                handPoseStateMachineBuilder,
+                fromLoweringAliasBuilder,
+                interactionHand,
+                FirstPersonHandPose.SPYGLASS,
+                FirstPersonSpyglass.handSpyglassPoseFunction(cachedPoseContainer, interactionHand),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_POSE).build(),
+                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
+                ),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_POSE).build(),
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
                 ),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
