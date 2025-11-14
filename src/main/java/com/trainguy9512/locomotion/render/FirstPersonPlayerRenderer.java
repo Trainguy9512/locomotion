@@ -15,13 +15,12 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Direction;
@@ -38,12 +37,13 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.player.PlayerSkin;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 
 
 import java.util.List;
@@ -258,6 +258,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                 SHOULD_FLIP_ITEM_TRANSFORM = true;
             }
             switch (renderType) {
+                case MAP -> this.renderMap(nodeCollector, poseStack, itemStack, combinedLight);
                 case THIRD_PERSON_ITEM -> {
                     //? if >= 1.21.9 {
 
@@ -304,6 +305,33 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             SHOULD_FLIP_ITEM_TRANSFORM = false;
             IS_RENDERING_LOCOMOTION_FIRST_PERSON = false;
             poseStack.popPose();
+        }
+    }
+
+    private static final RenderType MAP_BACKGROUND = RenderType.text(ResourceLocation.withDefaultNamespace("textures/map/map_background.png"));
+    private static final RenderType MAP_BACKGROUND_CHECKERBOARD = RenderType.text(
+            ResourceLocation.withDefaultNamespace("textures/map/map_background_checkerboard.png")
+    );
+    private final MapRenderState mapRenderState = new MapRenderState();
+
+    private void renderMap(SubmitNodeCollector nodeCollector, PoseStack poseStack, ItemStack itemStack, int combinedLight) {
+        MapId mapId = itemStack.get(DataComponents.MAP_ID);
+        assert this.minecraft.level != null;
+        MapItemSavedData mapItemSavedData = MapItem.getSavedData(mapId, this.minecraft.level);
+        RenderType renderType = mapItemSavedData == null ? MAP_BACKGROUND : MAP_BACKGROUND_CHECKERBOARD;
+
+        poseStack.scale(-1f/128f, 1f/128f, -1f/128f);
+        poseStack.scale(1/4f, 1/4f, 1/4f);
+        nodeCollector.submitCustomGeometry(poseStack, renderType, /* method_73476 */ (pose, vertexConsumer) -> {
+            vertexConsumer.addVertex(pose, -7.0F, 135.0F, 0.0F).setColor(-1).setUv(0.0F, 1.0F).setLight(combinedLight);
+            vertexConsumer.addVertex(pose, 135.0F, 135.0F, 0.0F).setColor(-1).setUv(1.0F, 1.0F).setLight(combinedLight);
+            vertexConsumer.addVertex(pose, 135.0F, -7.0F, 0.0F).setColor(-1).setUv(1.0F, 0.0F).setLight(combinedLight);
+            vertexConsumer.addVertex(pose, -7.0F, -7.0F, 0.0F).setColor(-1).setUv(0.0F, 0.0F).setLight(combinedLight);
+        });
+        if (mapItemSavedData != null) {
+            MapRenderer mapRenderer = this.minecraft.getMapRenderer();
+            mapRenderer.extractRenderState(mapId, mapItemSavedData, this.mapRenderState);
+            mapRenderer.render(this.mapRenderState, poseStack, nodeCollector, false, combinedLight);
         }
     }
 
@@ -418,10 +446,14 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 
     private enum ItemRenderType {
         THIRD_PERSON_ITEM,
-        DEFAULT_BLOCK_STATE;
+        DEFAULT_BLOCK_STATE,
+        MAP;
 
         public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
             Item item = itemStack.getItem();
+            if (handPose == FirstPersonHandPose.GENERIC_ITEM && genericItemPose == FirstPersonGenericItemPose.MAP) {
+                return MAP;
+            }
             if (genericItemPose.shouldRenderBlockstate() && item instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {
                 return DEFAULT_BLOCK_STATE;
             }
