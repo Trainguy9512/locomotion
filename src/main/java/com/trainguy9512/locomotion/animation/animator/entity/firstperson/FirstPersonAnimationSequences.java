@@ -31,6 +31,9 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_GENERIC_ITEM_DOOR_BLOCK_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/door_block_pose");
     public static final ResourceLocation HAND_GENERIC_ITEM_BANNER_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/banner_pose");
     public static final ResourceLocation HAND_GENERIC_ITEM_ARROW_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/arrow_pose");
+    public static final ResourceLocation HAND_GENERIC_ITEM_FISHING_ROD_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/fishing_rod_pose");
+    public static final ResourceLocation HAND_GENERIC_ITEM_SHEARS_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/shears_pose");
+
     public static final ResourceLocation HAND_GENERIC_ITEM_RAISE = makeAnimationSequenceResourceLocation("hand/generic_item/raise");
     public static final ResourceLocation HAND_GENERIC_ITEM_LOWER = makeAnimationSequenceResourceLocation("hand/generic_item/lower");
     public static final ResourceLocation HAND_GENERIC_ITEM_DRINK_BEGIN = makeAnimationSequenceResourceLocation("hand/generic_item/drink_begin");

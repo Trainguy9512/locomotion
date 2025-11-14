@@ -25,22 +25,38 @@ import java.util.List;
 import java.util.Set;
 
 public enum FirstPersonGenericItemPose {
-    DEFAULT_2D_ITEM(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE, false, false),
-    BLOCK(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE, true, false),
-    SMALL_BLOCK(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_SMALL_BLOCK_POSE, true, false),
-    ROD(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE, false, false),
-    DOOR_BLOCK(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE, true, false),
-    BANNER(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BANNER_POSE, false, false),
-    ARROW(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ARROW_POSE, false, true);
+    DEFAULT_2D_ITEM(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE
+    ),
+    BLOCK(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE
+    ),
+    SMALL_BLOCK(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_SMALL_BLOCK_POSE
+    ),
+    ROD(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE
+    ),
+    DOOR_BLOCK(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE
+    ),
+    BANNER(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BANNER_POSE
+    ),
+    ARROW(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ARROW_POSE
+    ),
+    FISHING_ROD(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_FISHING_ROD_POSE
+    ),
+    SHEARS(
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_SHEARS_POSE
+    );
 
     public final ResourceLocation basePoseLocation;
-    public final boolean rendersBlockState;
-    public final boolean rendersMirrored;
 
-    FirstPersonGenericItemPose(ResourceLocation basePoseLocation, boolean rendersBlockState, boolean rendersMirrored) {
+    FirstPersonGenericItemPose(ResourceLocation basePoseLocation) {
         this.basePoseLocation = basePoseLocation;
-        this.rendersBlockState = rendersBlockState;
-        this.rendersMirrored = rendersMirrored;
     }
 
     public static final List<Item> ROD_ITEMS = List.of(
@@ -191,6 +207,12 @@ public enum FirstPersonGenericItemPose {
     );
 
     public static FirstPersonGenericItemPose fromItemStack(ItemStack itemStack) {
+        if (itemStack.is(ItemTags.FISHING_ENCHANTABLE)) {
+            return FISHING_ROD;
+        }
+        if (itemStack.is(Items.SHEARS)) {
+            return SHEARS;
+        }
         if (itemStack.is(ItemTags.ARROWS)) {
             return ARROW;
         }
@@ -231,6 +253,14 @@ public enum FirstPersonGenericItemPose {
         return DEFAULT_2D_ITEM;
     }
 
+    public boolean shouldRenderBlockstate() {
+        return List.of(
+                BLOCK,
+                SMALL_BLOCK,
+                DOOR_BLOCK
+        ).contains(this);
+    }
+
     public boolean shouldMirrorItemModel(FirstPersonHandPose handPose, HumanoidArm side) {
         if (side == HumanoidArm.RIGHT) {
             return false;
@@ -238,7 +268,7 @@ public enum FirstPersonGenericItemPose {
         if (handPose != FirstPersonHandPose.GENERIC_ITEM) {
             return false;
         }
-        return this.rendersMirrored;
+        return this == ARROW;
     }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {

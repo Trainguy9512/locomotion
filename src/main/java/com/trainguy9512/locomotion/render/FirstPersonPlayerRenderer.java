@@ -422,7 +422,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 
         public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
             Item item = itemStack.getItem();
-            if (genericItemPose.rendersBlockState && itemStack.getItem() instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {
+            if (genericItemPose.shouldRenderBlockstate() && item instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {
                 return DEFAULT_BLOCK_STATE;
             }
             return THIRD_PERSON_ITEM;
