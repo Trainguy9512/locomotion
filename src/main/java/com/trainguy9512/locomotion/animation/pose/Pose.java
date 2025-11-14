@@ -61,6 +61,10 @@ public abstract class Pose {
         return JointChannel.of(this.jointChannels.getOrDefault(joint, JointChannel.ZERO));
     }
 
+    public void setIdentity() {
+        this.jointChannels.values().forEach(JointChannel::setIdentity);
+    }
+
     public void loadCustomAttributeValue(String customAttributeName, float value) {
         this.customAttributes.put(customAttributeName, value);
     }

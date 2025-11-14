@@ -51,9 +51,6 @@ public enum FirstPersonGenericItemPose {
     ),
     SHEARS(
             FirstPersonAnimationSequences.HAND_GENERIC_ITEM_SHEARS_POSE
-    ),
-    MAP(
-            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_MAP_POSE
     );
 
     public final ResourceLocation basePoseLocation;
@@ -210,9 +207,6 @@ public enum FirstPersonGenericItemPose {
     );
 
     public static FirstPersonGenericItemPose fromItemStack(ItemStack itemStack) {
-        if (itemStack.has(DataComponents.MAP_ID)) {
-            return MAP;
-        }
         if (itemStack.is(ItemTags.FISHING_ENCHANTABLE)) {
             return FISHING_ROD;
         }
@@ -274,7 +268,7 @@ public enum FirstPersonGenericItemPose {
         if (handPose != FirstPersonHandPose.GENERIC_ITEM) {
             return false;
         }
-        return this == ARROW;
+        return this == ARROW || this == SHEARS;
     }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {

@@ -33,7 +33,6 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_GENERIC_ITEM_ARROW_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/arrow_pose");
     public static final ResourceLocation HAND_GENERIC_ITEM_FISHING_ROD_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/fishing_rod_pose");
     public static final ResourceLocation HAND_GENERIC_ITEM_SHEARS_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/shears_pose");
-    public static final ResourceLocation HAND_GENERIC_ITEM_MAP_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/map_pose");
 
     public static final ResourceLocation HAND_GENERIC_ITEM_RAISE = makeAnimationSequenceResourceLocation("hand/generic_item/raise");
     public static final ResourceLocation HAND_GENERIC_ITEM_LOWER = makeAnimationSequenceResourceLocation("hand/generic_item/lower");
@@ -49,6 +48,8 @@ public class FirstPersonAnimationSequences {
 
     public static final ResourceLocation HAND_SPYGLASS_POSE = makeAnimationSequenceResourceLocation("hand/spyglass/pose");
     public static final ResourceLocation HAND_SPYGLASS_LOOKING_EXIT = makeAnimationSequenceResourceLocation("hand/spyglass/looking_exit");
+
+    public static final ResourceLocation HAND_MAP_SINGLE_HAND_POSE = makeAnimationSequenceResourceLocation("hand/map/single_hand_pose");
 
     public static final ResourceLocation HAND_BOW_POSE = makeAnimationSequenceResourceLocation("hand/bow/pose");
     public static final ResourceLocation HAND_BOW_PULL = makeAnimationSequenceResourceLocation("hand/bow/pull");

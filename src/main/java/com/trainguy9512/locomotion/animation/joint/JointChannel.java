@@ -79,6 +79,10 @@ public final class JointChannel {
                 );
     }
 
+    public void setIdentity() {
+        this.transform.identity();
+    }
+
     public void translate(Vector3f translation, TransformSpace transformSpace, TransformType transformType) {
         switch (transformType){
             case ADD -> {

@@ -396,11 +396,17 @@ public class FirstPersonAdditiveMovement {
                 )
                 .build();
 
+        // Blending out the additive animation based on the map in hand.
+        pose = FirstPersonMap.blendAdditiveMovementIfHoldingMap(pose);
+
         // Making it additive at the end
-        return MakeDynamicAdditiveFunction.of(
+        PoseFunction<LocalSpacePose> additivePose = MakeDynamicAdditiveFunction.of(
                 pose,
                 SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build()
         );
+
+        return additivePose;
+
     }
 
     enum GroundMovementStates {

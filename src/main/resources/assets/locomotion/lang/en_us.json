@@ -31,6 +31,12 @@
   "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Controls how much friction the spring animation has. The higher the damping, the less it bounces back and forth",
   "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Stiffness Factor",
   "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "Controls how quickly the arms rotate to match up with the camera's rotation",
+
   "locomotion.config.option.first_person_mining_speed.name": "Mining Animation Speed Multiplier",
-  "locomotion.config.option.first_person_mining_speed.description": "Adjusts how fast the mining animations play. 1 is normal speed, 0.5 is half as fast, and 2 is twice as fast"
+  "locomotion.config.option.first_person_mining_speed.description": "Adjusts how fast the mining animations play. 1 is normal speed, 0.5 is half as fast, and 2 is twice as fast",
+
+  "locomotion.config.group.first_person_map.name": "Map Items",
+  "locomotion.config.group.first_person_map.description": "Settings for how map items are displayed and animated.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Map Movement Animation Intensity",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controls the intensity of movement animations when holding a map item. A lower intensity helps with map readability."
 }

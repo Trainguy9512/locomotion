@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.render;
 
+import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
@@ -320,7 +321,12 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         MapItemSavedData mapItemSavedData = MapItem.getSavedData(mapId, this.minecraft.level);
         RenderType renderType = mapItemSavedData == null ? MAP_BACKGROUND : MAP_BACKGROUND_CHECKERBOARD;
 
-        poseStack.scale(-1f/128f, 1f/128f, -1f/128f);
+        poseStack.scale(-1, 1, -1);
+
+        poseStack.scale(1f/16f, 1f/16f, 1f/16f);
+//        poseStack.translate(2, -4, 1);
+        poseStack.translate(-2, -4, -1);
+        poseStack.scale(1f/8f, 1f/8f, 1f/8f);
         poseStack.scale(1/4f, 1/4f, 1/4f);
         nodeCollector.submitCustomGeometry(poseStack, renderType, /* method_73476 */ (pose, vertexConsumer) -> {
             vertexConsumer.addVertex(pose, -7.0F, 135.0F, 0.0F).setColor(-1).setUv(0.0F, 1.0F).setLight(combinedLight);
@@ -451,7 +457,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 
         public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
             Item item = itemStack.getItem();
-            if (handPose == FirstPersonHandPose.GENERIC_ITEM && genericItemPose == FirstPersonGenericItemPose.MAP) {
+            if (handPose == FirstPersonHandPose.MAP) {
                 return MAP;
             }
             if (genericItemPose.shouldRenderBlockstate() && item instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {

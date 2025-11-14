@@ -100,6 +100,12 @@ public enum FirstPersonHandPose {
             HandPoseStates.SPYGLASS_LOWER,
             HandPoseStates.SPYGLASS,
             FirstPersonAnimationSequences.HAND_SPYGLASS_POSE
+    ),
+    MAP (
+            HandPoseStates.MAP_RAISE,
+            HandPoseStates.MAP_LOWER,
+            HandPoseStates.MAP,
+            FirstPersonAnimationSequences.HAND_MAP_SINGLE_HAND_POSE
     );
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator/HandPose");
@@ -146,6 +152,9 @@ public enum FirstPersonHandPose {
         ItemUseAnimation useAnimation = itemStack.getUseAnimation();
         if (POSES_BY_USE_ANIMATION.containsKey(useAnimation)) {
             return POSES_BY_USE_ANIMATION.get(useAnimation);
+        }
+        if (itemStack.has(DataComponents.MAP_ID)) {
+            return MAP;
         }
         if (itemStack.is(ItemTags.MACE_ENCHANTABLE)) {
             return MACE;
@@ -236,7 +245,10 @@ public enum FirstPersonHandPose {
         MACE_LOWER,
         SPYGLASS,
         SPYGLASS_RAISE,
-        SPYGLASS_LOWER
+        SPYGLASS_LOWER,
+        MAP,
+        MAP_RAISE,
+        MAP_LOWER
     }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
@@ -399,6 +411,23 @@ public enum FirstPersonHandPose {
                 ),
                 ApplyAdditiveFunction.of(
                         SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_POSE).build(),
+                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
+                ),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
+                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build()
+        );
+        addStatesForHandPose(
+                handPoseStateMachineBuilder,
+                fromLoweringAliasBuilder,
+                interactionHand,
+                FirstPersonHandPose.MAP,
+                FirstPersonHandPose.MAP.getMiningStateMachine(cachedPoseContainer, interactionHand),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonHandPose.MAP.basePoseLocation).build(),
+                        SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
+                ),
+                ApplyAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonHandPose.MAP.basePoseLocation).build(),
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
                 ),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
