@@ -1,0 +1,36 @@
+{
+  "locomotion.config.yacl_not_found.header": "Configuration API не установлен",
+  "locomotion.config.yacl_not_found.description": "Locomotion использует библиотеку конфигурации \"YetAnotherConfigLib\" для создания меню настройки внутри игры. Это не обязательная зависимость, но она должна быть установлена, если вы хотите изменять настройки во время игры. В противном случае вы можете изменить конфигурацию вручную в файле .minecraft/config/locomotion.json",
+  "locomotion.config.yacl_not_found.close": "Закрыть",
+
+  "locomotion.config.title": "Конфигурация Locomotion",
+  "locomotion.config.category.general.name": "Основные",
+  "locomotion.config.category.general.tooltip": "Общие настройки для всех анимаций",
+  "locomotion.config.category.first_person_player.name": "Игрок от первого лица",
+  "locomotion.config.category.first_person_player.tooltip": "Настройки анимаций игрока от первого лица",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "Анимации от первого лица",
+  "locomotion.config.option.enable_first_person_renderer.description": "Следует ли использовать анимации игрока от первого лица от Locomotion. В отличие от большинства других модификаций на изменение анимаций, эта имеет собственный рендере, который полностью заменяет стандартный движок рендера от первого лица. Отключите эту опцию, чтобы использовать обычные анимации игрока от первого лица, или для совместимости с модами, которые интегрируются в стандартный движок рендера от первого лица.",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "Включено",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "Отключено",
+
+  "locomotion.config.group.first_person_camera_shake.name": "Тряска камеры",
+  "locomotion.config.group.first_person_camera_shake.description": "Настройки интенсивности анимаций тряски камеры.",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "Общая интенсивность",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "Задает интенсивность всех анимаций тряски камеры.",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "Интенсивность при движении",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "Задает интенсивность тряски камеры от анимаций движения, в том числе и покачивание.",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "Интенсивность при взаимодействии с предметами",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "Задает интенсивность тряски камеры от анимаций взаимодействия с предметами, в том числе атаку и копание.",
+
+  "locomotion.config.group.first_person_arm_camera_damping.name": "Сглаживание вращения рук при движении камеры",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "Настройки вращения рук при движении камеры.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Включено",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Определяет, включено ли сглаживание вращения рук от первого лица. Отключение этой опции полностью останавливает движение рук при повороте камеры.",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Коэффициент сглаживания",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Определяет, насколько плавно движение рук останавливается. Чем выше значение, тем меньше руки \"раскачиваются\" после резкого движения.",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Коэффициент жесткости",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "Определяет, насколько быстро руки поворачиваются вслед за поворотом камеры.",
+  "locomotion.config.option.first_person_mining_speed.name": "Множитель скорости анимации копания",
+  "locomotion.config.option.first_person_mining_speed.description": "Регулирует скорость воспроизведения анимаций копания. 1 - нормальная скорость, 0.5 - в два раза медленнее, 2 - в два раза быстрее."
+}
