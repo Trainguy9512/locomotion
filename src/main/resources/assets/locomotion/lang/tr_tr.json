@@ -1,0 +1,42 @@
+{
+  "locomotion.config.yacl_not_found.header": "Konfigürasyon API yüklenmedi",
+  "locomotion.config.yacl_not_found.description": "Locomotion, oyun içi yapılandırma ekranını oluşturmak için \"YetAnotherConfigLib\" yapılandırma kütüphanesini kullanır. Zorunlu bir bağımlılık değildir, ancak oyun sırasında yapılandırmayı ayarlamak isterseniz yüklü olması gerekir. Aksi takdirde, yapılandırmayı .minecraft/config/locomotion.json dosyasından manuel olarak değiştirebilirsiniz.",
+  "locomotion.config.yacl_not_found.close": "Kapat",
+
+  "locomotion.config.title": "Locomotion Konfigürasyonu",
+  "locomotion.config.category.general.name": "Genel",
+  "locomotion.config.category.general.tooltip": "Tüm animasyonlar için genel ayarlar",
+  "locomotion.config.category.first_person_player.name": "Birinci Şahıs Oyuncu",
+  "locomotion.config.category.first_person_player.tooltip": "Birinci şahıs oyuncu animasyonları için ayarlar",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "Birinci Şahıs Oyuncu",
+  "locomotion.config.option.enable_first_person_renderer.description": "Locomotion'ın birinci şahıs oyuncu animasyonlarının kullanılıp kullanılmayacağı. Sağlanan diğer animasyonların çoğunluğundan farklı olarak, bu animasyon tamamen Vanilla'nın birinci şahıs oluşturucusunu değiştiren kendi ayrı oluşturucusuna sahiptir. Vanilla'nın birinci şahıs oyuncu oluşturucusunu görmek için veya Vanilla'nın birinci şahıs oluşturucusuna entegre olan modlarla uyumluluk için bunu devre dışı bırakın.",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "Etkin",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "Devre Dışı",
+
+  "locomotion.config.group.first_person_camera_shake.name": "Kamera Sarsıntısı",
+  "locomotion.config.group.first_person_camera_shake.description": "Kamera sarsıntı animasyonlarının ne kadar yoğun olduğunu ayarlamak için ayarlar.",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "Ana Yoğunluk",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "Tüm kamera sarsıntı animasyonlarının yoğunluğunu kontrol eder.",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "Hareket Yoğunluğu",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "Hareket animasyonlarından kaynaklanan kamera sarsıntısının yoğunluğunu kontrol eder; görüş sallanması da dahildir.",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "Eşya Etkileşimi Yoğunluğu",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "Eşya etkileşim animasyonlarından kaynaklanan kamera sarsıntısının yoğunluğunu kontrol eder; saldırı ve madencilik de dahildir.",
+
+  "locomotion.config.group.first_person_arm_camera_damping.name": "Kamera Döndürme Kolu Sönümleme",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "Kamera hareket ettirilirken kolların nasıl döndürüleceğini ayarlamak için ayarlar.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Etkinleştirildi",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Birinci şahıs kolu sönümlemenin etkinleştirilip etkinleştirilmediği. Bunu devre dışı bırakmak, kamera hareket ettirilirken kolların hiç hareket etmemesini sağlar.",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Sönümleme Faktörü",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Yay animasyonunun ne kadar esnekliği olduğunu kontrol eder. Sönümleme ne kadar yüksekse, o kadar az ileri geri sıçrar",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Sertlik Faktörü",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "Kolların kameranın dönüşüne uyacak şekilde ne kadar hızlı döndüğünü kontrol eder",
+
+  "locomotion.config.option.first_person_mining_speed.name": "Madencilik Animasyonu Hız Çarpanı",
+  "locomotion.config.option.first_person_mining_speed.description": "Madencilik animasyonlarının ne kadar hızlı oynatıldığını ayarlar. 1 normal hız, 0.5 yarı hız ve 2 iki katılı hız",
+
+  "locomotion.config.group.first_person_map.name": "Harita Eşyaları",
+  "locomotion.config.group.first_person_map.description": "Harita eşyalarının nasıl görüntüleneceği ve animasyonu için ayarlar.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Harita Hareket Animasyonu Yoğunluğu",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Harita eşyası tutarken hareket animasyonlarının yoğunluğunu kontrol eder. Daha düşük yoğunluk harita okunabilirliğine yardımcı olur."
+}
