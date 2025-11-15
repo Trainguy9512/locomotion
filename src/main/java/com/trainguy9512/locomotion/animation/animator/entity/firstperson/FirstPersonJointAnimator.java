@@ -177,7 +177,10 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         for (InteractionHand interactionHand : InteractionHand.values()) {
             VariableDriver<ItemStack> itemDriver = driverContainer.getDriver(FirstPersonDrivers.getItemDriver(interactionHand));
-            itemDriver.setValue(dataReference.getItemInHand(interactionHand).copy());
+            VariableDriver<ItemStack> itemCopyReferenceDriver = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand));
+            ItemStack itemInHand = dataReference.getItemInHand(interactionHand);
+            itemDriver.setValue(itemInHand);
+            itemCopyReferenceDriver.setValue(itemInHand.copy());
 
 //            if (interactionHand == InteractionHand.MAIN_HAND) {
 //                LocomotionMain.DEBUG_LOGGER.info("{} {}", dataReference.getItemInHand(interactionHand), driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand)));
@@ -234,7 +237,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                     }
                 }
             }
-            driverContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).runIfTriggered(() -> {});
+//            driverContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).runIfTriggered(() -> FirstPersonMontages.playUseMontage(driverContainer, montageManager, interactionHand));
 
 
             driverContainer.getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).setValue(false);

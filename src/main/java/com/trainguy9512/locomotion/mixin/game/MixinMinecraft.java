@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.InteractionHand;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -73,28 +74,30 @@ public abstract class MixinMinecraft {
         });
     }
 
-    @Inject(
-            method = "startUseItem",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V")
-    )
-    public void injectOnSwingPlayerHandWhenBeginningUse(CallbackInfo ci, @Local InteractionHand interactionHand) {
-        JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-            switch (interactionHand) {
-                case MAIN_HAND -> dataContainer.getDriver(FirstPersonDrivers.HAS_USED_MAIN_HAND_ITEM).trigger();
-                case OFF_HAND -> dataContainer.getDriver(FirstPersonDrivers.HAS_USED_OFF_HAND_ITEM).trigger();
-            }
-        });
-    }
+//    @Inject(
+//            method = "startUseItem",
+//            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V")
+//    )
+//    public void injectOnSwingPlayerHandWhenBeginningUse(CallbackInfo ci, @Local InteractionHand interactionHand) {
+//        JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
+//            switch (interactionHand) {
+//                case MAIN_HAND -> dataContainer.getDriver(FirstPersonDrivers.HAS_USED_MAIN_HAND_ITEM).trigger();
+//                case OFF_HAND -> dataContainer.getDriver(FirstPersonDrivers.HAS_USED_OFF_HAND_ITEM).trigger();
+//            }
+//        });
+//    }
 
     @Inject(
             method = "tick",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;animateTick(III)V")
     )
-    private void locomotionTick(CallbackInfo ci) {
+    private void locomotionTick(CallbackInfo ci, @Local ProfilerFiller profiler) {
+        profiler.push("locomotionTick");
         assert this.level != null;
         JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
         jointAnimatorDispatcher.tickEntityJointAnimators(this.level.entitiesForRendering());
         jointAnimatorDispatcher.tickFirstPersonPlayerJointAnimator();
+        profiler.pop();
     }
 
     /**

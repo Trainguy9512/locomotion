@@ -1,11 +1,13 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
@@ -120,8 +122,18 @@ public class FirstPersonMontages {
 
         // If the first person hand pose has not changed, update the rendered item.
         ItemStack renderedItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
-        ItemStack actualItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
-        if (FirstPersonHandPose.fromItemStack(renderedItemStack) == FirstPersonHandPose.fromItemStack(actualItemStack)) {
+        ItemStack currentActualItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
+
+        ItemStack currentCopyReferenceItemStack = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getCurrentValue();
+        ItemStack previousCopyReferenceItemStack = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getPreviousValue();
+
+        if (FirstPersonHandPose.fromItemStack(renderedItemStack) == FirstPersonHandPose.fromItemStack(currentActualItemStack)) {
+//            LocomotionMain.DEBUG_LOGGER.info("{}, {}, {}, {}",
+//                    currentCopyReferenceItemStack.getDamageValue(),
+//                    previousCopyReferenceItemStack.getDamageValue(),
+//                    currentActualItemStack.getDamageValue(),
+//                    renderedItemStack.getDamageValue()
+//            );
             FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
         }
     }

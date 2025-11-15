@@ -18,6 +18,8 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Integer>> HOTBAR_SLOT = DriverKey.of("hotbar_slot", () -> VariableDriver.ofConstant(() -> 0));
     public static final DriverKey<VariableDriver<ItemStack>> MAIN_HAND_ITEM = DriverKey.of("main_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> OFF_HAND_ITEM = DriverKey.of("off_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
+    public static final DriverKey<VariableDriver<ItemStack>> MAIN_HAND_ITEM_COPY_REFERENCE = DriverKey.of("main_hand_item_copy_reference", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
+    public static final DriverKey<VariableDriver<ItemStack>> OFF_HAND_ITEM_COPY_REFERENCE = DriverKey.of("off_hand_item_copy_reference", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_MAIN_HAND_ITEM = DriverKey.of("rendered_main_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_OFF_HAND_ITEM = DriverKey.of("rendered_off_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<FirstPersonHandPose>> MAIN_HAND_POSE = DriverKey.of("main_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPose.EMPTY));
@@ -57,11 +59,13 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Boolean>> IS_IN_RIPTIDE = DriverKey.of("is_in_riptide", () -> VariableDriver.ofBoolean(() -> false));
 
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
-        driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(driverContainer.getDriverValue(getItemDriver(interactionHand)).copy());
-        FirstPersonHandPose handPose = FirstPersonHandPose.fromItemStack(driverContainer.getDriver(getRenderedItemDriver(interactionHand)).getCurrentValue());
+        ItemStack newRenderedItem = driverContainer.getDriverValue(getItemDriver(interactionHand));
+        driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(newRenderedItem);
+        FirstPersonHandPose handPose = FirstPersonHandPose.fromItemStack(newRenderedItem);
         driverContainer.getDriver(getHandPoseDriver(interactionHand)).setValue(handPose);
         if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
-            driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(FirstPersonGenericItemPose.fromItemStack(driverContainer.getDriver(getRenderedItemDriver(interactionHand)).getCurrentValue()));
+            FirstPersonGenericItemPose genericItemPose = FirstPersonGenericItemPose.fromItemStack(newRenderedItem);
+            driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(genericItemPose);
         } else {
             driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(FirstPersonGenericItemPose.DEFAULT_2D_ITEM);
         }
@@ -98,6 +102,13 @@ public class FirstPersonDrivers {
         return switch (interactionHand) {
             case MAIN_HAND -> MAIN_HAND_ITEM;
             case OFF_HAND -> OFF_HAND_ITEM;
+        };
+    }
+
+    public static DriverKey<VariableDriver<ItemStack>> getItemCopyReferenceDriver(InteractionHand interactionHand) {
+        return switch (interactionHand) {
+            case MAIN_HAND -> MAIN_HAND_ITEM_COPY_REFERENCE;
+            case OFF_HAND -> OFF_HAND_ITEM_COPY_REFERENCE;
         };
     }
 

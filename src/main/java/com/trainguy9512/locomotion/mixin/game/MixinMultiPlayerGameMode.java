@@ -5,12 +5,16 @@ import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -85,6 +89,54 @@ public class MixinMultiPlayerGameMode {
         assert this.minecraft.player != null;
         if (cir.getReturnValue() && this.minecraft.player.getAbilities().instabuild) {
             JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger());
+        }
+    }
+
+    @Inject(
+            method = "useItem",
+            at = @At("RETURN")
+    )
+    public void triggerUseItemAnimation(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
+                dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
+            });
+        }
+    }
+
+    @Inject(
+            method = "useItemOn",
+            at = @At("RETURN")
+    )
+    public void triggerUseItemOnAnimation(LocalPlayer player, InteractionHand hand, BlockHitResult result, CallbackInfoReturnable<InteractionResult> cir) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
+                dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
+            });
+        }
+    }
+
+    @Inject(
+            method = "interactAt",
+            at = @At("RETURN")
+    )
+    public void triggerInteractAtAnimation(Player player, Entity target, EntityHitResult ray, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
+                dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
+            });
+        }
+    }
+
+    @Inject(
+            method = "interact",
+            at = @At("RETURN")
+    )
+    public void triggerInteractAnimation(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
+                dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
+            });
         }
     }
 }
