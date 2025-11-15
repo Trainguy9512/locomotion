@@ -10,7 +10,7 @@
   "locomotion.config.category.first_person_player.tooltip": "Birinci şahıs oyuncu animasyonları için ayarlar",
 
   "locomotion.config.option.enable_first_person_renderer.name": "Birinci Şahıs Oyuncu",
-  "locomotion.config.option.enable_first_person_renderer.description": "Locomotion'ın birinci şahıs oyuncu animasyonlarının kullanılıp kullanılmayacağı. Sağlanan diğer animasyonların çoğunluğundan farklı olarak, bu animasyon tamamen Vanilla'nın birinci şahıs oluşturucusunu değiştiren kendi ayrı oluşturucusuna sahiptir. Vanilla'nın birinci şahıs oyuncu oluşturucusunu görmek için veya Vanilla'nın birinci şahıs oluşturucusuna entegre olan modlarla uyumluluk için bunu devre dışı bırakın.",
+  "locomotion.config.option.enable_first_person_renderer.description": "Locomotion'ın birinci şahıs oyuncu animasyonlarının kullanılıp kullanılmayacağını ayarlar. Sağlanan diğer animasyonların çoğunluğundan farklı olarak, bu animasyon tamamen Vanilla'nın birinci şahıs oluşturucusunu değiştiren kendi ayrı oluşturucusuna sahiptir. Vanilla'nın birinci şahıs oyuncu oluşturucusunu görmek için veya Vanilla'nın birinci şahıs oluşturucusuna entegre olan modlarla uyumluluk için bunu devre dışı bırakın.",
   "locomotion.config.option.enable_first_person_renderer.enabled": "Etkin",
   "locomotion.config.option.enable_first_person_renderer.disabled": "Devre Dışı",
 
@@ -25,8 +25,8 @@
 
   "locomotion.config.group.first_person_arm_camera_damping.name": "Kamera Döndürme Kolu Sönümleme",
   "locomotion.config.group.first_person_arm_camera_damping.description": "Kamera hareket ettirilirken kolların nasıl döndürüleceğini ayarlamak için ayarlar.",
-  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Etkinleştirildi",
-  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Birinci şahıs kolu sönümlemenin etkinleştirilip etkinleştirilmediği. Bunu devre dışı bırakmak, kamera hareket ettirilirken kolların hiç hareket etmemesini sağlar.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Etkin",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Birinci şahıs kolu sönümlemenin etkinleştirilip etkinleştirilmediği belirler. Bunu devre dışı bırakmak, kamera hareket ettirilirken kolların hiç hareket etmemesini sağlar.",
   "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Sönümleme Faktörü",
   "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Yay animasyonunun ne kadar esnekliği olduğunu kontrol eder. Sönümleme ne kadar yüksekse, o kadar az ileri geri sıçrar",
   "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Sertlik Faktörü",
