@@ -34,8 +34,8 @@
   "locomotion.config.option.first_person_mining_speed.name": "Множитель скорости анимации копания",
   "locomotion.config.option.first_person_mining_speed.description": "Регулирует скорость воспроизведения анимаций копания. 1 - нормальная скорость, 0.5 - в два раза медленнее, 2 - в два раза быстрее."
 
-   "locomotion.config.group.first_person_map.name": "",
-  "locomotion.config.group.first_person_map.description": "Settings for how map items are displayed and animated.",
-  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Map Movement Animation Intensity",
-  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controls the intensity of movement animations when holding a map item. A lower intensity helps with map readability."
+   "locomotion.config.group.first_person_map.name": "Отображение карты",
+  "locomotion.config.group.first_person_map.description": "Настройки отображения и анимации карты от первого лица.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Интенсивность движения карты",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Контролирует интенсивность движения карты при перемещении. Меньшие значения повышают читабельность."
 }
