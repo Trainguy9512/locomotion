@@ -1,9 +1,6 @@
 package com.trainguy9512.locomotion.animation.driver;
 
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import net.minecraft.ChatFormatting;
-
-import java.util.function.Consumer;
 
 /**
  * Boolean driver that can be triggered to get a one-tick "pulse". When triggered, it will automatically be un-triggered after pose function evaluation.
@@ -18,6 +15,7 @@ public class TriggerDriver implements Driver<Boolean> {
     private TriggerDriver(int triggerTickDuration) {
         this.triggerTickDuration = triggerTickDuration;
         this.triggerCooldown = 0;
+        this.triggerConsumed = false;
     }
 
     public static TriggerDriver of() {
@@ -37,15 +35,27 @@ public class TriggerDriver implements Driver<Boolean> {
      * Runs a function if the driver has been triggered, and then resets the driver after pose function evaluation.
      * @param runnable          Function to run if triggered.
      */
-    public void runIfTriggered(Runnable runnable) {
-        if (this.triggerCooldown > 0 && !this.triggerConsumed) {
+    public void runAndConsumeIfTriggered(Runnable runnable) {
+        if (this.hasBeenTriggeredAndNotConsumed()) {
             runnable.run();
-            this.triggerConsumed = true;
+            this.consume();
         }
+    }
+
+    public void consume() {
+        this.triggerConsumed = true;
+    }
+
+    public boolean hasBeenConsumed() {
+        return this.triggerConsumed;
     }
 
     public boolean hasBeenTriggered() {
         return this.triggerCooldown > 0;
+    }
+
+    public boolean hasBeenTriggeredAndNotConsumed() {
+        return this.hasBeenTriggered() && !this.hasBeenConsumed();
     }
 
     @Override
@@ -65,8 +75,8 @@ public class TriggerDriver implements Driver<Boolean> {
 
     @Override
     public void postTick() {
-        if (this.triggerConsumed) {
-            this.triggerCooldown = Math.max(triggerCooldown - 1, 0);
+        if (this.triggerConsumed && this.triggerCooldown > 0) {
+            this.triggerCooldown -= 1;
         }
     }
 

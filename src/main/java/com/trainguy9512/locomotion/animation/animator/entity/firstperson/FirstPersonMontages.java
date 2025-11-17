@@ -1,15 +1,12 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
 
 
 public class FirstPersonMontages {
@@ -22,7 +19,7 @@ public class FirstPersonMontages {
         return interactionHand == InteractionHand.MAIN_HAND ? MAIN_HAND_ATTACK_SLOT : OFF_HAND_ATTACK_SLOT;
     }
 
-    public static final MontageConfiguration HAND_TOOL_ATTACK_PICKAXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_pickaxe", FirstPersonAnimationSequences.HAND_TOOL_ATTACK)
+    public static final MontageConfiguration HAND_TOOL_ATTACK_PICKAXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_pickaxe", FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
@@ -71,6 +68,7 @@ public class FirstPersonMontages {
             .build();
 
     public static final MontageConfiguration USE_OFF_HAND_MONTAGE = USE_MAIN_HAND_MONTAGE.makeBuilderCopy("hand_use_off_hand", USE_MAIN_HAND_MONTAGE.animationSequence())
+            .clearSlotsPlayedIn()
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
             .makeAdditive(driverContainer -> {
                 FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_POSE);
@@ -88,6 +86,17 @@ public class FirstPersonMontages {
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(8)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
 
+    public static final MontageConfiguration AXE_SCRAPE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("axe_scrape_main_hand", FirstPersonAnimationSequences.HAND_TOOL_AXE_SCRAPE)
+            .playsInSlot(MAIN_HAND_ATTACK_SLOT)
+            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
+            .build();
+
+    public static final MontageConfiguration AXE_SCRAPE_OFF_HAND_MONTAGE = AXE_SCRAPE_MAIN_HAND_MONTAGE.makeBuilderCopy("axe_scrape_off_hand", FirstPersonAnimationSequences.HAND_TOOL_AXE_SCRAPE)
+            .clearSlotsPlayedIn()
+            .playsInSlot(OFF_HAND_ATTACK_SLOT)
+            .build();
+
     public static final MontageConfiguration CROSSBOW_FIRE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("crossbow_fire_main_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
@@ -95,6 +104,7 @@ public class FirstPersonMontages {
             .build();
 
     public static final MontageConfiguration CROSSBOW_FIRE_OFF_HAND_MONTAGE = CROSSBOW_FIRE_MAIN_HAND_MONTAGE.makeBuilderCopy("crossbow_fire_off_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
+            .clearSlotsPlayedIn()
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
             .build();
 
@@ -105,36 +115,25 @@ public class FirstPersonMontages {
         };
     }
 
+    public static MontageConfiguration getUseAnimationMontage(InteractionHand interactionHand) {
+        return switch (interactionHand) {
+            case MAIN_HAND -> USE_MAIN_HAND_MONTAGE;
+            case OFF_HAND -> USE_OFF_HAND_MONTAGE;
+        };
+    }
+
+    public static MontageConfiguration getAxeScrapeMontage(InteractionHand interactionHand) {
+        return switch (interactionHand) {
+            case MAIN_HAND -> AXE_SCRAPE_MAIN_HAND_MONTAGE;
+            case OFF_HAND -> AXE_SCRAPE_OFF_HAND_MONTAGE;
+        };
+    }
+
     public static void playAttackMontage(OnTickDriverContainer driverContainer, MontageManager montageManager) {
         FirstPersonHandPose firstPersonHandPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
         MontageConfiguration montage = firstPersonHandPose.getAttackMontage(driverContainer);
         if (montage != null) {
             montageManager.playMontage(montage);
-        }
-    }
-
-    public static void playUseMontage(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
-        MontageConfiguration montageConfiguration = switch (interactionHand) {
-            case MAIN_HAND -> USE_MAIN_HAND_MONTAGE;
-            case OFF_HAND -> USE_OFF_HAND_MONTAGE;
-        };
-        montageManager.playMontage(montageConfiguration);
-
-        // If the first person hand pose has not changed, update the rendered item.
-        ItemStack renderedItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
-        ItemStack currentActualItemStack = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
-
-        ItemStack currentCopyReferenceItemStack = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getCurrentValue();
-        ItemStack previousCopyReferenceItemStack = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getPreviousValue();
-
-        if (FirstPersonHandPose.fromItemStack(renderedItemStack) == FirstPersonHandPose.fromItemStack(currentActualItemStack)) {
-//            LocomotionMain.DEBUG_LOGGER.info("{}, {}, {}, {}",
-//                    currentCopyReferenceItemStack.getDamageValue(),
-//                    previousCopyReferenceItemStack.getDamageValue(),
-//                    currentActualItemStack.getDamageValue(),
-//                    renderedItemStack.getDamageValue()
-//            );
-            FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
         }
     }
 }

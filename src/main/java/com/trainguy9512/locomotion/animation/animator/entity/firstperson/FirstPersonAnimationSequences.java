@@ -17,12 +17,13 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_TOOL_RAISE = makeAnimationSequenceResourceLocation("hand/tool/raise");
     public static final ResourceLocation HAND_TOOL_PICKAXE_MINE_SWING = makeAnimationSequenceResourceLocation("hand/tool/pickaxe/mine_swing");
     public static final ResourceLocation HAND_TOOL_PICKAXE_MINE_FINISH = makeAnimationSequenceResourceLocation("hand/tool/pickaxe/mine_finish");
-    public static final ResourceLocation HAND_TOOL_ATTACK = makeAnimationSequenceResourceLocation("hand/tool/attack");
-    public static final ResourceLocation HAND_TOOL_AXE_ATTACK = makeAnimationSequenceResourceLocation("hand/tool/axe_attack");
+    public static final ResourceLocation HAND_TOOL_PICKAXE_ATTACK = makeAnimationSequenceResourceLocation("hand/tool/pickaxe/attack");
     public static final ResourceLocation HAND_TOOL_USE = makeAnimationSequenceResourceLocation("hand/tool/use");
     public static final ResourceLocation HAND_TOOL_SWORD_SWING_LEFT = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_left");
     public static final ResourceLocation HAND_TOOL_SWORD_SWING_RIGHT = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_right");
     public static final ResourceLocation HAND_TOOL_SWORD_SWING_DOWN = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_down");
+    public static final ResourceLocation HAND_TOOL_AXE_ATTACK = makeAnimationSequenceResourceLocation("hand/tool/axe/attack");
+    public static final ResourceLocation HAND_TOOL_AXE_SCRAPE = makeAnimationSequenceResourceLocation("hand/tool/axe/scrape");
 
     public static final ResourceLocation HAND_GENERIC_ITEM_2D_ITEM_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/2d_item_pose");
     public static final ResourceLocation HAND_GENERIC_ITEM_BLOCK_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/block_pose");

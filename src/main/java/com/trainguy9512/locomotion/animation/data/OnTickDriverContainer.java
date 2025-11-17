@@ -12,4 +12,6 @@ public interface OnTickDriverContainer {
     public <D, R extends Driver<D>> D getDriverValue(DriverKey<R> driverKey);
 
     public <D, R extends Driver<D>> R getDriver(DriverKey<R> driverKey);
+
+    public long getCurrentTick();
 }

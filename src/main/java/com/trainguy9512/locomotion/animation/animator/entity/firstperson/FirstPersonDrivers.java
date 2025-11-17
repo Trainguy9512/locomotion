@@ -4,6 +4,7 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.*;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3f;
 
@@ -39,19 +40,22 @@ public class FirstPersonDrivers {
 
     public static final DriverKey<VariableDriver<Boolean>> IS_MINING = DriverKey.of("is_mining", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<TriggerDriver> HAS_ATTACKED = DriverKey.of("has_attacked", TriggerDriver::of);
-    public static final DriverKey<TriggerDriver> HAS_USED_MAIN_HAND_ITEM = DriverKey.of("has_used_main_hand_item", () -> TriggerDriver.of(2));
-    public static final DriverKey<TriggerDriver> HAS_USED_OFF_HAND_ITEM = DriverKey.of("has_used_off_hand_item", () -> TriggerDriver.of(2));
-    public static final DriverKey<TriggerDriver> HAS_INTERACTED_WITH_MAIN_HAND = DriverKey.of("has_interacted_with_main_hand_item", () -> TriggerDriver.of(2));
-    public static final DriverKey<TriggerDriver> HAS_INTERACTED_WITH_OFF_HAND = DriverKey.of("has_interacted_with_off_hand_item", () -> TriggerDriver.of(2));
     public static final DriverKey<TriggerDriver> HAS_BLOCKED_ATTACK = DriverKey.of("has_blocked_attack", TriggerDriver::of);
     public static final DriverKey<TriggerDriver> HAS_DROPPED_ITEM = DriverKey.of("has_dropped_item", TriggerDriver::of);
     public static final DriverKey<TriggerDriver> HAS_SWAPPED_ITEMS = DriverKey.of("has_swapped_items", () -> TriggerDriver.of(3));
+
+    public static final DriverKey<TriggerDriver> HAS_USED_MAIN_HAND_ITEM = DriverKey.of("has_used_main_hand_item", () -> TriggerDriver.of(2));
+    public static final DriverKey<TriggerDriver> HAS_USED_OFF_HAND_ITEM = DriverKey.of("has_used_off_hand_item", () -> TriggerDriver.of(2));
+    public static final DriverKey<VariableDriver<InteractionHand>> LAST_USED_HAND = DriverKey.of("last_used_hand", () -> VariableDriver.ofConstant(() -> InteractionHand.MAIN_HAND));
+    public static final DriverKey<VariableDriver<Long>> SCHEDULED_USE_ANIMATION_TICK = DriverKey.of("scheduled_use_animation_tick", () -> VariableDriver.ofConstant(() -> 0L));
+    public static final DriverKey<VariableDriver<Integer>> LAST_USED_SWING_TIME = DriverKey.of("last_used_swing_time", () -> VariableDriver.ofConstant(() -> 0));
+    public static final DriverKey<VariableDriver<InteractionResult.SwingSource>> LAST_USED_SWING_SOURCE = DriverKey.of("last_used_swing_source", () -> VariableDriver.ofConstant(() -> InteractionResult.SwingSource.CLIENT));
+    public static final DriverKey<VariableDriver<FirstPersonUseAnimations.UseAnimationType>> LAST_USED_TYPE = DriverKey.of("last_use_type", () -> VariableDriver.ofConstant(() -> FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON));
 
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_MAIN_HAND_ITEM = DriverKey.of("is_using_main_hand_item", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_OFF_HAND_ITEM = DriverKey.of("is_using_off_hand_item", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_MAIN_HAND_ON_COOLDOWN = DriverKey.of("is_main_hand_on_cooldown", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_OFF_HAND_ON_COOLDOWN = DriverKey.of("is_off_hand_on_cooldown", () -> VariableDriver.ofBoolean(() -> false));
-    public static final DriverKey<VariableDriver<InteractionHand>> LAST_USED_HAND = DriverKey.of("last_used_hand", () -> VariableDriver.ofConstant(() -> InteractionHand.MAIN_HAND));
 
     public static final DriverKey<VariableDriver<ItemStack>> PROJECTILE_ITEM = DriverKey.of("projectile_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<Float>> CROSSBOW_RELOAD_SPEED = DriverKey.of("crossbow_reload_speed", () -> VariableDriver.ofFloat(() -> 1f));
@@ -59,7 +63,7 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Boolean>> IS_IN_RIPTIDE = DriverKey.of("is_in_riptide", () -> VariableDriver.ofBoolean(() -> false));
 
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
-        ItemStack newRenderedItem = driverContainer.getDriverValue(getItemDriver(interactionHand));
+        ItemStack newRenderedItem = driverContainer.getDriverValue(getItemDriver(interactionHand)).copy();
         driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(newRenderedItem);
         FirstPersonHandPose handPose = FirstPersonHandPose.fromItemStack(newRenderedItem);
         driverContainer.getDriver(getHandPoseDriver(interactionHand)).setValue(handPose);
@@ -130,13 +134,6 @@ public class FirstPersonDrivers {
         return switch (interactionHand) {
             case MAIN_HAND -> HAS_USED_MAIN_HAND_ITEM;
             case OFF_HAND -> HAS_USED_OFF_HAND_ITEM;
-        };
-    }
-
-    public static DriverKey<TriggerDriver> getHasInteractedWithDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
-            case MAIN_HAND -> HAS_INTERACTED_WITH_MAIN_HAND;
-            case OFF_HAND -> HAS_INTERACTED_WITH_OFF_HAND;
         };
     }
 }

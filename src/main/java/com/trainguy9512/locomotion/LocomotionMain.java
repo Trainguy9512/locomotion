@@ -21,6 +21,10 @@ public class LocomotionMain {
 		registerEntityAnimators();
 	}
 
+	public static ResourceLocation makeResourceLocation(String location) {
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, location);
+	}
+
 	/*
 	public static void onClientPostInit(Platform.ModSetupContext ctx) {
 	}

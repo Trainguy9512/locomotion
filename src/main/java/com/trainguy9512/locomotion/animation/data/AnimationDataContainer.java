@@ -13,6 +13,8 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManage
 import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.TimeSpan;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
 
@@ -104,5 +106,10 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
     @Override
     public <D, R extends Driver<D>> R getDriver(DriverKey<R> driverKey) {
         return (R) this.drivers.computeIfAbsent(driverKey, DriverKey::createInstance);
+    }
+
+    @Override
+    public long getCurrentTick() {
+        return this.getDriverValue(this.gameTimeTicksDriverKey);
     }
 }
