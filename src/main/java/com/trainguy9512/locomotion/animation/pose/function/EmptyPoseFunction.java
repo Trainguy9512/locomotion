@@ -38,7 +38,7 @@ public class EmptyPoseFunction implements PoseFunction<LocalSpacePose> {
 
     @Override
     public PoseFunction<LocalSpacePose> wrapUnique() {
-        return of();
+        return EmptyPoseFunction.of(this.useReferencePose);
     }
 
     @Override

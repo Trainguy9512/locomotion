@@ -115,29 +115,22 @@ public record MontageConfiguration(
         }
 
         /**
-         * Adds a slot identifier that the animation will play in.
-         * Multiple slots can be added, so that the montage is played in multiple different places.
+         * Sets a slot identifier that the animation will play in.
          * @param slotIdentifier        String slot identifier
          */
         public Builder playsInSlot(String slotIdentifier) {
+            this.slots.clear();
             this.slots.add(slotIdentifier);
             return this;
         }
 
         /**
-         * Adds a list of slot identifiers that the animation will play in.
+         * Sets a list of slot identifiers that the animation will play in.
          * @param slotIdentifiers       String slot identifiers
          */
         public Builder playsInSlots(String... slotIdentifiers) {
-            this.slots.addAll(List.of(slotIdentifiers));
-            return this;
-        }
-
-        /**
-         * Clears the list of slots this montage will play in.
-         */
-        public Builder clearSlotsPlayedIn() {
             this.slots.clear();
+            this.slots.addAll(List.of(slotIdentifiers));
             return this;
         }
 

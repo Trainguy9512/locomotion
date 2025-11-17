@@ -1,10 +1,12 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.TriggerDriver;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -20,19 +22,29 @@ public class FirstPersonUseAnimations {
 
     static {
         registerUseAnimationRule(
-                "default",
+                LocomotionMain.makeResourceLocation("default"),
                 FirstPersonMontages::getUseAnimationMontage,
                 context -> context.clientSwingSource == InteractionResult.SwingSource.CLIENT
         );
         registerUseAnimationRule(
-                "crossbow_fire",
+                LocomotionMain.makeResourceLocation("crossbow_fire"),
                 FirstPersonMontages::getCrossbowFireMontage,
                 FirstPersonUseAnimations::shouldPlayCrossbowFire
         );
         registerUseAnimationRule(
-                "axe_scrape",
+                LocomotionMain.makeResourceLocation("axe_scrape"),
                 FirstPersonMontages::getAxeScrapeMontage,
                 FirstPersonUseAnimations::shouldPlayAxeScrape
+        );
+        registerUseAnimationRule(
+                LocomotionMain.makeResourceLocation("hoe_till"),
+                FirstPersonMontages::getHoeTillMontage,
+                FirstPersonUseAnimations::shouldPlayHoeTill
+        );
+        registerUseAnimationRule(
+                LocomotionMain.makeResourceLocation("shovel_flatten"),
+                FirstPersonMontages::getShovelFlattenMontage,
+                FirstPersonUseAnimations::shouldPlayShovelFlatten
         );
     }
 
@@ -54,10 +66,26 @@ public class FirstPersonUseAnimations {
         return context.hasDurabilityChanged();
     }
 
+    private static boolean shouldPlayHoeTill(UseAnimationConditionContext context) {
+        boolean isHoeItem = context.bothItemsMeetCondition(itemStack -> itemStack.is(ItemTags.HOES));
+        if (!isHoeItem) {
+            return false;
+        }
+        return context.hasDurabilityChanged();
+    }
+
+    private static boolean shouldPlayShovelFlatten(UseAnimationConditionContext context) {
+        boolean isShovelItem = context.bothItemsMeetCondition(itemStack -> itemStack.is(ItemTags.SHOVELS));
+        if (!isShovelItem) {
+            return false;
+        }
+        return context.hasDurabilityChanged();
+    }
+
 
 
     public static void registerUseAnimationRule(
-            String identifier,
+            ResourceLocation identifier,
             Function<InteractionHand, MontageConfiguration> montageProvider,
             Predicate<UseAnimationConditionContext> shouldChooseUseAnimation
     ) {
@@ -65,7 +93,7 @@ public class FirstPersonUseAnimations {
     }
 
     public record UseAnimationRule(
-            String identifier,
+            ResourceLocation identifier,
             Function<InteractionHand, MontageConfiguration> montageProvider,
             Predicate<UseAnimationConditionContext> shouldChooseUseAnimation
     ) {
