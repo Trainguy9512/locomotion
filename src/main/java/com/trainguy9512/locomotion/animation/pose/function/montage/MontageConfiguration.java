@@ -134,6 +134,14 @@ public record MontageConfiguration(
         }
 
         /**
+         * Clears the list of slots this montage will play in.
+         */
+        public Builder clearSlotsPlayedIn() {
+            this.slots.clear();
+            return this;
+        }
+
+        /**
          * Sets the rate at which the montage plays. The provided function is only called once each
          * time a montage is played, with the constant play rate for the whole animation decided then.
          * @param playRate              Play rate function.

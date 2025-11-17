@@ -1,6 +1,5 @@
 package com.trainguy9512.locomotion.render;
 
-import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
@@ -9,8 +8,8 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPe
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonGenericItemPose;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonHandPose;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
+import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
-import com.trainguy9512.locomotion.access.AlternateSingleBlockRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -23,7 +22,6 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
@@ -47,7 +45,6 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.player.PlayerSkin;
 
 
-import java.util.List;
 import java.util.Objects;
 
 public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRenderState, PlayerModel> {
@@ -114,18 +111,21 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 
                             boolean leftHanded = this.minecraft.options.mainHand().get() == HumanoidArm.LEFT;
 
-                            ItemStack leftHandRenderedItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDERED_MAIN_HAND_ITEM : FirstPersonDrivers.RENDERED_OFF_HAND_ITEM);
-                            ItemStack rightHandRenderedItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDERED_OFF_HAND_ITEM : FirstPersonDrivers.RENDERED_MAIN_HAND_ITEM);
-                            ItemStack leftHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.MAIN_HAND_ITEM : FirstPersonDrivers.OFF_HAND_ITEM);
-                            ItemStack rightHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.OFF_HAND_ITEM : FirstPersonDrivers.MAIN_HAND_ITEM);
+//                            ItemStack mainHandRenderedItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDERED_MAIN_HAND_ITEM : FirstPersonDrivers.RENDERED_OFF_HAND_ITEM);
+//                            ItemStack offHandRenderedItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.RENDERED_OFF_HAND_ITEM : FirstPersonDrivers.RENDERED_MAIN_HAND_ITEM);
+//                            ItemStack mainHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.MAIN_HAND_ITEM : FirstPersonDrivers.OFF_HAND_ITEM);
+//                            ItemStack offHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.OFF_HAND_ITEM : FirstPersonDrivers.MAIN_HAND_ITEM);
 
                             FirstPersonGenericItemPose leftHandGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
                             FirstPersonGenericItemPose rightHandGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
                             FirstPersonHandPose leftHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
                             FirstPersonHandPose rightHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
 
-                            leftHandItem = getItemStackToRender(leftHandItem, leftHandRenderedItem);
-                            rightHandItem = getItemStackToRender(rightHandItem, rightHandRenderedItem);
+                            ItemStack mainHandItem = getItemStackInHandToRender(dataContainer, player, InteractionHand.MAIN_HAND);
+                            ItemStack offHandItem = getItemStackInHandToRender(dataContainer, player, InteractionHand.OFF_HAND);
+
+                            ItemStack rightHandItem = leftHanded ? offHandItem : mainHandItem;
+                            ItemStack leftHandItem = leftHanded ? mainHandItem : offHandItem;
 
                             this.renderItem(
                                     player,
@@ -173,25 +173,29 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         this.minecraft.renderBuffers().bufferSource().endBatch();
     }
 
-    private static ItemStack getItemStackToRender(ItemStack currentItem, ItemStack renderedItem) {
-        if (!ItemStack.isSameItem(currentItem, renderedItem)) {
-            return renderedItem;
+    private static ItemStack getItemStackInHandToRender(AnimationDataContainer dataContainer, LocalPlayer localPlayer, InteractionHand interactionHand) {
+        ItemStack driverItem = dataContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
+        ItemStack driverRenderedItem = dataContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
+        ItemStack playerItem = localPlayer.getItemInHand(interactionHand);
+
+        if (!ItemStack.isSameItem(playerItem, driverRenderedItem)) {
+            return driverRenderedItem;
         }
-        if (ItemStack.isSameItemSameComponents(currentItem, renderedItem)) {
-            return currentItem;
+        if (ItemStack.isSameItemSameComponents(playerItem, driverRenderedItem)) {
+            return playerItem;
         }
-        for (TypedDataComponent<?> dataComponent : currentItem.getComponents()) {
+        for (TypedDataComponent<?> dataComponent : playerItem.getComponents()) {
             if (dataComponent.type() == DataComponents.DAMAGE) {
                 continue;
             }
-            if (!renderedItem.getComponents().has(dataComponent.type())) {
-                return renderedItem;
+            if (!driverRenderedItem.getComponents().has(dataComponent.type())) {
+                return driverRenderedItem;
             }
-            if (!Objects.equals(renderedItem.get(dataComponent.type()), dataComponent.value())) {
-                return renderedItem;
+            if (!Objects.equals(driverRenderedItem.get(dataComponent.type()), dataComponent.value())) {
+                return driverRenderedItem;
             }
         }
-        return currentItem;
+        return playerItem;
     }
 
     private void renderArm(

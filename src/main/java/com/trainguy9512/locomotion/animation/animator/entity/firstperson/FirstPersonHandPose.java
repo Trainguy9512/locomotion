@@ -563,7 +563,7 @@ public enum FirstPersonHandPose {
         }
         // Duct-tape solution for hand pose functions like consumables not being able to update the rendered item before the hard switch condition is updated.
         if (context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(interactionHand)).getPreviousValue()) {
-            ItemUseAnimation useAnimation = context.driverContainer().getDriver(FirstPersonDrivers.getItemDriver(interactionHand)).getPreviousValue().getUseAnimation();
+            ItemUseAnimation useAnimation = context.driverContainer().getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getPreviousValue().getUseAnimation();
             if (useAnimation == ItemUseAnimation.EAT) {
                 return false;
             }
@@ -604,9 +604,6 @@ public enum FirstPersonHandPose {
         }
         // If any of these conditions are met, use the "use last item" transition
         if (context.driverContainer().getDriver(FirstPersonDrivers.getHasUsedItemDriver(interactionHand)).hasBeenTriggered()) {
-            return true;
-        }
-        if (context.driverContainer().getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).hasBeenTriggered()) {
             return true;
         }
         return interactionHand == InteractionHand.MAIN_HAND && context.driverContainer().getDriver(FirstPersonDrivers.HAS_ATTACKED).hasBeenTriggered();

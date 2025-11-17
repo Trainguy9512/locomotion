@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.InteractionHand;
 import org.jetbrains.annotations.Nullable;
@@ -91,13 +92,12 @@ public abstract class MixinMinecraft {
             method = "tick",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;animateTick(III)V")
     )
-    private void locomotionTick(CallbackInfo ci, @Local ProfilerFiller profiler) {
-        profiler.push("locomotionTick");
+    private void locomotionTick(CallbackInfo ci) {
+
         assert this.level != null;
         JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
         jointAnimatorDispatcher.tickEntityJointAnimators(this.level.entitiesForRendering());
         jointAnimatorDispatcher.tickFirstPersonPlayerJointAnimator();
-        profiler.pop();
     }
 
     /**
