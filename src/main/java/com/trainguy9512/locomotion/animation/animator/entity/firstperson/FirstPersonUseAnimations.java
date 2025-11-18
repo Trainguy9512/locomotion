@@ -5,12 +5,13 @@ import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.TriggerDriver;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
 import java.util.function.Function;
@@ -24,13 +25,13 @@ public class FirstPersonUseAnimations {
         registerUseAnimationRule(
                 LocomotionMain.makeResourceLocation("default"),
                 FirstPersonMontages::getUseAnimationMontage,
-                context -> context.clientSwingSource == InteractionResult.SwingSource.CLIENT
+                UseAnimationConditionContext::isTargetingBlockOrEntity
         );
-        registerUseAnimationRule(
-                LocomotionMain.makeResourceLocation("crossbow_fire"),
-                FirstPersonMontages::getCrossbowFireMontage,
-                FirstPersonUseAnimations::shouldPlayCrossbowFire
-        );
+//        registerUseAnimationRule(
+//                LocomotionMain.makeResourceLocation("crossbow_fire"),
+//                FirstPersonMontages::getCrossbowFireMontage,
+//                FirstPersonUseAnimations::shouldPlayCrossbowFire
+//        );
         registerUseAnimationRule(
                 LocomotionMain.makeResourceLocation("axe_scrape"),
                 FirstPersonMontages::getAxeScrapeMontage,
@@ -48,41 +49,27 @@ public class FirstPersonUseAnimations {
         );
     }
 
-    private static boolean shouldPlayCrossbowFire(UseAnimationConditionContext context) {
-        boolean bothItemsAreCrossbows = context.bothItemsMeetCondition(itemStack -> itemStack.has(DataComponents.CHARGED_PROJECTILES));
-        if (!bothItemsAreCrossbows) {
-            return false;
-        }
-        boolean currentCrossbowHasCharge = !context.currentItem.get(DataComponents.CHARGED_PROJECTILES).isEmpty();
-        boolean previousCrossbowHasCharge = !context.previousItem.get(DataComponents.CHARGED_PROJECTILES).isEmpty();
-        return !currentCrossbowHasCharge && previousCrossbowHasCharge;
-    }
+//    private static boolean shouldPlayCrossbowFire(UseAnimationConditionContext context) {
+//        boolean bothItemsAreCrossbows = context.bothItemsMeetCondition(itemStack -> itemStack.has(DataComponents.CHARGED_PROJECTILES));
+//        if (!bothItemsAreCrossbows) {
+//            return false;
+//        }
+//        boolean currentCrossbowHasCharge = !context.currentItem.get(DataComponents.CHARGED_PROJECTILES).isEmpty();
+//        boolean previousCrossbowHasCharge = !context.previousItem.get(DataComponents.CHARGED_PROJECTILES).isEmpty();
+//        return !currentCrossbowHasCharge && previousCrossbowHasCharge;
+//    }
 
     private static boolean shouldPlayAxeScrape(UseAnimationConditionContext context) {
-        boolean isAxeItem = context.bothItemsMeetCondition(itemStack -> itemStack.is(ItemTags.AXES));
-        if (!isAxeItem) {
-            return false;
-        }
-        return context.hasDurabilityChanged();
+        return context.currentItem.is(ItemTags.AXES) && context.isTargetingBlock();
     }
 
     private static boolean shouldPlayHoeTill(UseAnimationConditionContext context) {
-        boolean isHoeItem = context.bothItemsMeetCondition(itemStack -> itemStack.is(ItemTags.HOES));
-        if (!isHoeItem) {
-            return false;
-        }
-        return context.hasDurabilityChanged();
+        return context.currentItem.is(ItemTags.HOES) && context.isTargetingBlock();
     }
 
     private static boolean shouldPlayShovelFlatten(UseAnimationConditionContext context) {
-        boolean isShovelItem = context.bothItemsMeetCondition(itemStack -> itemStack.is(ItemTags.SHOVELS));
-        if (!isShovelItem) {
-            return false;
-        }
-        return context.hasDurabilityChanged();
+        return context.currentItem.is(ItemTags.SHOVELS) && context.isTargetingBlock();
     }
-
-
 
     public static void registerUseAnimationRule(
             ResourceLocation identifier,
@@ -102,23 +89,23 @@ public class FirstPersonUseAnimations {
 
     public record UseAnimationConditionContext(
             UseAnimationType useAnimationType,
-            InteractionResult.SwingSource clientSwingSource,
             ItemStack currentItem,
-            ItemStack previousItem
+            boolean isTargetingBlock,
+            boolean isTargetingEntity
     ) {
-        public boolean bothItemsMeetCondition(Predicate<ItemStack> predicate) {
-            return predicate.test(this.currentItem) && predicate.test(this.previousItem);
+
+        public boolean isTargetingBlockOrEntity() {
+            return this.isTargetingBlock || this.isTargetingEntity;
         }
 
-        public boolean hasDurabilityChanged() {
-            boolean bothItemsCanBeDamaged = this.bothItemsMeetCondition(ItemStack::isDamageableItem);
-            if (!bothItemsCanBeDamaged) {
-                return false;
-            }
-            int currentItemDamage = this.currentItem.getDamageValue();
-            int previousItemDamage = this.previousItem.getDamageValue();
-            return currentItemDamage - 1 == previousItemDamage;
-        }
+//        public boolean hasDurabilityChanged() {
+//            boolean bothItemsCanBeDamaged = this.bothItemsMeetCondition(ItemStack::isDamageableItem);
+//            if (!bothItemsCanBeDamaged) {
+//                return false;
+//            }
+//            int currentItemDamage = this.currentItem.getDamageValue();
+//            return currentItemDamage - 1 == previousItemDamage;
+//        }
     }
 
     public enum UseAnimationType {
@@ -132,60 +119,43 @@ public class FirstPersonUseAnimations {
         }
     }
 
-    public static void scheduleAndPlayUseAnimation(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
+    public static void playUseAnimationIfTriggered(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
         // Scheduling the next use animation if triggered by the multiplayer game mode.
         TriggerDriver hasUsedItemDriver = driverContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(interactionHand));
-        long currentTick = driverContainer.getCurrentTick();
-        hasUsedItemDriver.runAndConsumeIfTriggered(() -> {
-            driverContainer.getDriver(FirstPersonDrivers.SCHEDULED_USE_ANIMATION_TICK).setValue(currentTick + 1);
-        });
+        TriggerDriver hasAttackedDriver = driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED);
 
-        // If no use animation is scheduled, return.
-        long scheduledUseAnimationTick = driverContainer.getDriverValue(FirstPersonDrivers.SCHEDULED_USE_ANIMATION_TICK);
-        if (scheduledUseAnimationTick != currentTick) {
-            return;
-        }
+        int swingTime = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_SWING_TIME);
         InteractionHand lastUsedHand = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_HAND);
+        boolean swingTimeIsOne = swingTime == 1;
+
         if (lastUsedHand != interactionHand) {
             return;
         }
+        boolean shouldPlayUseAnimationThisTick = hasUsedItemDriver.hasBeenTriggeredAndNotConsumed() || (swingTimeIsOne && hasAttackedDriver.hasBeenTriggered());
+        if (!shouldPlayUseAnimationThisTick) {
+            return;
+        }
+        hasUsedItemDriver.consume();
 
         ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
         ItemStack actualItem = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
-        UseAnimationType useAnimationType = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TYPE);
-        InteractionResult.SwingSource swingSource = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_SWING_SOURCE);
+        UseAnimationType useAnimationType = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USE_TYPE);
         UseAnimationConditionContext context = new UseAnimationConditionContext(
                 useAnimationType,
-                swingSource,
                 actualItem,
-                renderedItem
+                useAnimationType == UseAnimationType.USE_ITEM_ON,
+                useAnimationType == UseAnimationType.INTERACT || useAnimationType == UseAnimationType.INTERACT_AT
         );
-
-//        LocomotionMain.DEBUG_LOGGER.info("{}, {}",
-//                actualItem.getDamageValue(),
-//                renderedItem.getDamageValue()
-//        );
 
         for (UseAnimationRule rule : USE_ANIMATION_RULES) {
             if (rule.shouldChooseUseAnimation.test(context)) {
-//                LocomotionMain.DEBUG_LOGGER.info("Playing use animation \"{}\"", rule.identifier);
+                LocomotionMain.DEBUG_LOGGER.info("Playing use animation \"{}\"", rule.identifier);
                 montageManager.playMontage(rule.montageProvider.apply(interactionHand));
                 if (FirstPersonHandPose.fromItemStack(renderedItem) == FirstPersonHandPose.fromItemStack(actualItem)) {
                     FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
                 }
-                hasUsedItemDriver.consume();
                 return;
             }
         }
-        hasUsedItemDriver.consume();
-
-//        if (FirstPersonHandPose.fromItemStack(renderedItem) == FirstPersonHandPose.fromItemStack(actualItem)) {
-//            LocomotionMain.DEBUG_LOGGER.info("{}, {}",
-//                    actualItem,
-//                    renderedItem
-//            );
-//            FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
-//        }
     }
-
 }

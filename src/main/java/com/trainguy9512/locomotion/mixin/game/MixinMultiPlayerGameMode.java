@@ -8,14 +8,12 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -134,8 +132,7 @@ public class MixinMultiPlayerGameMode {
 //            LocomotionMain.DEBUG_LOGGER.info("{}, {},uses item: {}", useAniamtionType, success.swingSource(), Minecraft.getInstance().player.getMainHandItem().getDamageValue());
             JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
                 dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
-                dataContainer.getDriver(FirstPersonDrivers.LAST_USED_TYPE).setValue(useAniamtionType);
-                dataContainer.getDriver(FirstPersonDrivers.LAST_USED_SWING_SOURCE).setValue(success.swingSource());
+                dataContainer.getDriver(FirstPersonDrivers.LAST_USE_TYPE).setValue(useAniamtionType);
                 dataContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(hand);
             });
         }
