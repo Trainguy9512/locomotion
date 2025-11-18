@@ -1,19 +1,31 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
+import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.TriggerDriver;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -60,15 +72,59 @@ public class FirstPersonUseAnimations {
 //    }
 
     private static boolean shouldPlayAxeScrape(UseAnimationConditionContext context) {
-        return context.currentItem.is(ItemTags.AXES) && context.isTargetingBlock();
+        if (!context.currentItem.is(ItemTags.AXES) || !context.isTargetingBlock()) {
+            return false;
+        }
+        if (WeatheringCopper.getPrevious(context.lastTargetedBlock()).isPresent()) {
+            return true;
+        }
+        if (HoneycombItem.WAX_OFF_BY_BLOCK.get().get(context.lastTargetedBlock()) != null) {
+            return true;
+        }
+        if (context.lastTargetedBlock().asItem().getDefaultInstance().is(ItemTags.LOGS)) {
+            return true;
+        }
+        if (context.lastTargetedBlock() == Blocks.BAMBOO_BLOCK) {
+            return true;
+        }
+        return false;
     }
+
+    private static final List<Block> TILLABLES = List.of(
+            Blocks.GRASS_BLOCK,
+            Blocks.DIRT_PATH,
+            Blocks.DIRT,
+            Blocks.COARSE_DIRT,
+            Blocks.ROOTED_DIRT
+    );
 
     private static boolean shouldPlayHoeTill(UseAnimationConditionContext context) {
-        return context.currentItem.is(ItemTags.HOES) && context.isTargetingBlock();
+        if (!context.currentItem.is(ItemTags.HOES) || !context.isTargetingBlock()) {
+            return false;
+        }
+        if (TILLABLES.contains(context.lastTargetedBlock())) {
+            return true;
+        }
+        return false;
     }
 
+    private static final List<Block> FLATTENABLES = List.of(
+            Blocks.GRASS_BLOCK,
+            Blocks.DIRT,
+            Blocks.PODZOL,
+            Blocks.COARSE_DIRT,
+            Blocks.MYCELIUM,
+            Blocks.ROOTED_DIRT
+    );
+
     private static boolean shouldPlayShovelFlatten(UseAnimationConditionContext context) {
-        return context.currentItem.is(ItemTags.SHOVELS) && context.isTargetingBlock();
+        if (!context.currentItem.is(ItemTags.SHOVELS) || !context.isTargetingBlock()) {
+            return false;
+        }
+        if (FLATTENABLES.contains(context.lastTargetedBlock())) {
+            return true;
+        }
+        return false;
     }
 
     public static void registerUseAnimationRule(
@@ -91,28 +147,21 @@ public class FirstPersonUseAnimations {
             UseAnimationType useAnimationType,
             ItemStack currentItem,
             boolean isTargetingBlock,
-            boolean isTargetingEntity
+            boolean isTargetingEntity,
+            Block lastTargetedBlock,
+            EntityType<?> lastTargetedEntity
     ) {
 
         public boolean isTargetingBlockOrEntity() {
             return this.isTargetingBlock || this.isTargetingEntity;
         }
-
-//        public boolean hasDurabilityChanged() {
-//            boolean bothItemsCanBeDamaged = this.bothItemsMeetCondition(ItemStack::isDamageableItem);
-//            if (!bothItemsCanBeDamaged) {
-//                return false;
-//            }
-//            int currentItemDamage = this.currentItem.getDamageValue();
-//            return currentItemDamage - 1 == previousItemDamage;
-//        }
     }
 
     public enum UseAnimationType {
-        INTERACT,
-        INTERACT_AT,
+        INTERACT_WITH_ENTITY,
+        USE_ITEM_ON_ENTITY,
         USE_ITEM,
-        USE_ITEM_ON;
+        USE_ITEM_ON_BLOCK;
 
         UseAnimationType() {
 
@@ -140,11 +189,18 @@ public class FirstPersonUseAnimations {
         ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
         ItemStack actualItem = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
         UseAnimationType useAnimationType = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USE_TYPE);
+        Block lastTargetedBlock = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_BLOCK);
+        EntityType<?> lastTargetedEntity = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_ENTITY);
+
+        LocomotionMain.DEBUG_LOGGER.info(lastTargetedBlock);
+
         UseAnimationConditionContext context = new UseAnimationConditionContext(
                 useAnimationType,
                 actualItem,
-                useAnimationType == UseAnimationType.USE_ITEM_ON,
-                useAnimationType == UseAnimationType.INTERACT || useAnimationType == UseAnimationType.INTERACT_AT
+                useAnimationType == UseAnimationType.USE_ITEM_ON_BLOCK,
+                useAnimationType == UseAnimationType.INTERACT_WITH_ENTITY || useAnimationType == UseAnimationType.USE_ITEM_ON_ENTITY,
+                lastTargetedBlock,
+                lastTargetedEntity
         );
 
         for (UseAnimationRule rule : USE_ANIMATION_RULES) {
@@ -156,6 +212,37 @@ public class FirstPersonUseAnimations {
                 }
                 return;
             }
+        }
+    }
+
+    public static void triggerUseAnimation(
+            InteractionHand hand,
+            UseAnimationType useAnimationType
+    ) {
+        var optional = JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer();
+        if (optional.isEmpty()) {
+            return;
+        }
+
+        AnimationDataContainer dataContainer = optional.get();
+        dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
+        dataContainer.getDriver(FirstPersonDrivers.LAST_USE_TYPE).setValue(useAnimationType);
+        dataContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(hand);
+    }
+
+    public static void updateUseAnimationHitResults(AnimationDataContainer dataContainer) {
+        HitResult hitResult = Minecraft.getInstance().hitResult;
+        assert hitResult != null;
+
+        if (hitResult instanceof BlockHitResult blockHitResult && Minecraft.getInstance().level != null) {
+            BlockState blockState = Minecraft.getInstance().level.getBlockState(blockHitResult.getBlockPos());
+            Block block = blockState.getBlock();
+            dataContainer.getDriver(FirstPersonDrivers.LAST_USED_TARGET_BLOCK).setValue(block);
+        }
+
+        if (hitResult instanceof EntityHitResult entityHitResult) {
+            EntityType<?> entityType = entityHitResult.getEntity().getType();
+            dataContainer.getDriver(FirstPersonDrivers.LAST_USED_TARGET_ENTITY).setValue(entityType);
         }
     }
 }

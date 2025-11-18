@@ -96,7 +96,12 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerUseItemAnimation(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        locomotion$triggerHasUsedItemDriver(cir.getReturnValue(), hand, FirstPersonUseAnimations.UseAnimationType.USE_ITEM);
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            FirstPersonUseAnimations.triggerUseAnimation(
+                    hand,
+                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM
+            );
+        }
     }
 
     @Inject(
@@ -104,7 +109,12 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerUseItemOnAnimation(LocalPlayer player, InteractionHand hand, BlockHitResult result, CallbackInfoReturnable<InteractionResult> cir) {
-        locomotion$triggerHasUsedItemDriver(cir.getReturnValue(), hand, FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON);
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            FirstPersonUseAnimations.triggerUseAnimation(
+                    hand,
+                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON_BLOCK
+            );
+        }
     }
 
     @Inject(
@@ -112,7 +122,12 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerInteractAtAnimation(Player player, Entity target, EntityHitResult ray, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        locomotion$triggerHasUsedItemDriver(cir.getReturnValue(), hand, FirstPersonUseAnimations.UseAnimationType.INTERACT_AT);
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            FirstPersonUseAnimations.triggerUseAnimation(
+                    hand,
+                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON_ENTITY
+            );
+        }
     }
 
     @Inject(
@@ -120,21 +135,11 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerInteractAnimation(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        locomotion$triggerHasUsedItemDriver(cir.getReturnValue(), hand, FirstPersonUseAnimations.UseAnimationType.INTERACT);
-    }
-
-    @Unique
-    private void locomotion$triggerHasUsedItemDriver(InteractionResult interactionResult, InteractionHand hand, FirstPersonUseAnimations.UseAnimationType useAniamtionType) {
-        if (interactionResult instanceof InteractionResult.Success success) {
-//            if (!useAniamtionType.hasEffectOnWorld() && success.swingSource() != InteractionResult.SwingSource.CLIENT) {
-//                return;
-//            }
-//            LocomotionMain.DEBUG_LOGGER.info("{}, {},uses item: {}", useAniamtionType, success.swingSource(), Minecraft.getInstance().player.getMainHandItem().getDamageValue());
-            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-                dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
-                dataContainer.getDriver(FirstPersonDrivers.LAST_USE_TYPE).setValue(useAniamtionType);
-                dataContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(hand);
-            });
+        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+            FirstPersonUseAnimations.triggerUseAnimation(
+                    hand,
+                    FirstPersonUseAnimations.UseAnimationType.INTERACT_WITH_ENTITY
+            );
         }
     }
 }
