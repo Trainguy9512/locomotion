@@ -45,6 +45,9 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_GENERIC_ITEM_DRINK_LOOP = makeAnimationSequenceResourceLocation("hand/generic_item/drink_loop");
     public static final ResourceLocation HAND_GENERIC_ITEM_EAT_LOOP = makeAnimationSequenceResourceLocation("hand/generic_item/eat_loop");
     public static final ResourceLocation HAND_GENERIC_ITEM_EAT_BEGIN = makeAnimationSequenceResourceLocation("hand/generic_item/eat_begin");
+    public static final ResourceLocation HAND_GENERIC_ITEM_SHEARS_USE = makeAnimationSequenceResourceLocation("hand/generic_item/shears_use");
+    public static final ResourceLocation HAND_GENERIC_ITEM_BUCKET_COLLECT = makeAnimationSequenceResourceLocation("hand/generic_item/bucket_collect");
+    public static final ResourceLocation HAND_GENERIC_ITEM_BUCKET_EMPTY = makeAnimationSequenceResourceLocation("hand/generic_item/bucket_empty");
 
     public static final ResourceLocation HAND_BRUSH_POSE = makeAnimationSequenceResourceLocation("hand/brush/pose");
     public static final ResourceLocation HAND_BRUSH_SIFT_LOOP = makeAnimationSequenceResourceLocation("hand/brush/sift_loop");

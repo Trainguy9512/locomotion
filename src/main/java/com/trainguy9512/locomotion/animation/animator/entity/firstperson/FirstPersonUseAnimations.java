@@ -15,6 +15,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.WeatheringCopper;
@@ -58,6 +59,11 @@ public class FirstPersonUseAnimations {
                 LocomotionMain.makeResourceLocation("shovel_flatten"),
                 FirstPersonMontages::getShovelFlattenMontage,
                 FirstPersonUseAnimations::shouldPlayShovelFlatten
+        );
+        registerUseAnimationRule(
+                LocomotionMain.makeResourceLocation("shears_use"),
+                FirstPersonMontages::getShearsUseMontage,
+                FirstPersonUseAnimations::shouldPlayShearsUse
         );
     }
 
@@ -125,6 +131,10 @@ public class FirstPersonUseAnimations {
             return true;
         }
         return false;
+    }
+
+    private static boolean shouldPlayShearsUse(UseAnimationConditionContext context) {
+        return context.currentItem.is(Items.SHEARS) && context.isTargetingEntity();
     }
 
     public static void registerUseAnimationRule(
