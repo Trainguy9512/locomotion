@@ -229,7 +229,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             ItemStack itemInHand = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
             ItemStack renderedItemInHand = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
 
-            FirstPersonUseAnimations.scheduleAndPlayUseAnimation(driverContainer, montageManager, interactionHand);
+            FirstPersonUseAnimations.playUseAnimationIfTriggered(driverContainer, montageManager, interactionHand);
 
 //            if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW && renderedItemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
 //                if (itemInHand.has(DataComponents.CHARGED_PROJECTILES) && renderedItemInHand.has(DataComponents.CHARGED_PROJECTILES)) {

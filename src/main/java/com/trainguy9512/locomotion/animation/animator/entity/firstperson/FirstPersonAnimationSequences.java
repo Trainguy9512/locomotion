@@ -24,6 +24,8 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_TOOL_SWORD_SWING_DOWN = makeAnimationSequenceResourceLocation("hand/tool/sword/swing_down");
     public static final ResourceLocation HAND_TOOL_AXE_ATTACK = makeAnimationSequenceResourceLocation("hand/tool/axe/attack");
     public static final ResourceLocation HAND_TOOL_AXE_SCRAPE = makeAnimationSequenceResourceLocation("hand/tool/axe/scrape");
+    public static final ResourceLocation HAND_TOOL_HOE_TILL= makeAnimationSequenceResourceLocation("hand/tool/hoe/till");
+    public static final ResourceLocation HAND_TOOL_SHOVEL_FLATTEN = makeAnimationSequenceResourceLocation("hand/tool/shovel/flatten");
 
     public static final ResourceLocation HAND_GENERIC_ITEM_2D_ITEM_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/2d_item_pose");
     public static final ResourceLocation HAND_GENERIC_ITEM_BLOCK_POSE = makeAnimationSequenceResourceLocation("hand/generic_item/block_pose");
@@ -43,6 +45,9 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation HAND_GENERIC_ITEM_DRINK_LOOP = makeAnimationSequenceResourceLocation("hand/generic_item/drink_loop");
     public static final ResourceLocation HAND_GENERIC_ITEM_EAT_LOOP = makeAnimationSequenceResourceLocation("hand/generic_item/eat_loop");
     public static final ResourceLocation HAND_GENERIC_ITEM_EAT_BEGIN = makeAnimationSequenceResourceLocation("hand/generic_item/eat_begin");
+    public static final ResourceLocation HAND_GENERIC_ITEM_SHEARS_USE = makeAnimationSequenceResourceLocation("hand/generic_item/shears_use");
+    public static final ResourceLocation HAND_GENERIC_ITEM_BUCKET_COLLECT = makeAnimationSequenceResourceLocation("hand/generic_item/bucket_collect");
+    public static final ResourceLocation HAND_GENERIC_ITEM_BUCKET_EMPTY = makeAnimationSequenceResourceLocation("hand/generic_item/bucket_empty");
 
     public static final ResourceLocation HAND_BRUSH_POSE = makeAnimationSequenceResourceLocation("hand/brush/pose");
     public static final ResourceLocation HAND_BRUSH_SIFT_LOOP = makeAnimationSequenceResourceLocation("hand/brush/sift_loop");

@@ -1,16 +1,12 @@
 package com.trainguy9512.locomotion.mixin.game;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonUseAnimations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.util.profiling.Profiler;
-import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.InteractionHand;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -73,6 +69,14 @@ public abstract class MixinMinecraft {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
             dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger();
         });
+    }
+
+    @Inject(
+            method = "startUseItem",
+            at = @At("HEAD")
+    )
+    public void injectOnSwingPlayerHandWhenBeginningUse(CallbackInfo ci) {
+        JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(FirstPersonUseAnimations::updateUseAnimationHitResults);
     }
 
 //    @Inject(

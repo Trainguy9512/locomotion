@@ -4,8 +4,11 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.*;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3f;
 
 public class FirstPersonDrivers {
@@ -47,10 +50,11 @@ public class FirstPersonDrivers {
     public static final DriverKey<TriggerDriver> HAS_USED_MAIN_HAND_ITEM = DriverKey.of("has_used_main_hand_item", () -> TriggerDriver.of(2));
     public static final DriverKey<TriggerDriver> HAS_USED_OFF_HAND_ITEM = DriverKey.of("has_used_off_hand_item", () -> TriggerDriver.of(2));
     public static final DriverKey<VariableDriver<InteractionHand>> LAST_USED_HAND = DriverKey.of("last_used_hand", () -> VariableDriver.ofConstant(() -> InteractionHand.MAIN_HAND));
-    public static final DriverKey<VariableDriver<Long>> SCHEDULED_USE_ANIMATION_TICK = DriverKey.of("scheduled_use_animation_tick", () -> VariableDriver.ofConstant(() -> 0L));
     public static final DriverKey<VariableDriver<Integer>> LAST_USED_SWING_TIME = DriverKey.of("last_used_swing_time", () -> VariableDriver.ofConstant(() -> 0));
-    public static final DriverKey<VariableDriver<InteractionResult.SwingSource>> LAST_USED_SWING_SOURCE = DriverKey.of("last_used_swing_source", () -> VariableDriver.ofConstant(() -> InteractionResult.SwingSource.CLIENT));
-    public static final DriverKey<VariableDriver<FirstPersonUseAnimations.UseAnimationType>> LAST_USED_TYPE = DriverKey.of("last_use_type", () -> VariableDriver.ofConstant(() -> FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON));
+    public static final DriverKey<VariableDriver<Boolean>> LAST_USED_SWING_FROM_CLIENT = DriverKey.of("last_used_swing_from_client", () -> VariableDriver.ofConstant(() -> false));
+    public static final DriverKey<VariableDriver<EntityType<?>>> LAST_USED_TARGET_ENTITY = DriverKey.of("last_used_target_entity", () -> VariableDriver.ofConstant(() -> EntityType.COW));
+    public static final DriverKey<VariableDriver<BlockState>> LAST_USED_TARGET_BLOCK_STATE = DriverKey.of("last_used_target_block_state", () -> VariableDriver.ofConstant(Blocks.AIR::defaultBlockState));
+    public static final DriverKey<VariableDriver<FirstPersonUseAnimations.UseAnimationType>> LAST_USE_TYPE = DriverKey.of("last_use_type", () -> VariableDriver.ofConstant(() -> FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON_BLOCK));
 
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_MAIN_HAND_ITEM = DriverKey.of("is_using_main_hand_item", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_USING_OFF_HAND_ITEM = DriverKey.of("is_using_off_hand_item", () -> VariableDriver.ofBoolean(() -> false));
