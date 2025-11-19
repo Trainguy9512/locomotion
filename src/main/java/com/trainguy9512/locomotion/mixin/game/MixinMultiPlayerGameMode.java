@@ -17,7 +17,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -96,10 +95,11 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerUseItemAnimation(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success success) {
             FirstPersonUseAnimations.triggerUseAnimation(
                     hand,
-                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM
+                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM,
+                    success.swingSource()
             );
         }
     }
@@ -109,10 +109,11 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerUseItemOnAnimation(LocalPlayer player, InteractionHand hand, BlockHitResult result, CallbackInfoReturnable<InteractionResult> cir) {
-        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success success) {
             FirstPersonUseAnimations.triggerUseAnimation(
                     hand,
-                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON_BLOCK
+                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON_BLOCK,
+                    success.swingSource()
             );
         }
     }
@@ -122,10 +123,11 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerInteractAtAnimation(Player player, Entity target, EntityHitResult ray, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success success) {
             FirstPersonUseAnimations.triggerUseAnimation(
                     hand,
-                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON_ENTITY
+                    FirstPersonUseAnimations.UseAnimationType.INTERACT_AT_ENTITY,
+                    success.swingSource()
             );
         }
     }
@@ -135,10 +137,11 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerInteractAnimation(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (cir.getReturnValue() instanceof InteractionResult.Success) {
+        if (cir.getReturnValue() instanceof InteractionResult.Success success) {
             FirstPersonUseAnimations.triggerUseAnimation(
                     hand,
-                    FirstPersonUseAnimations.UseAnimationType.INTERACT_WITH_ENTITY
+                    FirstPersonUseAnimations.UseAnimationType.INTERACT_ENTITY,
+                    success.swingSource()
             );
         }
     }

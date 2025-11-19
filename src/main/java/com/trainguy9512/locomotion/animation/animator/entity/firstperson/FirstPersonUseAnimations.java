@@ -8,10 +8,10 @@ import com.trainguy9512.locomotion.animation.driver.TriggerDriver;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,7 @@ public class FirstPersonUseAnimations {
         registerUseAnimationRule(
                 LocomotionMain.makeResourceLocation("default"),
                 FirstPersonMontages::getUseAnimationMontage,
-                UseAnimationConditionContext::isTargetingBlockOrEntity
+                UseAnimationConditionContext::swingFromClient
         );
 //        registerUseAnimationRule(
 //                LocomotionMain.makeResourceLocation("crossbow_fire"),
@@ -87,10 +86,10 @@ public class FirstPersonUseAnimations {
         if (HoneycombItem.WAX_OFF_BY_BLOCK.get().get(context.lastTargetedBlock()) != null) {
             return true;
         }
-        if (context.lastTargetedBlock().asItem().getDefaultInstance().is(ItemTags.LOGS)) {
+        if (context.lastTargetedBlock().getBlock().asItem().getDefaultInstance().is(ItemTags.LOGS)) {
             return true;
         }
-        if (context.lastTargetedBlock() == Blocks.BAMBOO_BLOCK) {
+        if (context.lastTargetedBlock().getBlock() == Blocks.BAMBOO_BLOCK) {
             return true;
         }
         return false;
@@ -108,7 +107,7 @@ public class FirstPersonUseAnimations {
         if (!context.currentItem.is(ItemTags.HOES) || !context.isTargetingBlock()) {
             return false;
         }
-        if (TILLABLES.contains(context.lastTargetedBlock())) {
+        if (TILLABLES.contains(context.lastTargetedBlock().getBlock())) {
             return true;
         }
         return false;
@@ -127,14 +126,14 @@ public class FirstPersonUseAnimations {
         if (!context.currentItem.is(ItemTags.SHOVELS) || !context.isTargetingBlock()) {
             return false;
         }
-        if (FLATTENABLES.contains(context.lastTargetedBlock())) {
+        if (FLATTENABLES.contains(context.lastTargetedBlock().getBlock())) {
             return true;
         }
         return false;
     }
 
     private static boolean shouldPlayShearsUse(UseAnimationConditionContext context) {
-        return context.currentItem.is(Items.SHEARS) && context.isTargetingEntity();
+        return context.currentItem.is(Items.SHEARS) && context.useAnimationType() == UseAnimationType.INTERACT_ENTITY;
     }
 
     public static void registerUseAnimationRule(
@@ -158,8 +157,9 @@ public class FirstPersonUseAnimations {
             ItemStack currentItem,
             boolean isTargetingBlock,
             boolean isTargetingEntity,
-            Block lastTargetedBlock,
-            EntityType<?> lastTargetedEntity
+            BlockState lastTargetedBlock,
+            EntityType<?> lastTargetedEntity,
+            boolean swingFromClient
     ) {
 
         public boolean isTargetingBlockOrEntity() {
@@ -168,8 +168,8 @@ public class FirstPersonUseAnimations {
     }
 
     public enum UseAnimationType {
-        INTERACT_WITH_ENTITY,
-        USE_ITEM_ON_ENTITY,
+        INTERACT_ENTITY,
+        INTERACT_AT_ENTITY,
         USE_ITEM,
         USE_ITEM_ON_BLOCK;
 
@@ -190,7 +190,7 @@ public class FirstPersonUseAnimations {
         if (lastUsedHand != interactionHand) {
             return;
         }
-        boolean shouldPlayUseAnimationThisTick = hasUsedItemDriver.hasBeenTriggeredAndNotConsumed() || (swingTimeIsOne && hasAttackedDriver.hasBeenTriggered());
+        boolean shouldPlayUseAnimationThisTick = hasUsedItemDriver.hasBeenTriggeredAndNotConsumed();
         if (!shouldPlayUseAnimationThisTick) {
             return;
         }
@@ -199,8 +199,9 @@ public class FirstPersonUseAnimations {
         ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
         ItemStack actualItem = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
         UseAnimationType useAnimationType = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USE_TYPE);
-        Block lastTargetedBlock = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_BLOCK);
+        BlockState lastTargetedBlock = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_BLOCK_STATE);
         EntityType<?> lastTargetedEntity = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_ENTITY);
+        boolean lastSwingFromClient = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_SWING_FROM_CLIENT);
 
         LocomotionMain.DEBUG_LOGGER.info(lastTargetedBlock);
 
@@ -208,9 +209,10 @@ public class FirstPersonUseAnimations {
                 useAnimationType,
                 actualItem,
                 useAnimationType == UseAnimationType.USE_ITEM_ON_BLOCK,
-                useAnimationType == UseAnimationType.INTERACT_WITH_ENTITY || useAnimationType == UseAnimationType.USE_ITEM_ON_ENTITY,
+                useAnimationType == UseAnimationType.INTERACT_ENTITY || useAnimationType == UseAnimationType.INTERACT_AT_ENTITY,
                 lastTargetedBlock,
-                lastTargetedEntity
+                lastTargetedEntity,
+                lastSwingFromClient
         );
 
         for (UseAnimationRule rule : USE_ANIMATION_RULES) {
@@ -227,7 +229,8 @@ public class FirstPersonUseAnimations {
 
     public static void triggerUseAnimation(
             InteractionHand hand,
-            UseAnimationType useAnimationType
+            UseAnimationType useAnimationType,
+            InteractionResult.SwingSource swingSource
     ) {
         var optional = JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer();
         if (optional.isEmpty()) {
@@ -238,6 +241,7 @@ public class FirstPersonUseAnimations {
         dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
         dataContainer.getDriver(FirstPersonDrivers.LAST_USE_TYPE).setValue(useAnimationType);
         dataContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(hand);
+        dataContainer.getDriver(FirstPersonDrivers.LAST_USED_SWING_FROM_CLIENT).setValue(swingSource == InteractionResult.SwingSource.CLIENT);
     }
 
     public static void updateUseAnimationHitResults(AnimationDataContainer dataContainer) {
@@ -246,8 +250,7 @@ public class FirstPersonUseAnimations {
 
         if (hitResult instanceof BlockHitResult blockHitResult && Minecraft.getInstance().level != null) {
             BlockState blockState = Minecraft.getInstance().level.getBlockState(blockHitResult.getBlockPos());
-            Block block = blockState.getBlock();
-            dataContainer.getDriver(FirstPersonDrivers.LAST_USED_TARGET_BLOCK).setValue(block);
+            dataContainer.getDriver(FirstPersonDrivers.LAST_USED_TARGET_BLOCK_STATE).setValue(blockState);
         }
 
         if (hitResult instanceof EntityHitResult entityHitResult) {
