@@ -26,7 +26,7 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
         LocalSpacePose pose = this.basePoseFunction.compute(context);
         for(BlendInput blendInput : this.inputs.keySet()) {
             float weight = this.inputs.get(blendInput).getValueInterpolated(context.partialTicks());
-            if(weight != 0f){
+            if (weight != 0f) {
                 pose = pose.interpolated(blendInput.inputFunction.compute(context), weight, blendInput.blendMask);
             }
         }

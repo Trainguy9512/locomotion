@@ -22,14 +22,8 @@ import java.util.Set;
 public class FirstPersonShield {
 
     public static PoseFunction<LocalSpacePose> handShieldPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        DriverKey<VariableDriver<Boolean>> usingItemDriverKey = switch (interactionHand) {
-            case MAIN_HAND -> FirstPersonDrivers.IS_USING_MAIN_HAND_ITEM;
-            case OFF_HAND -> FirstPersonDrivers.IS_USING_OFF_HAND_ITEM;
-        };
-        DriverKey<VariableDriver<Boolean>> isHandOnCooldownKey = switch (interactionHand) {
-            case MAIN_HAND -> FirstPersonDrivers.IS_MAIN_HAND_ON_COOLDOWN;
-            case OFF_HAND -> FirstPersonDrivers.IS_OFF_HAND_ON_COOLDOWN;
-        };
+        DriverKey<VariableDriver<Boolean>> usingItemDriverKey = FirstPersonDrivers.getUsingItemDriver(interactionHand);
+        DriverKey<VariableDriver<Boolean>> isHandOnCooldownKey = FirstPersonDrivers.getItemOnCooldownDriver(interactionHand);
         PoseFunction<LocalSpacePose> shieldBlockingStateMachine = StateMachineFunction.builder(evaluationState -> ShieldStates.LOWERED)
                 .resetsUponRelevant(true)
                 .defineState(State.builder(ShieldStates.LOWERED, FirstPersonHandPose.SHIELD.getMiningStateMachine(cachedPoseContainer, interactionHand))

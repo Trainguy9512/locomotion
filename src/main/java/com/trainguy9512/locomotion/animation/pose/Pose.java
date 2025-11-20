@@ -28,7 +28,13 @@ public abstract class Pose {
 
     protected Pose (Pose pose) {
         this.jointSkeleton = pose.jointSkeleton;
-        this.jointChannels = new HashMap<>(pose.jointChannels);
+
+        this.jointChannels = Maps.newHashMap();
+        pose.jointChannels.forEach((joint, channel) -> {
+            JointChannel duplicateJointChannel = JointChannel.of(channel);
+            this.jointChannels.put(joint, duplicateJointChannel);
+        });
+
         this.customAttributes = new HashMap<>(pose.customAttributes);
         this.jointParentMatrices = new HashMap<>(pose.jointParentMatrices);
     }

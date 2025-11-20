@@ -66,16 +66,6 @@ public class FirstPersonUseAnimations {
         );
     }
 
-//    private static boolean shouldPlayCrossbowFire(UseAnimationConditionContext context) {
-//        boolean bothItemsAreCrossbows = context.bothItemsMeetCondition(itemStack -> itemStack.has(DataComponents.CHARGED_PROJECTILES));
-//        if (!bothItemsAreCrossbows) {
-//            return false;
-//        }
-//        boolean currentCrossbowHasCharge = !context.currentItem.get(DataComponents.CHARGED_PROJECTILES).isEmpty();
-//        boolean previousCrossbowHasCharge = !context.previousItem.get(DataComponents.CHARGED_PROJECTILES).isEmpty();
-//        return !currentCrossbowHasCharge && previousCrossbowHasCharge;
-//    }
-
     private static boolean shouldPlayAxeScrape(UseAnimationConditionContext context) {
         if (!context.currentItem.is(ItemTags.AXES) || !context.isTargetingBlock()) {
             return false;
@@ -202,8 +192,6 @@ public class FirstPersonUseAnimations {
         BlockState lastTargetedBlock = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_BLOCK_STATE);
         EntityType<?> lastTargetedEntity = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_ENTITY);
         boolean lastSwingFromClient = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_SWING_FROM_CLIENT);
-
-        LocomotionMain.DEBUG_LOGGER.info(lastTargetedBlock);
 
         UseAnimationConditionContext context = new UseAnimationConditionContext(
                 useAnimationType,

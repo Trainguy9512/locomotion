@@ -201,9 +201,11 @@ public enum FirstPersonHandPose {
         return switch (interactionHand) {
             case MAIN_HAND -> switch (this) {
                 case TOOL -> FirstPersonMining.makePickaxeMiningPoseFunction(cachedPoseContainer);
-                default -> ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(this.basePoseLocation).build(), MakeDynamicAdditiveFunction.of(
-                        FirstPersonMining.makePickaxeMiningPoseFunction(cachedPoseContainer),
-                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()));
+                default -> ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(this.basePoseLocation).build(),
+                        MakeDynamicAdditiveFunction.of(
+                                FirstPersonMining.makePickaxeMiningPoseFunction(cachedPoseContainer),
+                                SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build())
+                );
             };
             case OFF_HAND -> SequenceEvaluatorFunction.builder(this.basePoseLocation).build();
         };
@@ -573,15 +575,24 @@ public enum FirstPersonHandPose {
         }
         if (hasItemChanged(context, interactionHand)) {
             return true;
-        } else {
-            if (!hasSelectedHotbarSlotChanged(context, interactionHand)) {
-                return false;
-            }
-            if (!isNewItemEmpty(context, interactionHand)) {
-                return false;
-            }
-            return !isOldItemEmpty(context, interactionHand);
         }
+        if (hasSelectedHotbarSlotChanged(context, interactionHand)) {
+            if (!isNewItemEmpty(context, interactionHand) || !isOldItemEmpty(context, interactionHand)) {
+                return true;
+            }
+        }
+        return false;
+
+
+//        else {
+//            if (!hasSelectedHotbarSlotChanged(context, interactionHand)) {
+//                return false;
+//            }
+//            if (!isNewItemEmpty(context, interactionHand)) {
+//                return false;
+//            }
+//            return !isOldItemEmpty(context, interactionHand);
+//        }
     }
 
     private static boolean shouldTakeDropLastItemTransition(StateTransition.TransitionContext context, InteractionHand interactionHand) {

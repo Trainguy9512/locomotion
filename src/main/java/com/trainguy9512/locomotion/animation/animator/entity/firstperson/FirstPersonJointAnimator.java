@@ -106,7 +106,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 cachedPoseContainer.getOrThrow(MAIN_HAND_POSE_CACHE),
                 MakeDynamicAdditiveFunction.of(
                         cachedPoseContainer.getOrThrow(OFF_HAND_POSE_CACHE),
-                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build()
+                        EmptyPoseFunction.of(false)
                 ));
 
         PoseFunction<LocalSpacePose> pose = BlendPosesFunction.builder(cachedPoseContainer.getOrThrow(MAIN_HAND_POSE_CACHE))
@@ -114,12 +114,14 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 .addBlendInput(composedCameraPoseFunction, evaluationState -> 1f, CAMERA_MASK)
                 .build();
 
+        pose = FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer);
+
         // Adding the additive ground movement
         pose = ApplyAdditiveFunction.of(
-                FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer),
+                pose,
                 cachedPoseContainer.getOrThrow(ADDITIVE_GROUND_MOVEMENT_CACHE)
         );
-
+//
         // Master camera shake intensity
         pose = BlendPosesFunction.builder(pose)
                 .addBlendInput(
@@ -230,6 +232,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             ItemStack renderedItemInHand = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
 
             FirstPersonUseAnimations.playUseAnimationIfTriggered(driverContainer, montageManager, interactionHand);
+            FirstPersonItemUpdateAnimations.testForAndPlayItemUpdateAnimations(driverContainer, montageManager, interactionHand);
 
 //            if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW && renderedItemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
 //                if (itemInHand.has(DataComponents.CHARGED_PROJECTILES) && renderedItemInHand.has(DataComponents.CHARGED_PROJECTILES)) {
