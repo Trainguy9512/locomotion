@@ -22,14 +22,8 @@ import java.util.Set;
 public class FirstPersonShield {
 
     public static PoseFunction<LocalSpacePose> handShieldPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        DriverKey<VariableDriver<Boolean>> usingItemDriverKey = switch (interactionHand) {
-            case MAIN_HAND -> FirstPersonDrivers.IS_USING_MAIN_HAND_ITEM;
-            case OFF_HAND -> FirstPersonDrivers.IS_USING_OFF_HAND_ITEM;
-        };
-        DriverKey<VariableDriver<Boolean>> isHandOnCooldownKey = switch (interactionHand) {
-            case MAIN_HAND -> FirstPersonDrivers.IS_MAIN_HAND_ON_COOLDOWN;
-            case OFF_HAND -> FirstPersonDrivers.IS_OFF_HAND_ON_COOLDOWN;
-        };
+        DriverKey<VariableDriver<Boolean>> usingItemDriverKey = FirstPersonDrivers.getUsingItemDriver(interactionHand);
+        DriverKey<VariableDriver<Boolean>> isHandOnCooldownKey = FirstPersonDrivers.getItemOnCooldownDriver(interactionHand);
         PoseFunction<LocalSpacePose> shieldBlockingStateMachine = StateMachineFunction.builder(evaluationState -> ShieldStates.LOWERED)
                 .resetsUponRelevant(true)
                 .defineState(State.builder(ShieldStates.LOWERED, FirstPersonHandPose.SHIELD.getMiningStateMachine(cachedPoseContainer, interactionHand))
@@ -37,7 +31,7 @@ public class FirstPersonShield {
                 .defineState(State.builder(ShieldStates.BLOCKING_IN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_IN).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(5)).build())
                                 .build())
                         .build())
@@ -47,28 +41,28 @@ public class FirstPersonShield {
                 .defineState(State.builder(ShieldStates.BLOCKING_OUT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_OUT).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ShieldStates.LOWERED)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(15)).build())
                                 .build())
                         .build())
                 .defineState(State.builder(ShieldStates.DISABLED_IN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_IN).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ShieldStates.DISABLED)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(0)
+                                .isTakenOnAnimationFinished(0)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
                 .defineState(State.builder(ShieldStates.DISABLED, SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_OUT).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ShieldStates.DISABLED_OUT)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(isHandOnCooldownKey).negate())
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(isHandOnCooldownKey).negate())
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
                 .defineState(State.builder(ShieldStates.DISABLED_OUT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_OUT).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ShieldStates.LOWERED)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).build())
                                 .build())
                         .build())
@@ -81,7 +75,7 @@ public class FirstPersonShield {
                                         ShieldStates.DISABLED_OUT
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.DISABLED_IN)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(isHandOnCooldownKey).and(transitionContext -> transitionContext.driverContainer().getDriver(usingItemDriverKey).getPreviousValue()))
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(isHandOnCooldownKey).and(transitionContext -> transitionContext.driverContainer().getDriver(usingItemDriverKey).getPreviousValue()))
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
@@ -91,7 +85,7 @@ public class FirstPersonShield {
                                         ShieldStates.BLOCKING
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_OUT)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(usingItemDriverKey).negate()
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey).negate()
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED)
                                 )
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(6)).build())
@@ -105,9 +99,9 @@ public class FirstPersonShield {
                                         ShieldStates.BLOCKING_OUT
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.LOWERED)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(usingItemDriverKey).negate()
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey).negate()
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED)
-                                        .and(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING))
+                                        .and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING))
                                 )
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(6)).build())
                                 .setPriority(60)
@@ -119,7 +113,7 @@ public class FirstPersonShield {
                                         ShieldStates.DISABLED_OUT
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_IN)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(usingItemDriverKey)
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey)
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(13)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
@@ -129,7 +123,7 @@ public class FirstPersonShield {
                                         ShieldStates.LOWERED
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_IN)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(usingItemDriverKey))
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(13)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())

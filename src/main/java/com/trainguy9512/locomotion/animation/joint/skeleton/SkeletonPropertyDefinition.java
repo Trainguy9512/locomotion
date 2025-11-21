@@ -18,7 +18,8 @@ public abstract class SkeletonPropertyDefinition<D> {
 
     public D getJointProperty(String jointName, JointSkeleton skeleton) {
         if (!skeleton.containsJoint(jointName)) {
-            return this.defaultValue;
+            throw new RuntimeException("Joint " + jointName + " not present in given joint skeleton.");
+//            return this.defaultValue;
         }
         if (this.isMirrored) {
             jointName = skeleton.getJointConfiguration(jointName).mirrorJoint();

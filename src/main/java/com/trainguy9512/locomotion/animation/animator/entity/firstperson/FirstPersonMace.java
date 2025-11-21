@@ -5,7 +5,6 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
 import com.trainguy9512.locomotion.util.Easing;
@@ -13,12 +12,10 @@ import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.world.InteractionHand;
 
-import java.util.Set;
-
 public class FirstPersonMace {
 
     private static boolean isFalling(StateTransition.TransitionContext context) {
-        if (context.driverContainer().getDriverValue(FirstPersonDrivers.IS_GROUNDED)) {
+        if (context.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND)) {
             return false;
         }
         return context.driverContainer().getDriverValue(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED) < -0.5f;
@@ -37,7 +34,7 @@ public class FirstPersonMace {
 
     public static PoseFunction<LocalSpacePose> macePrepareStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
         PoseFunction<LocalSpacePose> fallAnticipationSequencePlayer = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_MACE_FALL_ANTICIPATION)
-                .looping(false)
+                .setLooping(false)
                 .setPlayRate(1)
                 .build();
 

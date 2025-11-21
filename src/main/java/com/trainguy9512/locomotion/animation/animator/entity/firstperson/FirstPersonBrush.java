@@ -30,7 +30,7 @@ public class FirstPersonBrush {
         PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonHandPose.BRUSH.getMiningStateMachine(cachedPoseContainer, interactionHand);
         PoseFunction<LocalSpacePose> siftingPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_BRUSH_SIFT_LOOP)
                 .setPlayRate(1)
-                .looping(true)
+                .setLooping(true)
                 .build();
 
         return StateMachineFunction.builder(functionEvaluationState -> BrushStates.IDLE)

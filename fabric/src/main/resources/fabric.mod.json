@@ -16,14 +16,14 @@
     "Marvin \"MineToBlend\" (Original keyframe structure and easement class help)"
   ],
   "contact": {
-    "homepage": "https://github.com/Trainguy9512/trainguys-animation-overhaul/",
-    "sources": "https://github.com/Trainguy9512/trainguys-animation-overhaul/"
+    "homepage": "https://github.com/Trainguy9512/locomotion/",
+    "sources": "https://github.com/Trainguy9512/locomotion/"
   },
 
   "license": "LGPLv3",
   "icon": "assets/locomotion/icon.png",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "client": [
       "com.trainguy9512.locomotion.LocomotionFabric"

@@ -14,7 +14,6 @@ import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import org.joml.Vector3f;
 
@@ -38,7 +37,7 @@ public class FirstPersonSpyglass {
         PoseFunction<LocalSpacePose> lookingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT).build();
         PoseFunction<LocalSpacePose> lookingExitPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT)
                 .setPlayRate(1)
-                .looping(false)
+                .setLooping(false)
                 .build();
 
         return StateMachineFunction.builder(functionEvaluationState -> SpyglassStates.IDLE)
@@ -59,7 +58,7 @@ public class FirstPersonSpyglass {
                 .defineState(State.builder(SpyglassStates.LOOKING_EXIT, lookingExitPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SpyglassStates.IDLE)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20))
                                         .setEasement(Easing.CUBIC_IN_OUT)
                                         .build())

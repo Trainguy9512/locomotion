@@ -156,7 +156,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
          *                              affects where the animation starts when reset.
          */
         @SuppressWarnings("unchecked")
-        public B looping(boolean looping) {
+        public B setLooping(boolean looping) {
             this.looping = looping;
             return (B) this;
         }

@@ -5,8 +5,8 @@ import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3f;
@@ -37,9 +37,11 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Float>> VERTICAL_MOVEMENT_SPEED = DriverKey.of("vertical_movement_speed", () -> VariableDriver.ofFloat(() -> 0f));
     public static final DriverKey<VariableDriver<Float>> MODIFIED_WALK_SPEED = DriverKey.of("modified_walk_speed", () -> VariableDriver.ofFloat(() -> 0f));
     public static final DriverKey<VariableDriver<Boolean>> IS_MOVING = DriverKey.of("is_moving", () -> VariableDriver.ofBoolean(() -> false));
-    public static final DriverKey<VariableDriver<Boolean>> IS_GROUNDED = DriverKey.of("is_grounded", () -> VariableDriver.ofBoolean(() -> true));
+    public static final DriverKey<VariableDriver<Boolean>> IS_ON_GROUND = DriverKey.of("is_grounded", () -> VariableDriver.ofBoolean(() -> true));
     public static final DriverKey<VariableDriver<Boolean>> IS_JUMPING = DriverKey.of("is_jumping", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_CROUCHING = DriverKey.of("is_crouching", () -> VariableDriver.ofBoolean(() -> false));
+    public static final DriverKey<VariableDriver<Boolean>> IS_UNDERWATER = DriverKey.of("is_underwater", () -> VariableDriver.ofBoolean(() -> false));
+    public static final DriverKey<VariableDriver<Boolean>> IS_SWIMMING_UNDERWATER = DriverKey.of("is_swimming_underwater", () -> VariableDriver.ofBoolean(() -> false));
 
     public static final DriverKey<VariableDriver<Boolean>> IS_MINING = DriverKey.of("is_mining", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<TriggerDriver> HAS_ATTACKED = DriverKey.of("has_attacked", TriggerDriver::of);

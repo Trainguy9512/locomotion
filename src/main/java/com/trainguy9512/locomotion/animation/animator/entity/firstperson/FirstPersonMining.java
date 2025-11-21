@@ -26,7 +26,7 @@ public class FirstPersonMining {
                 .resetsUponRelevant(true)
                 .defineState(State.builder(MiningStates.IDLE, idlePoseFunction)
                         .addOutboundTransition(StateTransition.builder(MiningStates.SWING)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING))
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING))
                                 .setTiming(idleToMiningTiming)
                                 .build())
                         .build())
@@ -34,7 +34,7 @@ public class FirstPersonMining {
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MiningStates.FINISH)
                                 .isTakenIfTrue(
-                                        StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING.and(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING).negate())
+                                        StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING.and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING).negate())
                                 )
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(50)
@@ -43,12 +43,12 @@ public class FirstPersonMining {
                 .defineState(State.builder(MiningStates.FINISH, finishPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MiningStates.IDLE)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setPriority(50)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(20)).build())
                                 .build())
                         .addOutboundTransition(StateTransition.builder(MiningStates.SWING)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING).and(StateTransition.CURRENT_TRANSITION_FINISHED))
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING).and(StateTransition.CURRENT_TRANSITION_FINISHED))
                                 .setPriority(60)
                                 .setTiming(idleToMiningTiming)
                                 .build())
@@ -67,7 +67,7 @@ public class FirstPersonMining {
                 cachedPoseContainer,
                 SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_MINE_SWING)
-                        .looping(true)
+                        .setLooping(true)
                         .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(16))
                         .setPlayRate(evaluationState -> 1.75f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier)
                         .build(),

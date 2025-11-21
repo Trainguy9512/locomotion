@@ -20,7 +20,6 @@ import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.component.ChargedProjectiles;
 
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 public class FirstPersonTwoHandedActions {
@@ -73,7 +72,7 @@ public class FirstPersonTwoHandedActions {
         stateMachineBuilder.defineState(State.builder(bowPullState, pullPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(bowReleaseState)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.getUsingItemDriver(interactionHand)).negate().and(StateTransition.CURRENT_TRANSITION_FINISHED))
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.getUsingItemDriver(interactionHand)).negate().and(StateTransition.CURRENT_TRANSITION_FINISHED))
                                 .bindToOnTransitionTaken(evaluationState -> {
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPose.EMPTY);
@@ -85,7 +84,7 @@ public class FirstPersonTwoHandedActions {
                 .defineState(State.builder(bowReleaseState, releasePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).build())
                                 .build())
                         .build())
@@ -96,7 +95,7 @@ public class FirstPersonTwoHandedActions {
                                 ))
                         .addOutboundTransition(StateTransition.builder(bowPullState)
                                 .isTakenIfTrue(
-                                        StateTransition.booleanDriverPredicate(FirstPersonDrivers.getUsingItemDriver(interactionHand))
+                                        StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.getUsingItemDriver(interactionHand))
                                                 .and(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(interactionHand)) == FirstPersonHandPose.BOW)
                                                 .and(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand)).getUseAnimation() == ItemUseAnimation.BOW)
                                 )
@@ -178,7 +177,7 @@ public class FirstPersonTwoHandedActions {
                 .defineState(State.builder(crossbowFinishReloadState, crossbowFinishReloadPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).build())
                                 .build())
                         .build())

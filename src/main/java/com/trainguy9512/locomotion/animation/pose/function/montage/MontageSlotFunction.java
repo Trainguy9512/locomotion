@@ -27,7 +27,7 @@ public record MontageSlotFunction(PoseFunction<LocalSpacePose> input, String slo
 
     @Override
     public PoseFunction<LocalSpacePose> wrapUnique() {
-        return MontageSlotFunction.of(this.input, this.slot);
+        return MontageSlotFunction.of(this.input.wrapUnique(), this.slot);
     }
 
     @Override

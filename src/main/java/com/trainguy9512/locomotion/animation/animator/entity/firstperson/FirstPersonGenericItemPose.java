@@ -1,6 +1,5 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
@@ -16,7 +15,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.*;
@@ -326,7 +324,7 @@ public enum FirstPersonGenericItemPose {
                         .setPlayRate(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED))
                         .build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_LOOP)
-                        .looping(true)
+                        .setLooping(true)
                         .setPlayRate(1f)
                         .isAdditive(true, SequenceReferencePoint.BEGINNING)
                         .build()
@@ -335,7 +333,7 @@ public enum FirstPersonGenericItemPose {
         // Eating pose functions
         PoseFunction<LocalSpacePose> eatingLoopPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_EAT_LOOP)
                 .setPlayRate(1.5f)
-                .looping(true)
+                .setLooping(true)
                 .build();
         PoseFunction<LocalSpacePose> eatingBeginPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_EAT_BEGIN).build();
 
@@ -352,7 +350,7 @@ public enum FirstPersonGenericItemPose {
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.DRINKING_LOOP)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
@@ -365,7 +363,7 @@ public enum FirstPersonGenericItemPose {
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
@@ -406,7 +404,7 @@ public enum FirstPersonGenericItemPose {
                                         ConsumableStates.DRINKING_FINISHED
                                 ))
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
-                                .isTakenIfTrue(StateTransition.booleanDriverPredicate(FirstPersonDrivers.IS_MINING))
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING))
                                 .setCanInterruptOtherTransitions(true)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
                                         .setEasement(Easing.SINE_IN_OUT)
@@ -418,7 +416,7 @@ public enum FirstPersonGenericItemPose {
                 .defineState(State.builder(ConsumableStates.EATING_BEGIN, eatingBeginPoseFunction)
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_LOOP)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .build())
