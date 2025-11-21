@@ -31,6 +31,12 @@
   "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Определяет, насколько плавно движение рук останавливается. Чем выше значение, тем меньше руки \"раскачиваются\" после резкого движения.",
   "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Коэффициент жесткости",
   "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "Определяет, насколько быстро руки поворачиваются вслед за поворотом камеры.",
+  
   "locomotion.config.option.first_person_mining_speed.name": "Множитель скорости анимации копания",
   "locomotion.config.option.first_person_mining_speed.description": "Регулирует скорость воспроизведения анимаций копания. 1 - нормальная скорость, 0.5 - в два раза медленнее, 2 - в два раза быстрее."
+
+   "locomotion.config.group.first_person_map.name": "Отображение карты",
+  "locomotion.config.group.first_person_map.description": "Настройки отображения и анимации карты от первого лица.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Интенсивность движения карты",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Контролирует интенсивность движения карты при перемещении. Чем меньше значение, тем больше читабельность."
 }
