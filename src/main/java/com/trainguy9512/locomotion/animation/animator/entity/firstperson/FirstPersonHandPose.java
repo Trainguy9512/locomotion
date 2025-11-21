@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 public enum FirstPersonHandPose {
     EMPTY (
@@ -474,7 +473,7 @@ public enum FirstPersonHandPose {
                         .build())
                 .defineState(State.builder(HandPoseStates.THROWING_TRIDENT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RELEASE_THROW).build())
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY_RAISE)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(0)
+                                .isTakenOnAnimationFinished(0)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(1)).build())
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
@@ -484,7 +483,7 @@ public enum FirstPersonHandPose {
                                 HandPoseStates.USING_LAST_ITEM
                         ))
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1)
+                                .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
@@ -691,7 +690,7 @@ public enum FirstPersonHandPose {
                 .defineState(State.builder(handPose.raisingState, MontageSlotFunction.of(raisingPoseFunction, interactionHand == InteractionHand.MAIN_HAND ? FirstPersonMontages.MAIN_HAND_ATTACK_SLOT : FirstPersonMontages.OFF_HAND_ATTACK_SLOT))
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(handPose.poseState)
-                                .isTakenIfMostRelevantAnimationPlayerFinishing(1f)
+                                .isTakenOnAnimationFinished(1f)
                                 .setTiming(raisingToPoseTiming)
                                 .build())
                         .addOutboundTransition(StateTransition.builder(handPose.poseState)

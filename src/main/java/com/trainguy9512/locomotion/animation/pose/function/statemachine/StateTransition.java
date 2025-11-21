@@ -33,7 +33,7 @@ public record StateTransition<S extends Enum<S>>(
     public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING = makeMostRelevantAnimationPlayerFinishedCondition(1f);
     public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED = makeMostRelevantAnimationPlayerFinishedCondition(0f);
 
-    public static <D extends Driver<Boolean>> Predicate<TransitionContext> booleanDriverPredicate(DriverKey<D> booleanDriverKey) {
+    public static <D extends Driver<Boolean>> Predicate<TransitionContext> takeIfBooleanDriverTrue(DriverKey<D> booleanDriverKey) {
         return transitionContext -> transitionContext.driverContainer.getDriverValue(booleanDriverKey);
     }
 
@@ -113,7 +113,7 @@ public record StateTransition<S extends Enum<S>>(
          *
          * @param crossFadeWeight Weight of how the transition duration affects the condition. 1 = Full crossfade, 0 = Always at end of animation
          */
-        public Builder<S> isTakenIfMostRelevantAnimationPlayerFinishing(float crossFadeWeight) {
+        public Builder<S> isTakenOnAnimationFinished(float crossFadeWeight) {
             this.automaticTransition = true;
             this.automaticTransitionCrossfadeWeight = crossFadeWeight;
             return this;

@@ -64,7 +64,7 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
         }
         List<Optional<PoseFunction<?>>> blendAnimationPlayers = new ArrayList<>();
         this.inputs.forEach(((blendInput, weightDriver) -> {
-            if (weightDriver.getCurrentValue() >= 0.5f) {
+            if (weightDriver.getCurrentValue() >= 0f) {
                 blendAnimationPlayers.add(blendInput.inputFunction.searchDownChainForMostRelevant(findCondition));
             }
         }));

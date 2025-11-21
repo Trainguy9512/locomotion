@@ -1,6 +1,5 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
-import com.google.common.base.MoreObjects;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.LivingEntityJointAnimator;
 import com.trainguy9512.locomotion.animation.data.*;
@@ -22,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -74,6 +74,13 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             .defineForJoint(CAMERA_JOINT, 1f)
             .build();
 
+    public static final BlendMask ARMS_ONLY_MASK = BlendMask.builder()
+            .defineForJoint(RIGHT_ARM_BUFFER_JOINT, 1f)
+            .defineForJoint(RIGHT_ARM_JOINT, 1f)
+            .defineForJoint(LEFT_ARM_BUFFER_JOINT, 1f)
+            .defineForJoint(LEFT_ARM_JOINT, 1f)
+            .build();
+
     @Override
     public void postProcessModelParts(EntityModel<AvatarRenderState> entityModel, AvatarRenderState entityRenderState) {
     }
@@ -88,13 +95,11 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         return PoseCalculationFrequency.CALCULATE_EVERY_FRAME;
     }
 
-    public static final String ADDITIVE_GROUND_MOVEMENT_CACHE = "additive_ground_movement";
     public static final String MAIN_HAND_POSE_CACHE = "main_hand_pose";
     public static final String OFF_HAND_POSE_CACHE = "off_hand_pose";
 
     @Override
     public PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer) {
-        cachedPoseContainer.register(ADDITIVE_GROUND_MOVEMENT_CACHE, FirstPersonAdditiveMovement.constructPoseFunction(cachedPoseContainer), false);
 
         PoseFunction<LocalSpacePose> mainHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.MAIN_HAND);
         PoseFunction<LocalSpacePose> offHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.OFF_HAND);
@@ -116,12 +121,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         pose = FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer);
 
-        // Adding the additive ground movement
-        pose = ApplyAdditiveFunction.of(
-                pose,
-                cachedPoseContainer.getOrThrow(ADDITIVE_GROUND_MOVEMENT_CACHE)
-        );
-//
+        // Adding in the movement animations.
+        pose = FirstPersonMovement.constructWithMovementAnimations(pose, cachedPoseContainer);
+
         // Master camera shake intensity
         pose = BlendPosesFunction.builder(pose)
                 .addBlendInput(
@@ -163,35 +165,8 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     @Override
     public void extractAnimationData(LocalPlayer player, OnTickDriverContainer driverContainer, MontageManager montageManager){
 
-        driverContainer.getDriver(FirstPersonDrivers.MODIFIED_WALK_SPEED).setValue(player.walkAnimation.speed());
-        driverContainer.getDriver(FirstPersonDrivers.HORIZONTAL_MOVEMENT_SPEED).setValue(new Vector3f((float) (player.getX() - player.xo), 0.0f, (float) (player.getZ() - player.zo)).length());
-        driverContainer.getDriver(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED).setValue((float) (player.getY() - player.yo));
-
-        // DEBUG ITEMS
-//        updateRenderedItem(driverContainer, InteractionHand.MAIN_HAND);
-//        updateRenderedItem(driverContainer, InteractionHand.OFF_HAND);
-//        LocomotionMain.LOGGER.info("-------------------");
-//        LocomotionMain.LOGGER.info(driverContainer.getDriverValue(HAS_USED_MAIN_HAND_ITEM));
-//        LocomotionMain.LOGGER.info(dataReference.getMainHandItem());
-//        LocomotionMain.LOGGER.info(dataReference.getMainHandItem().getCount());
-
-        // Triggering the use animation.
-        float playerAttackAnimValue = player.getAttackAnim(0);
-        InteractionHand playerAttackAnimHand = MoreObjects.firstNonNull(player.swingingArm, InteractionHand.MAIN_HAND);
-//        LocomotionMain.DEBUG_LOGGER.info("{}, {}", playerAttackAnimHand, playerAttackAnimValue);
-
-        // Setting the item
-        for (InteractionHand interactionHand : InteractionHand.values()) {
-            VariableDriver<ItemStack> itemDriver = driverContainer.getDriver(FirstPersonDrivers.getItemDriver(interactionHand));
-            VariableDriver<ItemStack> itemCopyReferenceDriver = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand));
-            ItemStack itemInHand = player.getItemInHand(interactionHand);
-            itemDriver.setValue(itemInHand);
-            itemCopyReferenceDriver.setValue(itemInHand.copy());
-
-//            if (interactionHand == InteractionHand.MAIN_HAND) {
-//                LocomotionMain.DEBUG_LOGGER.info("{} {}", dataReference.getItemInHand(interactionHand), driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand)));
-//            }
-        }
+        this.extractMovementPoseData(player, driverContainer);
+        this.extractItemData(player, driverContainer);
 
         //? if >= 1.21.5 {
         driverContainer.getDriver(FirstPersonDrivers.HOTBAR_SLOT).setValue(player.getInventory().getSelectedSlot());
@@ -199,31 +174,59 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         /*driverContainer.getDriver(HOTBAR_SLOT).setValue(dataReference.getInventory().selected);*/
         //?}
 
+        this.handleMontagesFromTriggerDrivers(player, driverContainer, montageManager);
+        this.extractInteractionHandData(player, driverContainer, montageManager);
+        this.extractDampedCameraData(player, driverContainer, montageManager);
+    }
 
+    public void extractMovementPoseData(LocalPlayer player, OnTickDriverContainer driverContainer) {
+        driverContainer.getDriver(FirstPersonDrivers.MODIFIED_WALK_SPEED).setValue(player.walkAnimation.speed());
+        driverContainer.getDriver(FirstPersonDrivers.HORIZONTAL_MOVEMENT_SPEED).setValue(new Vector3f((float) (player.getX() - player.xo), 0.0f, (float) (player.getZ() - player.zo)).length());
+        driverContainer.getDriver(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED).setValue((float) (player.getY() - player.yo));
+
+        driverContainer.getDriver(FirstPersonDrivers.IS_IN_RIPTIDE).setValue(player.isAutoSpinAttack());
+        driverContainer.getDriver(FirstPersonDrivers.IS_MOVING).setValue(player.input.keyPresses.forward() || player.input.keyPresses.backward() || player.input.keyPresses.left() || player.input.keyPresses.right());
+        driverContainer.getDriver(FirstPersonDrivers.IS_ON_GROUND).setValue(player.onGround());
+        driverContainer.getDriver(FirstPersonDrivers.IS_JUMPING).setValue(player.input.keyPresses.jump());
+        driverContainer.getDriver(FirstPersonDrivers.IS_CROUCHING).setValue(player.isCrouching());
+        driverContainer.getDriver(FirstPersonDrivers.IS_UNDERWATER).setValue(player.isUnderWater() || (player.isInWater() && !player.onGround()));
+
+        boolean isSwimmingUnderwater = player.getPose() == Pose.SWIMMING
+                && player.isInWater()
+                && !driverContainer.getDriverValue(FirstPersonDrivers.IS_USING_MAIN_HAND_ITEM)
+                && !driverContainer.getDriverValue(FirstPersonDrivers.IS_USING_OFF_HAND_ITEM)
+                && !player.isAutoSpinAttack();
+        driverContainer.getDriver(FirstPersonDrivers.IS_SWIMMING_UNDERWATER).setValue(isSwimmingUnderwater);
+    }
+
+    public void extractItemData(LocalPlayer player, OnTickDriverContainer driverContainer) {
+        for (InteractionHand interactionHand : InteractionHand.values()) {
+            VariableDriver<ItemStack> itemDriver = driverContainer.getDriver(FirstPersonDrivers.getItemDriver(interactionHand));
+            VariableDriver<ItemStack> itemCopyReferenceDriver = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand));
+            ItemStack itemInHand = player.getItemInHand(interactionHand);
+            itemDriver.setValue(itemInHand);
+            itemCopyReferenceDriver.setValue(itemInHand.copy());
+        }
+    }
+
+    public void handleMontagesFromTriggerDrivers(LocalPlayer player, OnTickDriverContainer driverContainer, MontageManager montageManager) {
         driverContainer.getDriver(FirstPersonDrivers.HAS_DROPPED_ITEM).runAndConsumeIfTriggered(() -> {
             montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE);
         });
         driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).runAndConsumeIfTriggered(() -> {
             FirstPersonMontages.playAttackMontage(driverContainer, montageManager);
         });
+        if (driverContainer.getDriver(FirstPersonDrivers.IS_MINING).getCurrentValue()) {
+            montageManager.interruptMontagesInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT, Transition.builder(TimeSpan.ofTicks(2)).build());
+        }
         driverContainer.getDriver(FirstPersonDrivers.HAS_BLOCKED_ATTACK).runAndConsumeIfTriggered(() -> montageManager.playMontage(FirstPersonMontages.SHIELD_BLOCK_IMPACT_MONTAGE));
         driverContainer.getDriver(FirstPersonDrivers.LAST_USED_SWING_TIME).setValue(player.swingTime);
 
-        this.extractInteractionHandData(player, driverContainer, montageManager);
-        this.extractDampedCameraData(player, driverContainer, montageManager);
 
         // Consuming the item swap trigger driver
         driverContainer.getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).runAndConsumeIfTriggered(() -> {});
 
-        if (driverContainer.getDriver(FirstPersonDrivers.IS_MINING).getCurrentValue()) {
-            montageManager.interruptMontagesInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT, Transition.builder(TimeSpan.ofTicks(2)).build());
-        }
 
-        driverContainer.getDriver(FirstPersonDrivers.IS_IN_RIPTIDE).setValue(player.isAutoSpinAttack());
-        driverContainer.getDriver(FirstPersonDrivers.IS_MOVING).setValue(player.input.keyPresses.forward() || player.input.keyPresses.backward() || player.input.keyPresses.left() || player.input.keyPresses.right());
-        driverContainer.getDriver(FirstPersonDrivers.IS_GROUNDED).setValue(player.onGround());
-        driverContainer.getDriver(FirstPersonDrivers.IS_JUMPING).setValue(player.input.keyPresses.jump());
-        driverContainer.getDriver(FirstPersonDrivers.IS_CROUCHING).setValue(player.isCrouching());
     }
 
     public void extractInteractionHandData(LocalPlayer dataReference, OnTickDriverContainer driverContainer, MontageManager montageManager) {

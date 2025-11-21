@@ -96,6 +96,9 @@ public class FirstPersonAnimationSequences {
     public static final ResourceLocation GROUND_MOVEMENT_LAND = makeAnimationSequenceResourceLocation("ground_movement/land");
     public static final ResourceLocation GROUND_MOVEMENT_CROUCH_IN = makeAnimationSequenceResourceLocation("ground_movement/crouch_in");
     public static final ResourceLocation GROUND_MOVEMENT_CROUCH_OUT = makeAnimationSequenceResourceLocation("ground_movement/crouch_out");
+    public static final ResourceLocation GROUND_MOVEMENT_SWIMMING_IDLE = makeAnimationSequenceResourceLocation("ground_movement/swimming_idle");
+
+    public static final ResourceLocation OVERRIDING_MOVEMENT_SWIMMING = makeAnimationSequenceResourceLocation("overriding_movement/swimming");
 
     private static ResourceLocation makeAnimationSequenceResourceLocation(String path) {
         return ResourceLocation.fromNamespaceAndPath(LocomotionMain.MOD_ID, "sequences/entity/player/first_person/".concat(path).concat(".json"));
