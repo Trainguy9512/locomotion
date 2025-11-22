@@ -1,6 +1,19 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
+import com.trainguy9512.locomotion.util.TimeSpan;
+
 public enum SequenceReferencePoint {
-    BEGINNING,
-    END
+    BEGINNING(0),
+    END(1);
+
+    private final float progressThroughSequence;
+
+    SequenceReferencePoint(float progressThroughSequence) {
+        this.progressThroughSequence = progressThroughSequence;
+    }
+
+    public float getProgressThroughSequence() {
+        return this.progressThroughSequence;
+    }
 }

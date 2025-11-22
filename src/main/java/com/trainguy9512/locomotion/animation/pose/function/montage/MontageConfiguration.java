@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
+import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.resources.ResourceLocation;
@@ -32,6 +33,7 @@ import java.util.function.Function;
  * @param isAdditive                        Whether the montage is additive. If additive, the montage will subtract the start frame from the
  *                                          animation and then add it to the start frame of the provided additive base pose resource location.
  * @param additiveBasePoseProvider          Base pose provider added back to the additive animation.
+ * @param additiveReferencePosePoint        Point in the animation sequence to use as the reference pose.
  */
 public record MontageConfiguration(
         String identifier,
@@ -46,8 +48,8 @@ public record MontageConfiguration(
         float transitionOutCrossfadeWeight,
         TimeSpan cooldownDuration,
         boolean isAdditive,
-        Function<OnTickDriverContainer, ResourceLocation> additiveBasePoseProvider
-
+        Function<OnTickDriverContainer, ResourceLocation> additiveBasePoseProvider,
+        SequenceReferencePoint additiveReferencePosePoint
 ) {
 
     public static Builder builder(String identifier, ResourceLocation animationSequence) {
@@ -76,7 +78,7 @@ public record MontageConfiguration(
             builder.bindToTimeMarker(entry.getKey(), entry.getValue());
         }
         if (this.isAdditive) {
-            builder.makeAdditive(this.additiveBasePoseProvider);
+            builder.makeAdditive(this.additiveBasePoseProvider, this.additiveReferencePosePoint);
         }
         return builder;
     }
@@ -96,6 +98,7 @@ public record MontageConfiguration(
         private TimeSpan cooldownDuration;
         private boolean isAdditive;
         private Function<OnTickDriverContainer, ResourceLocation> additiveBasePoseProvider;
+        private SequenceReferencePoint additiveReferencePosePoint;
 
 
         private Builder(String identifier, ResourceLocation animationSequence) {
@@ -112,6 +115,7 @@ public record MontageConfiguration(
             this.cooldownDuration = TimeSpan.ofTicks(0);
             this.isAdditive = false;
             this.additiveBasePoseProvider = null;
+            this.additiveReferencePosePoint = SequenceReferencePoint.BEGINNING;
         }
 
         /**
@@ -230,9 +234,13 @@ public record MontageConfiguration(
          *
          * @param additiveBasePoseProvider          Base pose provider, retrieved every time a montage of this configuration is fired.
          */
-        public Builder makeAdditive(Function<OnTickDriverContainer, ResourceLocation> additiveBasePoseProvider) {
+        public Builder makeAdditive(
+                Function<OnTickDriverContainer, ResourceLocation> additiveBasePoseProvider,
+                SequenceReferencePoint additiveReferencePosePoint
+        ) {
             this.isAdditive = true;
             this.additiveBasePoseProvider = additiveBasePoseProvider;
+            this.additiveReferencePosePoint = additiveReferencePosePoint;
             return this;
         }
 
@@ -250,7 +258,8 @@ public record MontageConfiguration(
                     this.transitionOutCrossfadeWeight,
                     this.cooldownDuration,
                     this.isAdditive,
-                    this.additiveBasePoseProvider
+                    this.additiveBasePoseProvider,
+                    this.additiveReferencePosePoint
             );
         }
     }

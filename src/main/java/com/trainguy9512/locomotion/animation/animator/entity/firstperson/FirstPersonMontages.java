@@ -1,6 +1,7 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.util.Easing;
@@ -30,7 +31,7 @@ public class FirstPersonMontages {
                     return driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE).basePoseLocation;
                 }
                 return handPose.basePoseLocation;
-            })
+            }, SequenceReferencePoint.END)
             .build();
     public static final MontageConfiguration HAND_TOOL_ATTACK_AXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_axe", FirstPersonAnimationSequences.HAND_TOOL_AXE_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
@@ -64,7 +65,7 @@ public class FirstPersonMontages {
                     return driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE).basePoseLocation;
                 }
                 return handPose.basePoseLocation;
-            })
+            }, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration USE_OFF_HAND_MONTAGE = USE_MAIN_HAND_MONTAGE.makeBuilderCopy("hand_use_off_hand", USE_MAIN_HAND_MONTAGE.animationSequence())
@@ -75,7 +76,7 @@ public class FirstPersonMontages {
                     return driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_GENERIC_ITEM_POSE).basePoseLocation;
                 }
                 return handPose.basePoseLocation;
-            })
+            }, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration SHIELD_BLOCK_IMPACT_MONTAGE = MontageConfiguration.builder("shield_block_impact", FirstPersonAnimationSequences.HAND_SHIELD_IMPACT)

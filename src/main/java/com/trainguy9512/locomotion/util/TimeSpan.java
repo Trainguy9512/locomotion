@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.util;
 
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -108,6 +109,11 @@ public class TimeSpan implements Comparable<TimeSpan> {
      */
     public float in24FramesPerSecond(){
         return this.inFramesPerSecond(24);
+    }
+
+    public TimeSpan interpolated(TimeSpan other, float alpha) {
+        float blendedTicks = Mth.lerp(alpha, this.timeInTicks, other.timeInTicks);
+        return TimeSpan.ofTicks(blendedTicks);
     }
 
     @Override
