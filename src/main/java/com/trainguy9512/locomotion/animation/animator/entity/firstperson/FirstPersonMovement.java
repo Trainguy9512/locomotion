@@ -52,7 +52,8 @@ public class FirstPersonMovement {
     public static boolean isJumping(StateTransition.TransitionContext context) {
         boolean isJumping = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_JUMPING);
         boolean isGrounded = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
-        return isJumping && !isGrounded;
+        boolean wasJustGrounded = context.driverContainer().getDriver(FirstPersonDrivers.IS_ON_GROUND).getPreviousValue();
+        return isJumping && !isGrounded && wasJustGrounded;
     }
 
     public static boolean isWalking(StateTransition.TransitionContext context) {
@@ -387,8 +388,7 @@ public class FirstPersonMovement {
                                 .build())
                         // Transition to the jumping animation if the player is jumping and grounded.
                         .addOutboundTransition(StateTransition.builder(FallingStates.JUMP)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_JUMPING)
-                                        .and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)))
+                                .isTakenIfTrue(FirstPersonMovement::isJumping)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(80)
                                 .build())
