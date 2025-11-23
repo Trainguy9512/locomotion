@@ -1,11 +1,8 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
-import com.trainguy9512.locomotion.animation.driver.DriverKey;
-import com.trainguy9512.locomotion.animation.driver.VariableDriver;
+import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
-import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
-import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
-import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
+import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageSlotFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
@@ -18,15 +15,101 @@ import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.world.InteractionHand;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class FirstPersonShield {
 
-    public static PoseFunction<LocalSpacePose> handShieldPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        DriverKey<VariableDriver<Boolean>> usingItemDriverKey = FirstPersonDrivers.getUsingItemDriver(interactionHand);
-        DriverKey<VariableDriver<Boolean>> isHandOnCooldownKey = FirstPersonDrivers.getItemOnCooldownDriver(interactionHand);
-        PoseFunction<LocalSpacePose> shieldBlockingStateMachine = StateMachineFunction.builder(evaluationState -> ShieldStates.LOWERED)
+    public static String SHIELD_MAIN_HAND_CACHE = "shield_main_hand";
+    public static String SHIELD_OFF_HAND_CACHE = "shield_off_hand";
+
+    public static String getShieldCacheIdentifier(InteractionHand hand) {
+        return hand == InteractionHand.MAIN_HAND ? SHIELD_MAIN_HAND_CACHE : SHIELD_OFF_HAND_CACHE;
+    }
+
+    public static boolean isUsingShield(StateTransition.TransitionContext context, InteractionHand hand) {
+        boolean isUsing = context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
+        boolean handPoseIsShield = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPose.SHIELD;
+        return isUsing && handPoseIsShield;
+    }
+
+    public static boolean hasShieldEnteredCooldown(StateTransition.TransitionContext context, InteractionHand hand) {
+        boolean isHandOnCooldown = context.driverContainer().getDriverValue(FirstPersonDrivers.getItemOnCooldownDriver(hand));
+        boolean wasUsingShield = context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getPreviousValue();
+        return isHandOnCooldown && wasUsingShield;
+    }
+
+    public static boolean isShieldNotOnCooldown(StateTransition.TransitionContext context, InteractionHand hand) {
+        boolean isHandOnCooldown = context.driverContainer().getDriverValue(FirstPersonDrivers.getItemOnCooldownDriver(hand));
+        return !isHandOnCooldown;
+    }
+
+    public static PoseFunction<LocalSpacePose> getShieldCachedPoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand
+    ) {
+        String shieldCacheIdentifier = getShieldCacheIdentifier(hand);
+        return cachedPoseContainer.getOrThrow(shieldCacheIdentifier);
+    }
+
+    public static PoseFunction<LocalSpacePose> constructShieldPoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand
+    ) {
+        PoseFunction<LocalSpacePose> shieldStateMachine = constructShieldStateMachine(cachedPoseContainer, hand);
+
+        String shieldCacheIdentifier = getShieldCacheIdentifier(hand);
+        cachedPoseContainer.register(shieldCacheIdentifier, shieldStateMachine, true);
+        return getShieldCachedPoseFunction(cachedPoseContainer, hand);
+    }
+
+    public static PoseFunction<LocalSpacePose> constructWithHandsOffsetByShield(
+            CachedPoseContainer cachedPoseContainer,
+            PoseFunction<LocalSpacePose> inputPose
+    ) {
+        PoseFunction<LocalSpacePose> pose = inputPose;
+        for (InteractionHand hand : InteractionHand.values()) {
+            BlendMask mask = FirstPersonJointAnimator.LEFT_SIDE_MASK;
+            pose = constructWithHandOffsetByShield(cachedPoseContainer, pose, hand, mask);
+        }
+        return pose;
+    }
+
+    public static PoseFunction<LocalSpacePose> constructWithHandOffsetByShield(
+            CachedPoseContainer cachedPoseContainer,
+            PoseFunction<LocalSpacePose> inputPose,
+            InteractionHand hand,
+            BlendMask handMask
+    ) {
+        PoseFunction<LocalSpacePose> shieldStateMachine = getShieldCachedPoseFunction(cachedPoseContainer, hand);
+        PoseFunction<LocalSpacePose> baseShieldPose;
+        baseShieldPose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_POSE).build();
+
+        PoseFunction<LocalSpacePose> additiveShieldStateMachine;
+        additiveShieldStateMachine = MakeDynamicAdditiveFunction.of(shieldStateMachine, baseShieldPose);
+        additiveShieldStateMachine = BlendPosesFunction.builder(EmptyPoseFunction.of(false))
+                .addBlendInput(additiveShieldStateMachine, evaluationState -> 1f, handMask)
+                .build();
+
+        if (hand == InteractionHand.OFF_HAND) {
+            additiveShieldStateMachine = MirrorFunction.of(additiveShieldStateMachine);
+        }
+
+        PoseFunction<LocalSpacePose> inputWithAdditivePose;
+        inputWithAdditivePose = ApplyAdditiveFunction.of(inputPose, additiveShieldStateMachine);
+        return inputWithAdditivePose;
+    }
+
+    private static PoseFunction<LocalSpacePose> constructShieldStateMachine(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand
+    ) {
+        Predicate<StateTransition.TransitionContext> isUsingShieldPredicate = context -> isUsingShield(context, hand);
+        Predicate<StateTransition.TransitionContext> isNotUsingShieldPredicate = isUsingShieldPredicate.negate();
+
+        PoseFunction<LocalSpacePose> shieldStateMachine;
+        shieldStateMachine = StateMachineFunction.builder(evaluationState -> ShieldStates.LOWERED)
                 .resetsUponRelevant(true)
-                .defineState(State.builder(ShieldStates.LOWERED, FirstPersonHandPose.SHIELD.getMiningStateMachine(cachedPoseContainer, interactionHand))
+                .defineState(State.builder(ShieldStates.LOWERED, FirstPersonHandPose.SHIELD.getMiningStateMachine(cachedPoseContainer, hand))
                         .build())
                 .defineState(State.builder(ShieldStates.BLOCKING_IN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_IN).build())
                         .resetsPoseFunctionUponEntry(true)
@@ -55,7 +138,7 @@ public class FirstPersonShield {
                 .defineState(State.builder(ShieldStates.DISABLED, SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_OUT).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ShieldStates.DISABLED_OUT)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(isHandOnCooldownKey).negate())
+                                .isTakenIfTrue(context -> isShieldNotOnCooldown(context, hand))
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
@@ -75,7 +158,7 @@ public class FirstPersonShield {
                                         ShieldStates.DISABLED_OUT
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.DISABLED_IN)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(isHandOnCooldownKey).and(transitionContext -> transitionContext.driverContainer().getDriver(usingItemDriverKey).getPreviousValue()))
+                                .isTakenIfTrue(context -> hasShieldEnteredCooldown(context, hand))
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
@@ -85,7 +168,7 @@ public class FirstPersonShield {
                                         ShieldStates.BLOCKING
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_OUT)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey).negate()
+                                .isTakenIfTrue(isNotUsingShieldPredicate
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED)
                                 )
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(6)).build())
@@ -99,7 +182,7 @@ public class FirstPersonShield {
                                         ShieldStates.BLOCKING_OUT
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.LOWERED)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey).negate()
+                                .isTakenIfTrue(isNotUsingShieldPredicate
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED)
                                         .and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING))
                                 )
@@ -113,7 +196,7 @@ public class FirstPersonShield {
                                         ShieldStates.DISABLED_OUT
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_IN)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey)
+                                .isTakenIfTrue(isUsingShieldPredicate
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(13)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
@@ -123,12 +206,13 @@ public class FirstPersonShield {
                                         ShieldStates.LOWERED
                                 ))
                         .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_IN)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey))
+                                .isTakenIfTrue(isUsingShieldPredicate)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(13)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())
                 .build();
-        return shieldBlockingStateMachine;
+
+        return shieldStateMachine;
     }
 
     enum ShieldStates {

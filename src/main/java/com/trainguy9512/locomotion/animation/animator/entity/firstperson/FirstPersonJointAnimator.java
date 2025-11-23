@@ -70,6 +70,10 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             .defineForMultipleJoints(LEFT_SIDE_JOINTS, 1)
             .build();
 
+    public static final BlendMask RIGHT_SIDE_MASK = BlendMask.builder()
+            .defineForMultipleJoints(RIGHT_SIDE_JOINTS, 1)
+            .build();
+
     public static final BlendMask CAMERA_MASK = BlendMask.builder()
             .defineForJoint(CAMERA_JOINT, 1f)
             .build();
@@ -120,6 +124,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 .build();
 
         pose = FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer);
+
+        // Offsetting the hands based on the shield state machine.
+        pose = FirstPersonShield.constructWithHandsOffsetByShield(cachedPoseContainer, pose);
 
         // Adding in the movement animations.
         pose = FirstPersonMovement.constructWithMovementAnimations(pose, cachedPoseContainer);
