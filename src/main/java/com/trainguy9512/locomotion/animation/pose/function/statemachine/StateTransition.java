@@ -37,6 +37,14 @@ public record StateTransition<S extends Enum<S>>(
         return transitionContext -> transitionContext.driverContainer.getDriverValue(booleanDriverKey);
     }
 
+    public static Predicate<TransitionContext> takeIfTimeInStateLessThan(TimeSpan time) {
+        return context -> context.timeElapsedInCurrentState().inTicks() < time.inTicks();
+    }
+
+    public static Predicate<TransitionContext> takeIfTimeInStateGreaterThan(TimeSpan time) {
+        return context -> context.timeElapsedInCurrentState().inTicks() > time.inTicks();
+    }
+
     public static Predicate<TransitionContext> makeMostRelevantAnimationPlayerFinishedCondition(float crossFadeWeight) {
         return transitionContext -> {
             var potentialPlayer = transitionContext.findMostRelevantAnimationPlayer();

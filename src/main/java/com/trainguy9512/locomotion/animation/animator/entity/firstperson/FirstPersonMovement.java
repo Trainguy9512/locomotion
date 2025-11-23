@@ -376,6 +376,15 @@ public class FirstPersonMovement {
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(60)
                                 .build())
+                        // Move into the landing animation if the player is no longer falling, but only just began falling.
+                        .addOutboundTransition(StateTransition.builder(FallingStates.STANDING)
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)
+                                        .and(StateTransition.CURRENT_TRANSITION_FINISHED.negate())
+                                        .and(StateTransition.takeIfTimeInStateLessThan(TimeSpan.ofSeconds(0.1f)))
+                                )
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_OUT).build())
+                                .setPriority(70)
+                                .build())
                         // Transition to the jumping animation if the player is jumping and grounded.
                         .addOutboundTransition(StateTransition.builder(FallingStates.JUMP)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_JUMPING)
