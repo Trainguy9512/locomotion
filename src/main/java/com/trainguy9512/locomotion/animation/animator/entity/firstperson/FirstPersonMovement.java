@@ -604,7 +604,9 @@ public class FirstPersonMovement {
     public static PoseFunction<LocalSpacePose> constructWithMountStateMachine(PoseFunction<LocalSpacePose> inputPose) {
         PoseFunction<LocalSpacePose> mountEnterPoseFunction;
         PoseFunction<LocalSpacePose> mountedPoseFunction;
-        mountEnterPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_MOUNT_ENTER).build();
+        mountEnterPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_MOUNT_ENTER)
+                .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(6))
+                .build();
         mountedPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build();
 
         PoseFunction<LocalSpacePose> mountStateMachine;
@@ -613,7 +615,9 @@ public class FirstPersonMovement {
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MountStates.MOUNT_ENTER)
                                 .isTakenIfTrue(FirstPersonMovement::isPassenger)
-                                .setTiming(Transition.INSTANT)
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(4f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
                                 .build())
                         .build())
                 .defineState(State.builder(MountStates.MOUNT_ENTER, mountEnterPoseFunction)

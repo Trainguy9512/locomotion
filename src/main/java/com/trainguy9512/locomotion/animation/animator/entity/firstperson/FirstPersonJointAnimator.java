@@ -308,6 +308,12 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 dampedVelocity.dot(new Vector3f(0, 1, 0).rotate(rotation)),
                 dampedVelocity.dot(new Vector3f(0, 0, -1).rotate(rotation))
         );
+
+        // Disable movement direction offset if mounted
+        if (driverContainer.getDriverValue(FirstPersonDrivers.IS_PASSENGER)) {
+            movementDirection.set(0);
+        }
+
         driverContainer.getDriver(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET).setValue(movementDirection);
         driverContainer.getDriver(FirstPersonDrivers.CAMERA_ROTATION_DAMPING).setValue(new Vector3f(dataReference.getXRot(), dataReference.getYRot(), dataReference.getYRot()).mul(Mth.DEG_TO_RAD));
         driverContainer.getDriver(FirstPersonDrivers.CAMERA_Z_ROTATION_DAMPING).setValue(driverContainer.getDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING).y);
