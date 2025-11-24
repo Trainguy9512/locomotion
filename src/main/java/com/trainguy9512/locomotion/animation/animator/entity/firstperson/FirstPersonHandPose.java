@@ -306,7 +306,7 @@ public enum FirstPersonHandPose {
                 fromLoweringAliasBuilder,
                 interactionHand,
                 FirstPersonHandPose.SHIELD,
-                FirstPersonShield.handShieldPoseFunction(cachedPoseContainer, interactionHand),
+                FirstPersonShield.constructShieldPoseFunction(cachedPoseContainer, interactionHand),
                 ApplyAdditiveFunction.of(
                         SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_POSE).build(),
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()

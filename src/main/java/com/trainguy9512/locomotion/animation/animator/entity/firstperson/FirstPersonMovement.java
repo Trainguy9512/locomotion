@@ -52,7 +52,8 @@ public class FirstPersonMovement {
     public static boolean isJumping(StateTransition.TransitionContext context) {
         boolean isJumping = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_JUMPING);
         boolean isGrounded = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
-        return isJumping && !isGrounded;
+        boolean wasJustGrounded = context.driverContainer().getDriver(FirstPersonDrivers.IS_ON_GROUND).getPreviousValue();
+        return isJumping && !isGrounded && wasJustGrounded;
     }
 
     public static boolean isWalking(StateTransition.TransitionContext context) {
@@ -87,6 +88,7 @@ public class FirstPersonMovement {
         pose = constructWithCrouchPose(cachedPoseContainer, pose);
         pose = constructWithFallingStateMachine(cachedPoseContainer, pose);
         pose = constructWithUnderwaterStateMachine(pose);
+        pose = constructWithMountStateMachine(pose);
 
         // Blending out the additive animation based on the map in hand.
         pose = FirstPersonMap.blendAdditiveMovementIfHoldingMap(pose);
@@ -376,10 +378,18 @@ public class FirstPersonMovement {
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(60)
                                 .build())
+                        // Move into the landing animation if the player is no longer falling, but only just began falling.
+                        .addOutboundTransition(StateTransition.builder(FallingStates.STANDING)
+                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)
+                                        .and(StateTransition.CURRENT_TRANSITION_FINISHED.negate())
+                                        .and(StateTransition.takeIfTimeInStateLessThan(TimeSpan.ofSeconds(0.1f)))
+                                )
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_OUT).build())
+                                .setPriority(70)
+                                .build())
                         // Transition to the jumping animation if the player is jumping and grounded.
                         .addOutboundTransition(StateTransition.builder(FallingStates.JUMP)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_JUMPING)
-                                        .and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)))
+                                .isTakenIfTrue(FirstPersonMovement::isJumping)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(80)
                                 .build())
@@ -570,5 +580,71 @@ public class FirstPersonMovement {
                 .build();
 
         return underwaterStateMachine;
+    }
+
+    enum MountStates {
+        STANDING,
+        MOUNT_ENTER,
+        MOUNTED;
+
+        private static MountStates entryState(PoseFunction.FunctionEvaluationState evaluationState) {
+            boolean isPassenger = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_PASSENGER);
+            return isPassenger ? MOUNTED : STANDING;
+        }
+    }
+
+    private static boolean isPassenger(StateTransition.TransitionContext context) {
+        return context.driverContainer().getDriverValue(FirstPersonDrivers.IS_PASSENGER);
+    }
+
+    private static boolean isNotPassenger(StateTransition.TransitionContext context) {
+        return !isPassenger(context);
+    }
+
+    public static PoseFunction<LocalSpacePose> constructWithMountStateMachine(PoseFunction<LocalSpacePose> inputPose) {
+        PoseFunction<LocalSpacePose> mountEnterPoseFunction;
+        PoseFunction<LocalSpacePose> mountedPoseFunction;
+        mountEnterPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_MOUNT_ENTER)
+                .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(6))
+                .build();
+        mountedPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build();
+
+        PoseFunction<LocalSpacePose> mountStateMachine;
+        mountStateMachine = StateMachineFunction.builder(MountStates::entryState)
+                .defineState(State.builder(MountStates.STANDING, inputPose)
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(MountStates.MOUNT_ENTER)
+                                .isTakenIfTrue(FirstPersonMovement::isPassenger)
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(4f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
+                                .build())
+                        .build())
+                .defineState(State.builder(MountStates.MOUNT_ENTER, mountEnterPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(MountStates.MOUNTED)
+                                .isTakenOnAnimationFinished(1)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
+                                .build())
+                        .build())
+                .defineState(State.builder(MountStates.MOUNTED, mountedPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .build())
+                .addStateAlias(StateAlias.builder(Set.of(
+                        MountStates.MOUNTED,
+                        MountStates.MOUNT_ENTER
+                        ))
+                        .addOutboundTransition(StateTransition.builder(MountStates.STANDING)
+                                .isTakenIfTrue(FirstPersonMovement::isNotPassenger)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
+                                        .setEasement(Easing.EXPONENTIAL_OUT)
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        return mountStateMachine;
     }
 }

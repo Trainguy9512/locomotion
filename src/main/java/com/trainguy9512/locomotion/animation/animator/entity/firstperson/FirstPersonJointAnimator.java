@@ -70,6 +70,10 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             .defineForMultipleJoints(LEFT_SIDE_JOINTS, 1)
             .build();
 
+    public static final BlendMask RIGHT_SIDE_MASK = BlendMask.builder()
+            .defineForMultipleJoints(RIGHT_SIDE_JOINTS, 1)
+            .build();
+
     public static final BlendMask CAMERA_MASK = BlendMask.builder()
             .defineForJoint(CAMERA_JOINT, 1f)
             .build();
@@ -120,6 +124,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 .build();
 
         pose = FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer);
+
+        // Offsetting the hands based on the shield state machine.
+        pose = FirstPersonShield.constructWithHandsOffsetByShield(cachedPoseContainer, pose);
 
         // Adding in the movement animations.
         pose = FirstPersonMovement.constructWithMovementAnimations(pose, cachedPoseContainer);
@@ -190,6 +197,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         driverContainer.getDriver(FirstPersonDrivers.IS_JUMPING).setValue(player.input.keyPresses.jump());
         driverContainer.getDriver(FirstPersonDrivers.IS_CROUCHING).setValue(player.isCrouching());
         driverContainer.getDriver(FirstPersonDrivers.IS_UNDERWATER).setValue(player.isUnderWater() || (player.isInWater() && !player.onGround()));
+        driverContainer.getDriver(FirstPersonDrivers.IS_PASSENGER).setValue(player.isPassenger());
 
         boolean isSwimmingUnderwater = player.getPose() == Pose.SWIMMING
                 && player.isInWater()
@@ -300,6 +308,12 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 dampedVelocity.dot(new Vector3f(0, 1, 0).rotate(rotation)),
                 dampedVelocity.dot(new Vector3f(0, 0, -1).rotate(rotation))
         );
+
+        // Disable movement direction offset if mounted
+        if (driverContainer.getDriverValue(FirstPersonDrivers.IS_PASSENGER)) {
+            movementDirection.set(0);
+        }
+
         driverContainer.getDriver(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET).setValue(movementDirection);
         driverContainer.getDriver(FirstPersonDrivers.CAMERA_ROTATION_DAMPING).setValue(new Vector3f(dataReference.getXRot(), dataReference.getYRot(), dataReference.getYRot()).mul(Mth.DEG_TO_RAD));
         driverContainer.getDriver(FirstPersonDrivers.CAMERA_Z_ROTATION_DAMPING).setValue(driverContainer.getDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING).y);

@@ -58,21 +58,20 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
                 this.isLooping
         );
         AnimationSequence sequence = LocomotionResources.getOrThrowAnimationSequence(this.animationSequence);
-        if (this.isAdditive) {
-            if (this.additiveSubtractionPose == null) {
-                this.additiveSubtractionPose = AnimationSequence.samplePose(
-                        context.driverContainer().getJointSkeleton(),
-                        this.animationSequence,
-                        switch (additiveSubtractionReferencePoint) {
-                            case BEGINNING -> this.resetStartTimeOffset;
-                            case END -> sequence.length();
-                        },
-                        false
-                );
-                this.additiveSubtractionPose.invert();
-            }
-            pose.multiply(this.additiveSubtractionPose, JointChannel.TransformSpace.COMPONENT);
+
+        if (!this.isAdditive) {
+            return pose;
         }
+        if (this.additiveSubtractionPose == null) {
+            this.additiveSubtractionPose = AnimationSequence.samplePose(
+                    context.driverContainer().getJointSkeleton(),
+                    this.animationSequence,
+                    this.resetStartTimeOffset.interpolated(sequence.length(), this.additiveSubtractionReferencePoint.getProgressThroughSequence()),
+                    false
+            );
+            this.additiveSubtractionPose.invert();
+        }
+        pose.multiply(this.additiveSubtractionPose, JointChannel.TransformSpace.COMPONENT);
         return pose;
     }
 
