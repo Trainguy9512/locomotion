@@ -441,9 +441,9 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                 Vector3f cameraRot = cameraPose.getEulerRotationZYX();
                 cameraRot.z *= -1;
                 cameraPose.rotate(cameraRot, JointChannel.TransformSpace.LOCAL, JointChannel.TransformType.REPLACE);
+                cameraPose.translate(cameraPose.getTranslation().mul(1, 1, -1), JointChannel.TransformSpace.COMPONENT, JointChannel.TransformType.REPLACE);
 
                 cameraPose.transformPoseStack(poseStack, 16f);
-                //poseStack.mulPose(cameraPose.getTransform().setTranslation(cameraPose.getTransform().getTranslation(new Vector3f().div(16f))));
             });
         }
     }

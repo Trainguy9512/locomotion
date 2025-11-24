@@ -88,6 +88,7 @@ public class FirstPersonMovement {
         pose = constructWithCrouchPose(cachedPoseContainer, pose);
         pose = constructWithFallingStateMachine(cachedPoseContainer, pose);
         pose = constructWithUnderwaterStateMachine(pose);
+        pose = constructWithMountStateMachine(pose);
 
         // Blending out the additive animation based on the map in hand.
         pose = FirstPersonMap.blendAdditiveMovementIfHoldingMap(pose);
@@ -579,5 +580,67 @@ public class FirstPersonMovement {
                 .build();
 
         return underwaterStateMachine;
+    }
+
+    enum MountStates {
+        STANDING,
+        MOUNT_ENTER,
+        MOUNTED;
+
+        private static MountStates entryState(PoseFunction.FunctionEvaluationState evaluationState) {
+            boolean isPassenger = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_PASSENGER);
+            return isPassenger ? MOUNTED : STANDING;
+        }
+    }
+
+    private static boolean isPassenger(StateTransition.TransitionContext context) {
+        return context.driverContainer().getDriverValue(FirstPersonDrivers.IS_PASSENGER);
+    }
+
+    private static boolean isNotPassenger(StateTransition.TransitionContext context) {
+        return !isPassenger(context);
+    }
+
+    public static PoseFunction<LocalSpacePose> constructWithMountStateMachine(PoseFunction<LocalSpacePose> inputPose) {
+        PoseFunction<LocalSpacePose> mountEnterPoseFunction;
+        PoseFunction<LocalSpacePose> mountedPoseFunction;
+        mountEnterPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_MOUNT_ENTER).build();
+        mountedPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build();
+
+        PoseFunction<LocalSpacePose> mountStateMachine;
+        mountStateMachine = StateMachineFunction.builder(MountStates::entryState)
+                .defineState(State.builder(MountStates.STANDING, inputPose)
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(MountStates.MOUNT_ENTER)
+                                .isTakenIfTrue(FirstPersonMovement::isPassenger)
+                                .setTiming(Transition.INSTANT)
+                                .build())
+                        .build())
+                .defineState(State.builder(MountStates.MOUNT_ENTER, mountEnterPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(MountStates.MOUNTED)
+                                .isTakenOnAnimationFinished(1)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
+                                        .setEasement(Easing.SINE_IN_OUT)
+                                        .build())
+                                .build())
+                        .build())
+                .defineState(State.builder(MountStates.MOUNTED, mountedPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .build())
+                .addStateAlias(StateAlias.builder(Set.of(
+                        MountStates.MOUNTED,
+                        MountStates.MOUNT_ENTER
+                        ))
+                        .addOutboundTransition(StateTransition.builder(MountStates.STANDING)
+                                .isTakenIfTrue(FirstPersonMovement::isNotPassenger)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
+                                        .setEasement(Easing.EXPONENTIAL_OUT)
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        return mountStateMachine;
     }
 }
