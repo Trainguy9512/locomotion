@@ -24,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.Items;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -140,7 +141,6 @@ public enum FirstPersonHandPose {
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.SPEAR, TRIDENT);
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.CROSSBOW, CROSSBOW);
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.BOW, BOW);
-        POSES_BY_USE_ANIMATION.put(ItemUseAnimation.BLOCK, SHIELD);
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.SPYGLASS, SPYGLASS);
     }
 
@@ -157,6 +157,9 @@ public enum FirstPersonHandPose {
         }
         if (itemStack.is(ItemTags.MACE_ENCHANTABLE)) {
             return MACE;
+        }
+        if (itemStack.is(Items.SHIELD)) {
+            return SHIELD;
         }
         if (itemStack.is(ItemTags.SWORDS)) {
             return SWORD;
