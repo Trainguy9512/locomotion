@@ -42,6 +42,7 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Boolean>> IS_UNDERWATER = DriverKey.of("is_underwater", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_SWIMMING_UNDERWATER = DriverKey.of("is_swimming_underwater", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_PASSENGER = DriverKey.of("is_passenger", () -> VariableDriver.ofBoolean(() -> false));
+    public static final DriverKey<VariableDriver<Boolean>> HAS_SCREEN_OPEN = DriverKey.of("has_screen_open", () -> VariableDriver.ofBoolean(() -> false));
 
     public static final DriverKey<VariableDriver<Boolean>> IS_MINING = DriverKey.of("is_mining", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<TriggerDriver> HAS_ATTACKED = DriverKey.of("has_attacked", TriggerDriver::of);

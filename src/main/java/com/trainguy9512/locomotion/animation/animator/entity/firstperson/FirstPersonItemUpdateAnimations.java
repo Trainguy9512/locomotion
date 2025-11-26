@@ -9,6 +9,7 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfig
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -109,6 +110,10 @@ public class FirstPersonItemUpdateAnimations {
             return;
         }
         if (driverContainer.getDriver(FirstPersonDrivers.HOTBAR_SLOT).hasValueChanged()) {
+            return;
+        }
+        // Don't play the item update animations if the player is currently in a screen
+        if (driverContainer.getDriverValue(FirstPersonDrivers.HAS_SCREEN_OPEN)) {
             return;
         }
 
