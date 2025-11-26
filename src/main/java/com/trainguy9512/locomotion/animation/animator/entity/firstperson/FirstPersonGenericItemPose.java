@@ -218,7 +218,8 @@ public enum FirstPersonGenericItemPose {
             return BANNER;
         }
         if (itemStack.is(ItemTags.DOORS)) {
-            return DOOR_BLOCK;
+            return DEFAULT_2D_ITEM;
+//            return DOOR_BLOCK;
         }
         for (Item item : ROD_ITEMS) {
             if (itemStack.is(item)) {
@@ -226,27 +227,28 @@ public enum FirstPersonGenericItemPose {
             }
         }
         if (itemStack.getItem() instanceof BlockItem) {
-            for (Item item : SMALL_BLOCK_ITEMS) {
-                if (itemStack.is(item)) {
-                    return SMALL_BLOCK;
-                }
-            }
-            for (TagKey<Item> tag : SMALL_BLOCK_ITEM_TAGS) {
-                if (itemStack.is(tag)) {
-                    return SMALL_BLOCK;
-                }
-            }
-            for (Item item : BLOCK_2D_OVERRIDE_ITEMS) {
-                if (itemStack.is(item)) {
-                    return DEFAULT_2D_ITEM;
-                }
-            }
-            for (TagKey<Item> tag : BLOCK_2D_OVERRIDE_ITEM_TAGS) {
-                if (itemStack.is(tag)) {
-                    return DEFAULT_2D_ITEM;
-                }
-            }
-            return BLOCK;
+            return DEFAULT_2D_ITEM;
+//            for (Item item : SMALL_BLOCK_ITEMS) {
+//                if (itemStack.is(item)) {
+//                    return SMALL_BLOCK;
+//                }
+//            }
+//            for (TagKey<Item> tag : SMALL_BLOCK_ITEM_TAGS) {
+//                if (itemStack.is(tag)) {
+//                    return SMALL_BLOCK;
+//                }
+//            }
+//            for (Item item : BLOCK_2D_OVERRIDE_ITEMS) {
+//                if (itemStack.is(item)) {
+//                    return DEFAULT_2D_ITEM;
+//                }
+//            }
+//            for (TagKey<Item> tag : BLOCK_2D_OVERRIDE_ITEM_TAGS) {
+//                if (itemStack.is(tag)) {
+//                    return DEFAULT_2D_ITEM;
+//                }
+//            }
+//            return BLOCK;
         }
         return DEFAULT_2D_ITEM;
     }
