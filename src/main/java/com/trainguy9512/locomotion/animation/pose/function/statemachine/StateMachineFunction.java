@@ -101,7 +101,9 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
 
         // If the state machine has no active states, initialize it using the initial state function.
         // If the state machine is just now becoming relevant again after not being relevant, re-initialize it.
-        if (this.stateBlendLayerStack.isEmpty() || (evaluationState.currentTick() - 1 > this.lastUpdateTick && this.resetsUponRelevant)) {
+        boolean layerStackIsEmpty = this.stateBlendLayerStack.isEmpty();
+        boolean hasBecomeRelevant = evaluationState.currentTick() - 1 > this.lastUpdateTick;
+        if (layerStackIsEmpty || (hasBecomeRelevant && this.resetsUponRelevant)) {
             this.stateBlendLayerStack.clear();
             S initialStateIdentifier = this.initialState.apply(evaluationState);
             if (this.states.containsKey(initialStateIdentifier)) {
