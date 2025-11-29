@@ -36,94 +36,68 @@ import java.util.Set;
 
 public enum FirstPersonHandPose {
     EMPTY (
-            HandPoseStates.EMPTY_RAISE,
-            HandPoseStates.EMPTY_LOWER,
-            HandPoseStates.EMPTY,
+            "empty",
             FirstPersonAnimationSequences.HAND_EMPTY_POSE
     ),
     GENERIC_ITEM (
-            HandPoseStates.GENERIC_ITEM_RAISE,
-            HandPoseStates.GENERIC_ITEM_LOWER,
-            HandPoseStates.GENERIC_ITEM,
+            "generic_item",
             FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE
     ),
     TOOL (
-            HandPoseStates.TOOL_RAISE,
-            HandPoseStates.TOOL_LOWER,
-            HandPoseStates.TOOL,
+            "tool",
             FirstPersonAnimationSequences.HAND_TOOL_POSE
     ),
     SWORD (
-            HandPoseStates.SWORD_RAISE,
-            HandPoseStates.SWORD_LOWER,
-            HandPoseStates.SWORD,
+            "sword",
             FirstPersonAnimationSequences.HAND_TOOL_POSE
     ),
     SHIELD (
-            HandPoseStates.SHIELD_RAISE,
-            HandPoseStates.SHIELD_LOWER,
-            HandPoseStates.SHIELD,
+            "shield",
             FirstPersonAnimationSequences.HAND_SHIELD_POSE
     ),
     BOW (
-            HandPoseStates.BOW_RAISE,
-            HandPoseStates.BOW_LOWER,
-            HandPoseStates.BOW,
+            "bow",
             FirstPersonAnimationSequences.HAND_BOW_POSE
     ),
     CROSSBOW (
-            HandPoseStates.CROSSBOW_RAISE,
-            HandPoseStates.CROSSBOW_LOWER,
-            HandPoseStates.CROSSBOW,
+            "crossbow",
             FirstPersonAnimationSequences.HAND_CROSSBOW_POSE
     ),
     TRIDENT (
-            HandPoseStates.TRIDENT_RAISE,
-            HandPoseStates.TRIDENT_LOWER,
-            HandPoseStates.TRIDENT,
+            "trident",
             FirstPersonAnimationSequences.HAND_TRIDENT_POSE
     ),
     BRUSH (
-            HandPoseStates.BRUSH_RAISE,
-            HandPoseStates.BRUSH_LOWER,
-            HandPoseStates.BRUSH,
+            "brush",
             FirstPersonAnimationSequences.HAND_BRUSH_POSE
     ),
     MACE (
-            HandPoseStates.MACE_RAISE,
-            HandPoseStates.MACE_LOWER,
-            HandPoseStates.MACE,
+            "mace",
             FirstPersonAnimationSequences.HAND_MACE_POSE
     ),
     SPYGLASS (
-            HandPoseStates.SPYGLASS_RAISE,
-            HandPoseStates.SPYGLASS_LOWER,
-            HandPoseStates.SPYGLASS,
+            "spyglass",
             FirstPersonAnimationSequences.HAND_SPYGLASS_POSE
     ),
     MAP (
-            HandPoseStates.MAP_RAISE,
-            HandPoseStates.MAP_LOWER,
-            HandPoseStates.MAP,
+            "map",
             FirstPersonAnimationSequences.HAND_MAP_SINGLE_HAND_POSE
     );
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator/HandPose");
 
-    public final HandPoseStates raisingState;
-    public final HandPoseStates loweringState;
-    public final HandPoseStates poseState;
+    public final String raisingState;
+    public final String loweringState;
+    public final String poseState;
     public final ResourceLocation basePoseLocation;
 
     FirstPersonHandPose(
-            HandPoseStates raisingState,
-            HandPoseStates loweringState,
-            HandPoseStates poseState,
+            String handPoseStateIdentifier,
             ResourceLocation basePoseLocation
     ) {
-        this.raisingState = raisingState;
-        this.loweringState = loweringState;
-        this.poseState = poseState;
+        this.raisingState = handPoseStateIdentifier + "_raise";
+        this.loweringState = handPoseStateIdentifier + "_lower";
+        this.poseState = handPoseStateIdentifier;
         this.basePoseLocation = basePoseLocation;
     }
 
@@ -213,57 +187,61 @@ public enum FirstPersonHandPose {
         };
     }
 
-    public enum HandPoseStates {
-        DROPPING_LAST_ITEM,
-        USING_LAST_ITEM,
-        THROWING_TRIDENT,
-        EMPTY,
-        EMPTY_RAISE,
-        EMPTY_LOWER,
-        GENERIC_ITEM,
-        GENERIC_ITEM_RAISE,
-        GENERIC_ITEM_LOWER,
-        TOOL,
-        TOOL_RAISE,
-        TOOL_LOWER,
-        SWORD,
-        SWORD_RAISE,
-        SWORD_LOWER,
-        SHIELD,
-        SHIELD_RAISE,
-        SHIELD_LOWER,
-        BOW,
-        BOW_RAISE,
-        BOW_LOWER,
-        CROSSBOW,
-        CROSSBOW_RAISE,
-        CROSSBOW_LOWER,
-        TRIDENT,
-        TRIDENT_RAISE,
-        TRIDENT_LOWER,
-        BRUSH,
-        BRUSH_RAISE,
-        BRUSH_LOWER,
-        MACE,
-        MACE_RAISE,
-        MACE_LOWER,
-        SPYGLASS,
-        SPYGLASS_RAISE,
-        SPYGLASS_LOWER,
-        MAP,
-        MAP_RAISE,
-        MAP_LOWER
-    }
+    public static final String HAND_POSE_DROPPING_LAST_ITEM_STATE = "dropping_last_item";
+    public static final String HAND_POSE_USING_LAST_ITEM_STATE = "using_last_item";
+    public static final String HAND_POSE_THROWING_TRIDENT_STATE = "throwing_trident";
+
+//    public enum HandPoseStates {
+//        DROPPING_LAST_ITEM,
+//        USING_LAST_ITEM,
+//        THROWING_TRIDENT,
+//        EMPTY,
+//        EMPTY_RAISE,
+//        EMPTY_LOWER,
+//        GENERIC_ITEM,
+//        GENERIC_ITEM_RAISE,
+//        GENERIC_ITEM_LOWER,
+//        TOOL,
+//        TOOL_RAISE,
+//        TOOL_LOWER,
+//        SWORD,
+//        SWORD_RAISE,
+//        SWORD_LOWER,
+//        SHIELD,
+//        SHIELD_RAISE,
+//        SHIELD_LOWER,
+//        BOW,
+//        BOW_RAISE,
+//        BOW_LOWER,
+//        CROSSBOW,
+//        CROSSBOW_RAISE,
+//        CROSSBOW_LOWER,
+//        TRIDENT,
+//        TRIDENT_RAISE,
+//        TRIDENT_LOWER,
+//        BRUSH,
+//        BRUSH_RAISE,
+//        BRUSH_LOWER,
+//        MACE,
+//        MACE_RAISE,
+//        MACE_LOWER,
+//        SPYGLASS,
+//        SPYGLASS_RAISE,
+//        SPYGLASS_LOWER,
+//        MAP,
+//        MAP_RAISE,
+//        MAP_LOWER
+//    }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
 
-        StateMachineFunction.Builder<HandPoseStates> handPoseStateMachineBuilder = switch (interactionHand) {
+        StateMachineFunction.Builder handPoseStateMachineBuilder = switch (interactionHand) {
             case MAIN_HAND -> StateMachineFunction.builder(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE).poseState);
             case OFF_HAND -> StateMachineFunction.builder(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.OFF_HAND_POSE).poseState);
         };
 
         handPoseStateMachineBuilder.resetsUponRelevant(true);
-        StateAlias.Builder<HandPoseStates> fromLoweringAliasBuilder = StateAlias.builder(Set.of(HandPoseStates.EMPTY_LOWER));
+        StateAlias.Builder fromLoweringAliasBuilder = StateAlias.builder(Set.of(EMPTY.loweringState));
 
         addStatesForHandPose(
                 handPoseStateMachineBuilder,
@@ -464,32 +442,40 @@ public enum FirstPersonHandPose {
                 }
         );
         handPoseStateMachineBuilder.addStateAlias(fromLoweringAliasBuilder.build())
-                .defineState(StateDefinition.builder(HandPoseStates.DROPPING_LAST_ITEM,
-                                ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(), MakeDynamicAdditiveFunction.of(SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).build(), SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()))
+                .defineState(StateDefinition.builder(HAND_POSE_DROPPING_LAST_ITEM_STATE,
+                                ApplyAdditiveFunction.of(
+                                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(),
+                                        MakeDynamicAdditiveFunction.of(
+                                                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).build(),
+                                                SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()))
                         )
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(HandPoseStates.USING_LAST_ITEM,
-                                ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(), MakeDynamicAdditiveFunction.of(SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).build(), SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()))
+                .defineState(StateDefinition.builder(HAND_POSE_USING_LAST_ITEM_STATE,
+                                ApplyAdditiveFunction.of(
+                                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(),
+                                        MakeDynamicAdditiveFunction.of(
+                                                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).build(),
+                                                SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()))
                         )
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(HandPoseStates.THROWING_TRIDENT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RELEASE_THROW).build())
-                        .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY_RAISE)
+                .defineState(StateDefinition.builder(HAND_POSE_THROWING_TRIDENT_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RELEASE_THROW).build())
+                        .addOutboundTransition(StateTransition.builder(EMPTY.raisingState)
                                 .isTakenOnAnimationFinished(0)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(1)).build())
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .addStateAlias(StateAlias.builder(Set.of(
-                                HandPoseStates.DROPPING_LAST_ITEM,
-                                HandPoseStates.USING_LAST_ITEM
+                                HAND_POSE_DROPPING_LAST_ITEM_STATE,
+                                HAND_POSE_USING_LAST_ITEM_STATE
                         ))
-                        .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
+                        .addOutboundTransition(StateTransition.builder(EMPTY.poseState)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
-                        .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY)
+                        .addOutboundTransition(StateTransition.builder(EMPTY.poseState)
                                 .isTakenIfTrue(context -> shouldCancelLastItemAnimation(context, interactionHand))
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.05f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
@@ -673,8 +659,8 @@ public enum FirstPersonHandPose {
     }
 
     public static void addStatesForHandPose(
-            StateMachineFunction.Builder<HandPoseStates> stateMachineBuilder,
-            StateAlias.Builder<HandPoseStates> fromLoweringAliasBuilder,
+            StateMachineFunction.Builder stateMachineBuilder,
+            StateAlias.Builder fromLoweringAliasBuilder,
             InteractionHand interactionHand,
             FirstPersonHandPose handPose,
             PoseFunction<LocalSpacePose> posePoseFunction,
@@ -711,21 +697,21 @@ public enum FirstPersonHandPose {
                                 .setTiming(poseToLoweringTiming)
                                 .setPriority(50)
                                 .build())
-                        .addOutboundTransition(StateTransition.builder(HandPoseStates.DROPPING_LAST_ITEM)
+                        .addOutboundTransition(StateTransition.builder(HAND_POSE_DROPPING_LAST_ITEM_STATE)
                                 .isTakenIfTrue(context -> shouldTakeDropLastItemTransition(context, interactionHand))
                                 .setPriority(80)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
                                 .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), interactionHand))
                                 .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
                                 .build())
-                        .addOutboundTransition(StateTransition.builder(HandPoseStates.USING_LAST_ITEM)
+                        .addOutboundTransition(StateTransition.builder(HAND_POSE_USING_LAST_ITEM_STATE)
                                 .isTakenIfTrue(context -> shouldTakeUseLastItemTransition(context, interactionHand))
                                 .setPriority(70)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(2)).build())
                                 .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), interactionHand))
                                 .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, interactionHand))
                                 .build())
-                        .addOutboundTransition(StateTransition.builder(HandPoseStates.THROWING_TRIDENT)
+                        .addOutboundTransition(StateTransition.builder(HAND_POSE_THROWING_TRIDENT_STATE)
                                 .isTakenIfTrue(context -> shouldTakeThrowTridentTransition(context, interactionHand))
                                 .setPriority(60)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(1)).build())
