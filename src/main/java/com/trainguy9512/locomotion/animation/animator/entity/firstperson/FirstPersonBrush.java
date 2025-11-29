@@ -14,14 +14,12 @@ import net.minecraft.world.InteractionHand;
 
 public class FirstPersonBrush {
 
-    public enum BrushStates {
-        IDLE,
-        SIFTING
-    }
-
     private static boolean isUsingItem(StateTransition.TransitionContext context, InteractionHand interactionHand) {
         return context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(interactionHand));
     }
+
+    public static final String BRUSH_IDLE_STATE = "idle";
+    public static final String BRUSH_SIFTING_STATE = "sifting";
 
     public static PoseFunction<LocalSpacePose> handBrushPoseFunction(
             CachedPoseContainer cachedPoseContainer,
@@ -33,9 +31,9 @@ public class FirstPersonBrush {
                 .setLooping(true)
                 .build();
 
-        return StateMachineFunction.builder(functionEvaluationState -> BrushStates.IDLE)
-                .defineState(StateDefinition.builder(BrushStates.IDLE, idlePoseFunction)
-                        .addOutboundTransition(StateTransition.builder(BrushStates.SIFTING)
+        return StateMachineFunction.builder(functionEvaluationState -> BRUSH_IDLE_STATE)
+                .defineState(StateDefinition.builder(BRUSH_IDLE_STATE, idlePoseFunction)
+                        .addOutboundTransition(StateTransition.builder(BRUSH_SIFTING_STATE)
                                 .isTakenIfTrue(context -> isUsingItem(context, interactionHand))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(8))
                                         .setEasement(Easing.CUBIC_IN_OUT)
@@ -44,8 +42,8 @@ public class FirstPersonBrush {
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(BrushStates.SIFTING, siftingPoseFunction)
-                        .addOutboundTransition(StateTransition.builder(BrushStates.IDLE)
+                .defineState(StateDefinition.builder(BRUSH_SIFTING_STATE, siftingPoseFunction)
+                        .addOutboundTransition(StateTransition.builder(BRUSH_IDLE_STATE)
                                 .isTakenIfTrue(context -> !isUsingItem(context, interactionHand))
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
                                         .setEasement(Easing.EXPONENTIAL_OUT)

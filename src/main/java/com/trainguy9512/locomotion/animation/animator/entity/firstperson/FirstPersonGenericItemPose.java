@@ -320,6 +320,13 @@ public enum FirstPersonGenericItemPose {
         EATING_LOOP
     }
 
+    public static final String CONSUMABLE_IDLE_STATE = "idle";
+    public static final String CONSUMABLE_DRINKING_BEGIN_STATE = "drinking_begin";
+    public static final String CONSUMABLE_DRINKING_LOOP_STATE = "drinking_loop";
+    public static final String CONSUMABLE_DRINKING_FINISHED_STATE = "drinking_finished";
+    public static final String CONSUMABLE_EATING_BEGIN_STATE = "eating_begin";
+    public static final String CONSUMABLE_EATING_LOOP_STATE = "eating_loop";
+
     private static PoseFunction<LocalSpacePose> constructConsumableStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand, PoseFunction<LocalSpacePose> idlePoseFunction) {
         PoseFunction<LocalSpacePose> drinkingLoopPoseFunction = ApplyAdditiveFunction.of(
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_PROGRESS)
@@ -339,32 +346,32 @@ public enum FirstPersonGenericItemPose {
                 .build();
         PoseFunction<LocalSpacePose> eatingBeginPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_EAT_BEGIN).build();
 
-        return StateMachineFunction.builder(evaluationState -> ConsumableStates.IDLE)
+        return StateMachineFunction.builder(evaluationState -> CONSUMABLE_IDLE_STATE)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(ConsumableStates.IDLE, idlePoseFunction)
+                .defineState(StateDefinition.builder(CONSUMABLE_IDLE_STATE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_BEGIN)
+                        .addOutboundTransition(StateTransition.builder(CONSUMABLE_EATING_BEGIN_STATE)
                                 .isTakenIfTrue(context -> isEating(context, interactionHand))
                                 .build())
                         .build())
                 // Drinking
-                .defineState(StateDefinition.builder(ConsumableStates.DRINKING_BEGIN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_BEGIN)
+                .defineState(StateDefinition.builder(CONSUMABLE_DRINKING_BEGIN_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_BEGIN)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.DRINKING_LOOP)
+                        .addOutboundTransition(StateTransition.builder(CONSUMABLE_DRINKING_LOOP_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(ConsumableStates.DRINKING_LOOP, drinkingLoopPoseFunction)
+                .defineState(StateDefinition.builder(CONSUMABLE_DRINKING_LOOP_STATE, drinkingLoopPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(ConsumableStates.DRINKING_FINISHED, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_FINISH)
+                .defineState(StateDefinition.builder(CONSUMABLE_DRINKING_FINISHED_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_FINISH)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(CONSUMABLE_IDLE_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
                                         .setEasement(Easing.SINE_IN_OUT)
@@ -373,10 +380,10 @@ public enum FirstPersonGenericItemPose {
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ConsumableStates.DRINKING_BEGIN,
-                                        ConsumableStates.DRINKING_LOOP
+                                        CONSUMABLE_DRINKING_BEGIN_STATE,
+                                        CONSUMABLE_DRINKING_LOOP_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.DRINKING_FINISHED)
+                        .addOutboundTransition(StateTransition.builder(CONSUMABLE_DRINKING_FINISHED_STATE)
                                 .isTakenIfTrue(context -> !isDrinking(context, interactionHand))
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
@@ -387,10 +394,10 @@ public enum FirstPersonGenericItemPose {
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ConsumableStates.DRINKING_FINISHED,
-                                        ConsumableStates.IDLE
+                                        CONSUMABLE_DRINKING_FINISHED_STATE,
+                                        CONSUMABLE_IDLE_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.DRINKING_BEGIN)
+                        .addOutboundTransition(StateTransition.builder(CONSUMABLE_DRINKING_BEGIN_STATE)
                                 .isTakenIfTrue(context -> isDrinking(context, interactionHand))
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
@@ -401,11 +408,11 @@ public enum FirstPersonGenericItemPose {
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ConsumableStates.DRINKING_BEGIN,
-                                        ConsumableStates.DRINKING_LOOP,
-                                        ConsumableStates.DRINKING_FINISHED
+                                        CONSUMABLE_DRINKING_BEGIN_STATE,
+                                        CONSUMABLE_DRINKING_LOOP_STATE,
+                                        CONSUMABLE_DRINKING_FINISHED_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(CONSUMABLE_IDLE_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING))
                                 .setCanInterruptOtherTransitions(true)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
@@ -415,22 +422,22 @@ public enum FirstPersonGenericItemPose {
                                 .build())
                         .build())
                 // Eating
-                .defineState(StateDefinition.builder(ConsumableStates.EATING_BEGIN, eatingBeginPoseFunction)
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_LOOP)
+                .defineState(StateDefinition.builder(CONSUMABLE_EATING_BEGIN_STATE, eatingBeginPoseFunction)
+                        .addOutboundTransition(StateTransition.builder(CONSUMABLE_EATING_LOOP_STATE)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .isTakenOnAnimationFinished(1)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(ConsumableStates.EATING_LOOP, eatingLoopPoseFunction)
+                .defineState(StateDefinition.builder(CONSUMABLE_EATING_LOOP_STATE, eatingLoopPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ConsumableStates.EATING_BEGIN,
-                                        ConsumableStates.EATING_LOOP
+                                        CONSUMABLE_EATING_BEGIN_STATE,
+                                        CONSUMABLE_EATING_LOOP_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(CONSUMABLE_IDLE_STATE)
                                 .isTakenIfTrue(context -> !isEating(context, interactionHand))
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.8f))
