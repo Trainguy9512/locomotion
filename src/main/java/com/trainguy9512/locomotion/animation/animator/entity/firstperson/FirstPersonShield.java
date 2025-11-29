@@ -107,67 +107,67 @@ public class FirstPersonShield {
         Predicate<StateTransition.TransitionContext> isNotUsingShieldPredicate = isUsingShieldPredicate.negate();
 
         PoseFunction<LocalSpacePose> shieldStateMachine;
-        shieldStateMachine = StateMachineFunction.builder(evaluationState -> ShieldStates.LOWERED)
+        shieldStateMachine = StateMachineFunction.builder(FirstPersonShield::getShieldEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(ShieldStates.LOWERED, FirstPersonHandPose.SHIELD.getMiningStateMachine(cachedPoseContainer, hand))
+                .defineState(StateDefinition.builder(SHIELD_LOWERED_STATE, FirstPersonHandPose.SHIELD.getMiningStateMachine(cachedPoseContainer, hand))
                         .build())
-                .defineState(StateDefinition.builder(ShieldStates.BLOCKING_IN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_IN).build())
+                .defineState(StateDefinition.builder(SHIELD_BLOCKING_IN_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_IN).build())
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_BLOCKING_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(5)).build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(ShieldStates.BLOCKING, MontageSlotFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_OUT).build(), FirstPersonMontages.SHIELD_BLOCK_SLOT))
+                .defineState(StateDefinition.builder(SHIELD_BLOCKING_STATE, MontageSlotFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_OUT).build(), FirstPersonMontages.SHIELD_BLOCK_SLOT))
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(ShieldStates.BLOCKING_OUT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_OUT).build())
+                .defineState(StateDefinition.builder(SHIELD_BLOCKING_OUT_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_OUT).build())
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.LOWERED)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_LOWERED_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(15)).build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(ShieldStates.DISABLED_IN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_IN).build())
+                .defineState(StateDefinition.builder(SHIELD_DISABLED_IN_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_IN).build())
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.DISABLED)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_DISABLED_STATE)
                                 .isTakenOnAnimationFinished(0)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(ShieldStates.DISABLED, SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_OUT).build())
+                .defineState(StateDefinition.builder(SHIELD_DISABLED_STATE, SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_OUT).build())
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.DISABLED_OUT)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_DISABLED_OUT_STATE)
                                 .isTakenIfTrue(context -> isShieldNotOnCooldown(context, hand))
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(ShieldStates.DISABLED_OUT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_OUT).build())
+                .defineState(StateDefinition.builder(SHIELD_DISABLED_OUT_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_DISABLE_OUT).build())
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.LOWERED)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_LOWERED_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).build())
                                 .build())
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ShieldStates.BLOCKING_IN,
-                                        ShieldStates.BLOCKING,
-                                        ShieldStates.BLOCKING_OUT,
-                                        ShieldStates.LOWERED,
-                                        ShieldStates.DISABLED_OUT
+                                        SHIELD_BLOCKING_IN_STATE,
+                                        SHIELD_BLOCKING_STATE,
+                                        SHIELD_BLOCKING_OUT_STATE,
+                                        SHIELD_LOWERED_STATE,
+                                        SHIELD_DISABLED_OUT_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.DISABLED_IN)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_DISABLED_IN_STATE)
                                 .isTakenIfTrue(context -> hasShieldEnteredCooldown(context, hand))
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ShieldStates.BLOCKING_IN,
-                                        ShieldStates.BLOCKING
+                                        SHIELD_BLOCKING_IN_STATE,
+                                        SHIELD_BLOCKING_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_OUT)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_BLOCKING_OUT_STATE)
                                 .isTakenIfTrue(isNotUsingShieldPredicate
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED)
                                 )
@@ -177,11 +177,11 @@ public class FirstPersonShield {
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ShieldStates.BLOCKING_IN,
-                                        ShieldStates.BLOCKING,
-                                        ShieldStates.BLOCKING_OUT
+                                        SHIELD_BLOCKING_IN_STATE,
+                                        SHIELD_BLOCKING_STATE,
+                                        SHIELD_BLOCKING_OUT_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.LOWERED)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_LOWERED_STATE)
                                 .isTakenIfTrue(isNotUsingShieldPredicate
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED)
                                         .and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING))
@@ -192,10 +192,10 @@ public class FirstPersonShield {
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ShieldStates.BLOCKING_OUT,
-                                        ShieldStates.DISABLED_OUT
+                                        SHIELD_BLOCKING_OUT_STATE,
+                                        SHIELD_DISABLED_OUT_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_IN)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_BLOCKING_IN_STATE)
                                 .isTakenIfTrue(isUsingShieldPredicate
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(13)).setEasement(Easing.SINE_IN_OUT).build())
@@ -203,9 +203,9 @@ public class FirstPersonShield {
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        ShieldStates.LOWERED
+                                        SHIELD_LOWERED_STATE
                                 ))
-                        .addOutboundTransition(StateTransition.builder(ShieldStates.BLOCKING_IN)
+                        .addOutboundTransition(StateTransition.builder(SHIELD_BLOCKING_IN_STATE)
                                 .isTakenIfTrue(isUsingShieldPredicate)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(13)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
@@ -213,6 +213,18 @@ public class FirstPersonShield {
                 .build();
 
         return shieldStateMachine;
+    }
+
+    public static final String SHIELD_LOWERED_STATE = "lowered";
+    public static final String SHIELD_BLOCKING_IN_STATE = "blocking_in";
+    public static final String SHIELD_BLOCKING_STATE = "blocking";
+    public static final String SHIELD_BLOCKING_OUT_STATE = "blocking_out";
+    public static final String SHIELD_DISABLED_IN_STATE = "disabled_in";
+    public static final String SHIELD_DISABLED_STATE = "disabled";
+    public static final String SHIELD_DISABLED_OUT_STATE = "disabled_out";
+
+    private static String getShieldEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        return SHIELD_LOWERED_STATE;
     }
 
     enum ShieldStates {

@@ -19,10 +19,12 @@ import org.joml.Vector3f;
 
 public class FirstPersonSpyglass {
 
-    public enum SpyglassStates {
-        IDLE,
-        LOOKING,
-        LOOKING_EXIT
+    public static final String SPYGLASS_IDLE_STATE = "idle";
+    public static final String SPYGLASS_LOOKING_STATE = "looking";
+    public static final String SPYGLASS_LOOKING_EXIT_STATE = "looking_exit";
+
+    private static String getSpyglassEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        return SPYGLASS_IDLE_STATE;
     }
 
     private static boolean isUsingItem(StateTransition.TransitionContext context, InteractionHand interactionHand) {
@@ -40,30 +42,30 @@ public class FirstPersonSpyglass {
                 .setLooping(false)
                 .build();
 
-        return StateMachineFunction.builder(functionEvaluationState -> SpyglassStates.IDLE)
-                .defineState(StateDefinition.builder(SpyglassStates.IDLE, idlePoseFunction)
+        return StateMachineFunction.builder(FirstPersonSpyglass::getSpyglassEntryState)
+                .defineState(StateDefinition.builder(SPYGLASS_IDLE_STATE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(SpyglassStates.LOOKING)
+                        .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_STATE)
                                 .isTakenIfTrue(context -> isUsingItem(context, interactionHand))
                                 .setTiming(Transition.INSTANT)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(SpyglassStates.LOOKING, lookingPoseFunction)
+                .defineState(StateDefinition.builder(SPYGLASS_LOOKING_STATE, lookingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(SpyglassStates.LOOKING_EXIT)
+                        .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_EXIT_STATE)
                                 .isTakenIfTrue(context -> !isUsingItem(context, interactionHand))
                                 .setTiming(Transition.INSTANT)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(SpyglassStates.LOOKING_EXIT, lookingExitPoseFunction)
+                .defineState(StateDefinition.builder(SPYGLASS_LOOKING_EXIT_STATE, lookingExitPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(SpyglassStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(SPYGLASS_IDLE_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20))
                                         .setEasement(Easing.CUBIC_IN_OUT)
                                         .build())
                                 .build())
-                        .addOutboundTransition(StateTransition.builder(SpyglassStates.LOOKING)
+                        .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_STATE)
                                 .isTakenIfTrue(context -> isUsingItem(context, interactionHand))
                                 .setTiming(Transition.INSTANT)
                                 .build())
