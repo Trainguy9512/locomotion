@@ -28,25 +28,24 @@ import java.util.stream.Collectors;
  * should be triggered in sequence based on an entity's actions, such as a jumping animation triggering when the entity
  * is both off the ground and moving upwards, which would transition into a falling animation and then
  * back to a standing animation once no longer falling.</p>
- * @param <S>           Enum type used as state identifiers.
  */
-public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFunction<LocalSpacePose> {
+public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> {
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/StateMachineFunction");
 
-    private final Map<S, StateDefinition<S>> states;
-    private final Function<FunctionEvaluationState, S> initialStateFunction;
+    private final Map<String, StateDefinition> states;
+    private final Function<FunctionEvaluationState, String> initialStateFunction;
     private final List<StateBlendLayer> stateBlendLayerStack;
 
     private long lastUpdateTick;
     private final boolean resetsUponRelevant;
-    private final List<DriverKey<VariableDriver<S>>> driversToUpdateOnStateChanged;
+    private final List<DriverKey<VariableDriver<String>>> driversToUpdateOnStateChanged;
 
     private StateMachineFunction(
-            Map<S, StateDefinition<S>> states,
-            Function<FunctionEvaluationState, S> initialStateFunction,
+            Map<String, StateDefinition> states,
+            Function<FunctionEvaluationState, String> initialStateFunction,
             boolean resetsUponRelevant,
-            List<DriverKey<VariableDriver<S>>> driversToUpdateOnStateChanged
+            List<DriverKey<VariableDriver<String>>> driversToUpdateOnStateChanged
     ) {
         super(evaluationState -> true, evaluationState -> 1f, TimeSpan.ZERO);
         this.states = states;
@@ -62,14 +61,15 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
     public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
         // If the list of active states is empty, throw an error because this should never be the case unless something has gone wrong.
         if(this.stateBlendLayerStack.isEmpty()){
-            LOGGER.error("State machine of enum type {}'s active states list found to be empty. Throwing error...", this.states.keySet().stream().findAny().get().getClass().getSimpleName());
+            LOGGER.error("State machine active states list found to be empty. Throwing error...");
+            LOGGER.error("States in state machine: {}", this.states.keySet());
             throw new IllegalStateException("State machine found to have no active states");
         }
         // Add all calculated poses to a map, because there can be multiple instances of the same
         // state in the stack but each state should only have its pose calculated once.
-        Set<S> uniqueStatesInLayerStack = this.getStatesInLayerStack();
-        Map<S, LocalSpacePose> layerStackPoses = Maps.newHashMapWithExpectedSize(uniqueStatesInLayerStack.size());
-        for (S stateIdentifier : uniqueStatesInLayerStack) {
+        Set<String> uniqueStatesInLayerStack = this.getStatesInLayerStack();
+        Map<String, LocalSpacePose> layerStackPoses = Maps.newHashMapWithExpectedSize(uniqueStatesInLayerStack.size());
+        for (String stateIdentifier : uniqueStatesInLayerStack) {
             layerStackPoses.put(stateIdentifier, this.states.get(stateIdentifier).inputFunction.compute(context));
         }
 
@@ -97,12 +97,12 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
         this.takeInitialStateIfResetting(evaluationState);
         this.lastUpdateTick = evaluationState.currentTick();
 
-        Optional<StateTransition<S>> potentialStateTransition = this.testForOutboundTransition(evaluationState);
+        Optional<StateTransition> potentialStateTransition = this.testForOutboundTransition(evaluationState);
 
         // If there is a transition occurring, add a new state blend layer instance to the layer stack, and resets the elapsed time in the state machine.
-        S stateBeingEntered = null;
+        String stateBeingEntered = null;
         if (potentialStateTransition.isPresent()) {
-            StateTransition<S> transition = potentialStateTransition.get();
+            StateTransition transition = potentialStateTransition.get();
             this.takeTransition(evaluationState, transition);
             stateBeingEntered = transition.target();
         }
@@ -121,26 +121,32 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
         boolean hasBecomeRelevant = evaluationState.currentTick() - 1 > this.lastUpdateTick;
         if (layerStackIsEmpty || (hasBecomeRelevant && this.resetsUponRelevant)) {
             this.stateBlendLayerStack.clear();
-            S initialStateIdentifier = this.initialStateFunction.apply(evaluationState);
+            String initialStateIdentifier = this.initialStateFunction.apply(evaluationState);
             if (this.states.containsKey(initialStateIdentifier)) {
-                this.stateBlendLayerStack.addLast(new StateBlendLayer(initialStateIdentifier, StateTransition.builder(initialStateIdentifier).setTiming(Transition.INSTANT).isTakenIfTrue(transitionContext -> true).build()));
+                this.stateBlendLayerStack.addLast(new StateBlendLayer(
+                        initialStateIdentifier,
+                        StateTransition.builder(initialStateIdentifier)
+                                .setTiming(Transition.INSTANT)
+                                .isTakenIfTrue(transitionContext -> true)
+                                .build())
+                );
             } else {
                 throw new IllegalStateException("Initial state " + initialStateIdentifier + " not found to be present in the state machine");
             }
         }
     }
 
-    private Optional<StateTransition<S>> testForOutboundTransition(FunctionEvaluationState evaluationState) {
+    private Optional<StateTransition> testForOutboundTransition(FunctionEvaluationState evaluationState) {
         // Get the current active state
-        S currentActiveStateIdentifier = this.stateBlendLayerStack.getLast().identifier;
-        StateDefinition<S> currentActiveStateDefinition = this.states.get(currentActiveStateIdentifier);
+        String currentActiveStateIdentifier = this.stateBlendLayerStack.getLast().identifier;
+        StateDefinition currentActiveStateDefinition = this.states.get(currentActiveStateIdentifier);
 
         // Filter each potential state transition by whether it's valid, then filter by whether its condition predicate is true,
         // then shuffle it in order to make equal priority transitions randomized and re-order the valid transitions by filter order.
         return currentActiveStateDefinition.outboundTransitions.stream()
                 .filter(stateTransition -> {
                     boolean transitionTargetIncludedInThisMachine = this.states.containsKey(stateTransition.target());
-                    boolean targetIsNotCurrentActiveState = stateTransition.target() != currentActiveStateIdentifier;
+                    boolean targetIsNotCurrentActiveState = !Objects.equals(stateTransition.target(), currentActiveStateIdentifier);
                     if(transitionTargetIncludedInThisMachine && targetIsNotCurrentActiveState){
                         StateTransition.TransitionContext transitionContext = StateTransition.TransitionContext.of(
                                 evaluationState.driverContainer(),
@@ -163,7 +169,7 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
                 .findFirst();
     }
 
-    private void takeTransition(FunctionEvaluationState evaluationState, StateTransition<S> transition) {
+    private void takeTransition(FunctionEvaluationState evaluationState, StateTransition transition) {
         transition.onTransitionTakenListener().accept(evaluationState);
         this.driversToUpdateOnStateChanged.forEach(driverKey -> {
             LOGGER.info(driverKey.getIdentifier());
@@ -188,24 +194,24 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
         this.stateBlendLayerStack.removeAll(inactiveLayers);
     }
 
-    private void tickPoseFunctionsInActiveStates(FunctionEvaluationState evaluationState, @Nullable S stateBeingEntered) {
-        for (S stateIdentifier : this.getStatesInLayerStack()) {
-            StateDefinition<S> stateDefinition = this.states.get(stateIdentifier);
+    private void tickPoseFunctionsInActiveStates(FunctionEvaluationState evaluationState, @Nullable String stateBeingEntered) {
+        for (String stateIdentifier : this.getStatesInLayerStack()) {
+            StateDefinition stateDefinition = this.states.get(stateIdentifier);
             PoseFunction<?> statePoseFunction = stateDefinition.inputFunction;
-            boolean shouldResetStatePoseFunction = stateBeingEntered == stateIdentifier && stateDefinition.resetUponEntry;
+            boolean shouldResetStatePoseFunction = Objects.equals(stateBeingEntered, stateIdentifier) && stateDefinition.resetUponEntry;
             statePoseFunction.tick(shouldResetStatePoseFunction ? evaluationState.markedForReset() : evaluationState);
         }
     }
 
-    private Set<S> getStatesInLayerStack() {
-        Set<S> set = new HashSet<>();
+    private Set<String> getStatesInLayerStack() {
+        Set<String> set = new HashSet<>();
         this.stateBlendLayerStack.forEach(stateBlendLayer -> set.add(stateBlendLayer.identifier));
         return set;
     }
 
     @Override
     public PoseFunction<LocalSpacePose> wrapUnique() {
-        Builder<S> builder = StateMachineFunction.builder(this.initialStateFunction);
+        Builder builder = StateMachineFunction.builder(this.initialStateFunction);
         builder.resetsUponRelevant(this.resetsUponRelevant);
         this.driversToUpdateOnStateChanged.forEach(builder::bindDriverToCurrentActiveState);
         this.states.forEach((identifier, state) ->
@@ -232,14 +238,14 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
         return Optional.empty();
     }
 
-    private class StateBlendLayer {
-        private final S identifier;
-        private final StateTransition<S> entranceTransition;
+    private static class StateBlendLayer {
+        private final String identifier;
+        private final StateTransition entranceTransition;
         private final VariableDriver<Float> weight;
         private final float weightIncrement;
         private boolean isIsFullyActive;
 
-        private StateBlendLayer(S identifier, StateTransition<S> entranceTransition) {
+        private StateBlendLayer(String identifier, StateTransition entranceTransition) {
             this.identifier = identifier;
             this.entranceTransition = entranceTransition;
             this.weight = VariableDriver.ofFloat(() -> 0f);
@@ -268,22 +274,21 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
      * ran to determine the entry state.</p>
      *
      * @param entryStateFunction        Function to determine the entry state
-     * @param <S>                       State enum type
      */
-    public static <S extends Enum<S>> Builder<S> builder(Function<FunctionEvaluationState, S> entryStateFunction) {
-        return new Builder<>(entryStateFunction);
+    public static Builder builder(Function<FunctionEvaluationState, String> entryStateFunction) {
+        return new Builder(entryStateFunction);
     }
 
-    public static class Builder<S extends Enum<S>> {
+    public static class Builder {
 
-        private final Function<FunctionEvaluationState, S> initialState;
-        private final Map<S, StateDefinition<S>> states;
-        private final List<StateAlias<S>> stateAliases;
+        private final Function<FunctionEvaluationState, String> initialState;
+        private final Map<String, StateDefinition> states;
+        private final List<StateAlias> stateAliases;
 
         private boolean resetUponRelevant;
-        private final List<DriverKey<VariableDriver<S>>> driversToUpdateOnStateChanged;
+        private final List<DriverKey<VariableDriver<String>>> driversToUpdateOnStateChanged;
 
-        protected Builder(Function<FunctionEvaluationState, S> initialState) {
+        protected Builder(Function<FunctionEvaluationState, String> initialState) {
             this.initialState = initialState;
             this.states = Maps.newHashMap();
             this.stateAliases = new ArrayList<>();
@@ -296,7 +301,7 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
          * Adds a state to the state machine builder.
          * @param stateDefinition                 State created with a {@link StateDefinition.Builder}
          */
-        public Builder<S> defineState(StateDefinition<S> stateDefinition) {
+        public Builder defineState(StateDefinition stateDefinition) {
             if (this.states.containsKey(stateDefinition.identifier)) {
                 throw new IllegalStateException("Cannot add state " + stateDefinition.identifier + " twice to the same state machine.");
             } else {
@@ -308,7 +313,7 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
         /**
          * Sets this state machine to reset to the initial state every time the state machine goes from being irrelevant to relevant.
          */
-        public Builder<S> resetsUponRelevant(boolean resetUponRelevant) {
+        public Builder resetsUponRelevant(boolean resetUponRelevant) {
             this.resetUponRelevant = resetUponRelevant;
             return this;
         }
@@ -326,43 +331,45 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
          *
          * @param stateAlias            State alias created with a {@link StateAlias.Builder}
          */
-        public Builder<S> addStateAlias(StateAlias<S> stateAlias) {
+        public Builder addStateAlias(StateAlias stateAlias) {
             this.stateAliases.add(stateAlias);
             return this;
         }
 
-        public Builder<S> bindDriverToCurrentActiveState(DriverKey<VariableDriver<S>> driverKey) {
+        public Builder bindDriverToCurrentActiveState(DriverKey<VariableDriver<String>> driverKey) {
             this.driversToUpdateOnStateChanged.add(driverKey);
             return this;
         }
 
         public PoseFunction<LocalSpacePose> build(){
             // Apply the state alias's outbound transitions to each of its origin states.
-            for (StateAlias<S> stateAlias : this.stateAliases) {
-                for (S originState : stateAlias.originStates()) {
+            for (StateAlias stateAlias : this.stateAliases) {
+                for (String originState : stateAlias.originStates()) {
                     if (this.states.containsKey(originState)) {
-                        StateDefinition.Builder<S> stateBuilder = StateDefinition.builder(this.states.get(originState));
+                        StateDefinition.Builder stateBuilder = StateDefinition.builder(this.states.get(originState));
                         this.states.put(originState, stateBuilder.addOutboundTransitions(stateAlias.outboundTransitions()).build());
                     } else {
                         LOGGER.error("Failed to apply state alias for state {}, as it hasn't been added to the state machine builder.", originState);
+                        throw new IllegalArgumentException("State machine transition validation failed, state alias contains states not found in state machine.");
                     }
                 }
             }
             // Check that every state's outbound transitions have valid identifiers.
-            for (StateDefinition<S> stateDefinition : this.states.values()) {
-                for (StateTransition<S> transition : stateDefinition.outboundTransitions) {
+            for (StateDefinition stateDefinition : this.states.values()) {
+                for (StateTransition transition : stateDefinition.outboundTransitions) {
                     if (!this.states.containsKey(transition.target())) {
                         LOGGER.error("State transition from states {} to {} not valid because state {} is not present in the state machine.", stateDefinition.identifier, transition.target(), transition.target());
+                        throw new IllegalArgumentException("State machine transition validation failed, transition target not found in state machine.");
                     }
                 }
             }
             // Check that each state has at least one outbound transitions.
-            for (StateDefinition<S> stateDefinition : this.states.values()) {
+            for (StateDefinition stateDefinition : this.states.values()) {
                 if (stateDefinition.outboundTransitions.isEmpty()) {
                     LOGGER.warn("State {} in state machine contains no outbound transitions. If this state is entered, it will have no valid path out without re-initializing the state!", stateDefinition.identifier);
                 }
             }
-            return new StateMachineFunction<>(this.states, this.initialState, this.resetUponRelevant, this.driversToUpdateOnStateChanged);
+            return new StateMachineFunction(this.states, this.initialState, this.resetUponRelevant, this.driversToUpdateOnStateChanged);
         }
     }
 

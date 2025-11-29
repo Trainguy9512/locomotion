@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public record StateAlias<S extends Enum<S>>(Set<S> originStates, List<StateTransition<S>> outboundTransitions) {
+public record StateAlias(Set<String> originStates, List<StateTransition> outboundTransitions) {
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/StateAlias");
 
@@ -18,16 +18,16 @@ public record StateAlias<S extends Enum<S>>(Set<S> originStates, List<StateTrans
      *
      * @param originStates      States that the alias' transitions can originate from.
      */
-    public static <S extends Enum<S>> Builder<S> builder(Set<S> originStates) {
-        return new Builder<>(originStates);
+    public static Builder builder(Set<String> originStates) {
+        return new Builder(originStates);
     }
 
-    public static class Builder<S extends Enum<S>> {
+    public static class Builder {
 
-        private final Set<S> originStates;
-        private final List<StateTransition<S>> outboundTransitions;
+        private final Set<String> originStates;
+        private final List<StateTransition> outboundTransitions;
 
-        private Builder(Set<S> originStates) {
+        private Builder(Set<String> originStates) {
             this.originStates = new HashSet<>(originStates);
             this.outboundTransitions = new ArrayList<>();
         }
@@ -36,7 +36,7 @@ public record StateAlias<S extends Enum<S>>(Set<S> originStates, List<StateTrans
          * Adds a set of states that the alias' transitions can originate from.
          * @param states        State identifiers
          */
-        public final Builder<S> addOriginatingStates(Set<S> states) {
+        public final Builder addOriginatingStates(Set<String> states) {
             this.originStates.addAll(states);
             return this;
         }
@@ -45,7 +45,7 @@ public record StateAlias<S extends Enum<S>>(Set<S> originStates, List<StateTrans
          * Adds a state that the alias' transitions can originate from.
          * @param state         State identifier
          */
-        public final Builder<S> addOriginatingState(S state) {
+        public final Builder addOriginatingState(String state) {
             this.originStates.add(state);
             return this;
         }
@@ -55,7 +55,7 @@ public record StateAlias<S extends Enum<S>>(Set<S> originStates, List<StateTrans
          *
          * @param transition    Outbound transitions.
          */
-        public Builder<S> addOutboundTransition(StateTransition<S> transition) {
+        public Builder addOutboundTransition(StateTransition transition) {
             if (this.originStates.contains(transition.target())) {
                 LOGGER.warn("Cannot add state transition to state {} from state alias that contains it already: {}", transition.target(), this.originStates);
             }
@@ -63,8 +63,8 @@ public record StateAlias<S extends Enum<S>>(Set<S> originStates, List<StateTrans
             return this;
         }
 
-        public StateAlias<S> build() {
-            return new StateAlias<>(this.originStates, this.outboundTransitions);
+        public StateAlias build() {
+            return new StateAlias(this.originStates, this.outboundTransitions);
         }
     }
 }

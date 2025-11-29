@@ -17,14 +17,14 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public record StateTransition<S extends Enum<S>>(
-        S target,
+public record StateTransition(
+        String target,
         Predicate<TransitionContext> conditionPredicate,
         Transition transition,
         int priority,
         Consumer<PoseFunction.FunctionEvaluationState> onTransitionTakenListener,
         boolean isAutomaticTransition
-) implements Comparable<StateTransition<S>> {
+) implements Comparable<StateTransition> {
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/StateTransition");
 
@@ -70,8 +70,8 @@ public record StateTransition<S extends Enum<S>>(
      *
      * @param target Destination state identifier of the transition
      */
-    public static <S extends Enum<S>> Builder<S> builder(S target) {
-        return new Builder<>(target);
+    public static Builder builder(String target) {
+        return new Builder(target);
     }
 
     @Override
@@ -79,8 +79,8 @@ public record StateTransition<S extends Enum<S>>(
         return Integer.compare(other.priority(), this.priority());
     }
 
-    public static class Builder<S extends Enum<S>> {
-        private final S target;
+    public static class Builder {
+        private final String target;
         private Predicate<TransitionContext> conditionPredicate;
         private Transition transition;
         private int priority;
@@ -89,7 +89,7 @@ public record StateTransition<S extends Enum<S>>(
         private boolean automaticTransition;
         private float automaticTransitionCrossfadeWeight;
 
-        private Builder(S target) {
+        private Builder(String target) {
             this.conditionPredicate = null;
             this.target = target;
             this.transition = Transition.SINGLE_TICK;
@@ -107,7 +107,7 @@ public record StateTransition<S extends Enum<S>>(
          *
          * @param canInterruptOtherTransitions If true, this transition will not be taken if another transition is still in progress.
          */
-        public Builder<S> setCanInterruptOtherTransitions(boolean canInterruptOtherTransitions) {
+        public Builder setCanInterruptOtherTransitions(boolean canInterruptOtherTransitions) {
             this.canInterruptOtherTransitions = canInterruptOtherTransitions;
             return this;
         }
@@ -121,7 +121,7 @@ public record StateTransition<S extends Enum<S>>(
          *
          * @param crossFadeWeight Weight of how the transition duration affects the condition. 1 = Full crossfade, 0 = Always at end of animation
          */
-        public Builder<S> isTakenOnAnimationFinished(float crossFadeWeight) {
+        public Builder isTakenOnAnimationFinished(float crossFadeWeight) {
             this.automaticTransition = true;
             this.automaticTransitionCrossfadeWeight = crossFadeWeight;
             return this;
@@ -134,7 +134,7 @@ public record StateTransition<S extends Enum<S>>(
          *
          * @param conditionPredicate Function that returns true or false based on the transition context.
          */
-        public final Builder<S> isTakenIfTrue(Predicate<TransitionContext> conditionPredicate) {
+        public final Builder isTakenIfTrue(Predicate<TransitionContext> conditionPredicate) {
             this.conditionPredicate = conditionPredicate;
             return this;
         }
@@ -144,7 +144,7 @@ public record StateTransition<S extends Enum<S>>(
          *
          * @param transition The {@link Transition} to use
          */
-        public Builder<S> setTiming(Transition transition) {
+        public Builder setTiming(Transition transition) {
             this.transition = transition;
             return this;
         }
@@ -158,7 +158,7 @@ public record StateTransition<S extends Enum<S>>(
          *
          * @param priority Priority integer
          */
-        public Builder<S> setPriority(int priority) {
+        public Builder setPriority(int priority) {
             this.priority = priority;
             return this;
         }
@@ -168,12 +168,12 @@ public record StateTransition<S extends Enum<S>>(
          *
          * <p>Multiple events can be chained together with multiple calls to this method.</p>
          */
-        public Builder<S> bindToOnTransitionTaken(Consumer<PoseFunction.FunctionEvaluationState> onTransitionTaken) {
+        public Builder bindToOnTransitionTaken(Consumer<PoseFunction.FunctionEvaluationState> onTransitionTaken) {
             this.onTransitionTakenListener = this.onTransitionTakenListener.andThen(onTransitionTaken);
             return this;
         }
 
-        public StateTransition<S> build() {
+        public StateTransition build() {
             if (this.conditionPredicate == null) {
                 this.conditionPredicate = context -> false;
                 if (!this.automaticTransition) {
@@ -186,7 +186,7 @@ public record StateTransition<S extends Enum<S>>(
             if (this.automaticTransition) {
                 this.conditionPredicate = this.conditionPredicate.or(makeMostRelevantAnimationPlayerFinishedCondition(this.automaticTransitionCrossfadeWeight));
             }
-            return new StateTransition<>(this.target, this.conditionPredicate, this.transition, this.priority, this.onTransitionTakenListener, this.automaticTransition);
+            return new StateTransition(this.target, this.conditionPredicate, this.transition, this.priority, this.onTransitionTakenListener, this.automaticTransition);
         }
     }
 
