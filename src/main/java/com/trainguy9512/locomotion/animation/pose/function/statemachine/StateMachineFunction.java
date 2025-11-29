@@ -11,6 +11,7 @@ import com.trainguy9512.locomotion.util.Transition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -34,7 +35,7 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/StateMachineFunction");
 
     private final Map<S, State<S>> states;
-    private final Function<FunctionEvaluationState, S> initialState;
+    private final Function<FunctionEvaluationState, S> initialStateFunction;
     private final List<StateBlendLayer> stateBlendLayerStack;
 
     private long lastUpdateTick;
@@ -43,13 +44,13 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
 
     private StateMachineFunction(
             Map<S, State<S>> states,
-            Function<FunctionEvaluationState, S> initialState,
+            Function<FunctionEvaluationState, S> initialStateFunction,
             boolean resetsUponRelevant,
             List<DriverKey<VariableDriver<S>>> driversToUpdateOnStateChanged
     ) {
         super(evaluationState -> true, evaluationState -> 1f, TimeSpan.ZERO);
         this.states = states;
-        this.initialState = initialState;
+        this.initialStateFunction = initialStateFunction;
         this.stateBlendLayerStack = new ArrayList<>();
 
         this.lastUpdateTick = 0;
@@ -99,75 +100,43 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
         // Add to the current elapsed ticks
         super.tick(evaluationState);
 
+        this.takeInitialStateIfResetting(evaluationState);
+        this.lastUpdateTick = evaluationState.currentTick();
+
+        Optional<StateTransition<S>> potentialStateTransition = this.testForOutboundTransition(evaluationState);
+
+        // If there is a transition occurring, add a new state blend layer instance to the layer stack, and resets the elapsed time in the state machine.
+        S stateBeingEntered = null;
+        if (potentialStateTransition.isPresent()) {
+            StateTransition<S> transition = potentialStateTransition.get();
+            this.takeTransition(evaluationState, transition);
+            stateBeingEntered = transition.target();
+        }
+
+        // Tick each layer on the blend layer instance stack.
+        this.stateBlendLayerStack.forEach(StateBlendLayer::tick);
+        this.popOverriddenStates();
+
+        this.tickPoseFunctionsInActiveStates(evaluationState, stateBeingEntered);
+    }
+
+    private void takeInitialStateIfResetting(FunctionEvaluationState evaluationState) {
         // If the state machine has no active states, initialize it using the initial state function.
         // If the state machine is just now becoming relevant again after not being relevant, re-initialize it.
         boolean layerStackIsEmpty = this.stateBlendLayerStack.isEmpty();
         boolean hasBecomeRelevant = evaluationState.currentTick() - 1 > this.lastUpdateTick;
         if (layerStackIsEmpty || (hasBecomeRelevant && this.resetsUponRelevant)) {
             this.stateBlendLayerStack.clear();
-            S initialStateIdentifier = this.initialState.apply(evaluationState);
+            S initialStateIdentifier = this.initialStateFunction.apply(evaluationState);
             if (this.states.containsKey(initialStateIdentifier)) {
                 this.stateBlendLayerStack.addLast(new StateBlendLayer(initialStateIdentifier, StateTransition.builder(initialStateIdentifier).setTiming(Transition.INSTANT).isTakenIfTrue(transitionContext -> true).build()));
             } else {
                 throw new IllegalStateException("Initial state " + initialStateIdentifier + " not found to be present in the state machine");
             }
         }
-        this.lastUpdateTick = evaluationState.currentTick();
-
-        Optional<StateTransition<S>> potentialStateTransition = this.getPotentialTransitionFromCurrentState(evaluationState);
-
-        // If there is a transition occurring, add a new state blend layer instance to the layer stack, and resets the elapsed time in the state machine.
-        potentialStateTransition.ifPresent(stateTransition -> {
-            stateTransition.onTransitionTakenListener().accept(evaluationState);
-            this.driversToUpdateOnStateChanged.forEach(driverKey -> {
-                LOGGER.info(driverKey.getIdentifier());
-                evaluationState.driverContainer().getDriver(driverKey).setValue(stateTransition.target());
-            });
-            this.stateBlendLayerStack.addLast(new StateBlendLayer(stateTransition.target(), stateTransition));
-            this.resetTime();
-        });
-
-        // Tick each layer on the blend layer instance stack.
-        this.stateBlendLayerStack.forEach(StateBlendLayer::tick);
-        // Iterate through the layer stack top to bottom.
-        // If a layer is found to be fully active, meaning it's overriding all states beneath it, remove all states beneath it.
-        boolean higherStateIsFullyOverriding = false;
-        List<StateBlendLayer> inactiveLayers = new ArrayList<>();
-        for (StateBlendLayer stateBlendLayer : this.stateBlendLayerStack.reversed()) {
-            if (higherStateIsFullyOverriding) {
-                inactiveLayers.add(stateBlendLayer);
-            } else if (stateBlendLayer.isIsFullyActive) {
-                higherStateIsFullyOverriding = true;
-            }
-        }
-        this.stateBlendLayerStack.removeAll(inactiveLayers);
-
-
-        // Tick each state's pose function input.
-        // If there is a transition currently occurring, and its target matches the current iterator, tick the state input with an evaluation state marked for reset.
-        // Otherwise, tick the state as normal.
-        for (S stateIdentifier : this.getStatesInLayerStack()) {
-            PoseFunction<?> statePoseFunction = this.states.get(stateIdentifier).inputFunction;
-            potentialStateTransition.ifPresentOrElse(stateTransition -> {
-                if (stateTransition.target() == stateIdentifier && this.states.get(stateIdentifier).resetUponEntry) {
-                    statePoseFunction.tick(evaluationState.markedForReset());
-                } else {
-                    statePoseFunction.tick(evaluationState);
-                }
-            }, () -> statePoseFunction.tick(evaluationState));
-        }
-
-
-        //LocomotionMain.LOGGER.info(this.stateBlendLayerStack);
-//        if (this.stateBlendLayerStack.getLast().identifier instanceof FirstPersonPlayerJointAnimator.HandPoseStates) {
-//            LocomotionMain.LOGGER.info("{}",
-//                    this.stateBlendLayerStack.getLast().identifier);
-//        }
-
-
     }
 
-    private Optional<StateTransition<S>> getPotentialTransitionFromCurrentState(FunctionEvaluationState evaluationState) {
+    private Optional<StateTransition<S>> testForOutboundTransition(FunctionEvaluationState evaluationState) {
         // Get the current active state
         S currentActiveStateIdentifier = this.stateBlendLayerStack.getLast().identifier;
         State<S> currentActiveState = this.states.get(currentActiveStateIdentifier);
@@ -200,6 +169,40 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
                 .findFirst();
     }
 
+    private void takeTransition(FunctionEvaluationState evaluationState, StateTransition<S> transition) {
+        transition.onTransitionTakenListener().accept(evaluationState);
+        this.driversToUpdateOnStateChanged.forEach(driverKey -> {
+            LOGGER.info(driverKey.getIdentifier());
+            evaluationState.driverContainer().getDriver(driverKey).setValue(transition.target());
+        });
+        this.stateBlendLayerStack.addLast(new StateBlendLayer(transition.target(), transition));
+        this.resetTime();
+    }
+
+    private void popOverriddenStates() {
+        // Iterate through the layer stack top to bottom.
+        // If a layer is found to be fully active, meaning it's overriding all states beneath it, remove all states beneath it.
+        boolean higherStateIsFullyOverriding = false;
+        List<StateBlendLayer> inactiveLayers = new ArrayList<>();
+        for (StateBlendLayer stateBlendLayer : this.stateBlendLayerStack.reversed()) {
+            if (higherStateIsFullyOverriding) {
+                inactiveLayers.add(stateBlendLayer);
+            } else if (stateBlendLayer.isIsFullyActive) {
+                higherStateIsFullyOverriding = true;
+            }
+        }
+        this.stateBlendLayerStack.removeAll(inactiveLayers);
+    }
+
+    private void tickPoseFunctionsInActiveStates(FunctionEvaluationState evaluationState, @Nullable S stateBeingEntered) {
+        for (S stateIdentifier : this.getStatesInLayerStack()) {
+            State<S> stateDefinition = this.states.get(stateIdentifier);
+            PoseFunction<?> statePoseFunction = stateDefinition.inputFunction;
+            boolean shouldResetStatePoseFunction = stateBeingEntered == stateIdentifier && stateDefinition.resetUponEntry;
+            statePoseFunction.tick(shouldResetStatePoseFunction ? evaluationState.markedForReset() : evaluationState);
+        }
+    }
+
     private Set<S> getStatesInLayerStack() {
         Set<S> set = new HashSet<>();
         this.stateBlendLayerStack.forEach(stateBlendLayer -> set.add(stateBlendLayer.identifier));
@@ -208,7 +211,7 @@ public class StateMachineFunction<S extends Enum<S>> extends TimeBasedPoseFuncti
 
     @Override
     public PoseFunction<LocalSpacePose> wrapUnique() {
-        Builder<S> builder = StateMachineFunction.builder(this.initialState);
+        Builder<S> builder = StateMachineFunction.builder(this.initialStateFunction);
         builder.resetsUponRelevant(this.resetsUponRelevant);
         this.driversToUpdateOnStateChanged.forEach(builder::bindDriverToCurrentActiveState);
         this.states.forEach((identifier, state) ->
