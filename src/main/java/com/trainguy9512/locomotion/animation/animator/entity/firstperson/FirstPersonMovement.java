@@ -113,13 +113,11 @@ public class FirstPersonMovement {
         return !isDiveSwimming(context);
     }
 
-    enum OverridingMovementStates {
-        IDLE,
-        SWIMMING;
+    public static final String OVERRIDING_MOVEMENT_IDLE_STATE = "idle";
+    public static final String OVERRIDING_MOVEMENT_SWIMMING_STATE = "swimming";
 
-        private static OverridingMovementStates entryState(PoseFunction.FunctionEvaluationState evaluationState) {
-            return IDLE;
-        }
+    private static String getOverridingMovementEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        return OVERRIDING_MOVEMENT_IDLE_STATE;
     }
 
     public static PoseFunction<LocalSpacePose> constructWithOverridingMovementAnimations(PoseFunction<LocalSpacePose> inputPose) {
@@ -130,11 +128,11 @@ public class FirstPersonMovement {
                 .build();
 
         PoseFunction<LocalSpacePose> overridingMovementStateMachine;
-        overridingMovementStateMachine = StateMachineFunction.builder(OverridingMovementStates::entryState)
+        overridingMovementStateMachine = StateMachineFunction.builder(FirstPersonMovement::getOverridingMovementEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(OverridingMovementStates.IDLE, inputPose)
+                .defineState(StateDefinition.builder(OVERRIDING_MOVEMENT_IDLE_STATE, inputPose)
                         .resetsPoseFunctionUponEntry(false)
-                        .addOutboundTransition(StateTransition.builder(OverridingMovementStates.SWIMMING)
+                        .addOutboundTransition(StateTransition.builder(OVERRIDING_MOVEMENT_SWIMMING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isDiveSwimming)
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
@@ -142,9 +140,9 @@ public class FirstPersonMovement {
                                         .build())
                                 .build())
                          .build())
-                .defineState(StateDefinition.builder(OverridingMovementStates.SWIMMING, swimmingPoseFunction)
+                .defineState(StateDefinition.builder(OVERRIDING_MOVEMENT_SWIMMING_STATE, swimmingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(OverridingMovementStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(OVERRIDING_MOVEMENT_IDLE_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNoLongerSwimming)
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.6f))
@@ -157,15 +155,13 @@ public class FirstPersonMovement {
         return overridingMovementStateMachine;
     }
 
-    enum WalkingStates {
-        IDLE,
-        WALKING,
-        STOPPING;
+    public static final String WALKING_IDLE_STATE = "idle";
+    public static final String WALKING_WALKING_STATE = "walking";
+    public static final String WALKING_STOPPING_STATE = "stopping";
 
-        private static WalkingStates entryState(PoseFunction.FunctionEvaluationState evaluationState) {
-            boolean isMoving = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_MOVING);
-            return isMoving ? WALKING : IDLE;
-        }
+    private static String getWalkingEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        boolean isMoving = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_MOVING);
+        return isMoving ? WALKING_WALKING_STATE : WALKING_IDLE_STATE;
     }
 
     public static PoseFunction<LocalSpacePose> constructWalkingStateMachine() {
@@ -186,36 +182,36 @@ public class FirstPersonMovement {
                 .build();
 
         PoseFunction<LocalSpacePose> walkingStateMachine;
-        walkingStateMachine = StateMachineFunction.builder(WalkingStates::entryState)
+        walkingStateMachine = StateMachineFunction.builder(FirstPersonMovement::getWalkingEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(WalkingStates.IDLE, idleAnimationPlayer)
+                .defineState(StateDefinition.builder(WALKING_IDLE_STATE, idleAnimationPlayer)
                         .resetsPoseFunctionUponEntry(true)
                         // Begin walking if the player is moving horizontally
-                        .addOutboundTransition(StateTransition.builder(WalkingStates.WALKING)
+                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isWalking)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.EXPONENTIAL_OUT).build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(WalkingStates.WALKING, walkingPoseFunction)
+                .defineState(StateDefinition.builder(WALKING_WALKING_STATE, walkingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         // Stop walking with the walk-to-stop animation if the player's already been walking for a bit.
-                        .addOutboundTransition(StateTransition.builder(WalkingStates.STOPPING)
+                        .addOutboundTransition(StateTransition.builder(WALKING_STOPPING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isEasingOutOfWalk)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         // Stop walking directly into the idle animation if the player only just began walking.
-                        .addOutboundTransition(StateTransition.builder(WalkingStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isCancellingWalk)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(WalkingStates.STOPPING, stoppingPoseFunction)
+                .defineState(StateDefinition.builder(WALKING_STOPPING_STATE, stoppingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(WalkingStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
                                 .isTakenOnAnimationFinished(0f)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(1f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
-                        .addOutboundTransition(StateTransition.builder(WalkingStates.WALKING)
+                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
                                 .isTakenIfTrue(StateTransition.CURRENT_TRANSITION_FINISHED.and(FirstPersonMovement::isWalking))
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
@@ -224,17 +220,14 @@ public class FirstPersonMovement {
         return walkingStateMachine;
     }
 
-    enum CrouchingStates {
-        STANDING,
-        CROUCH_IN,
-        CROUCHING,
-        CROUCH_OUT;
+    public static final String CROUCHING_STANDING_STATE = "standing";
+    public static final String CROUCHING_CROUCH_IN_STATE = "crouch_in";
+    public static final String CROUCHING_CROUCHING_STATE = "crouching";
+    public static final String CROUCHING_CROUCH_OUT_STATE = "crouch_out";
 
-        private static CrouchingStates entryState(PoseFunction.FunctionEvaluationState evaluationState) {
-//            return STANDING;
-            boolean isCrouching = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_CROUCHING);
-            return isCrouching ? CROUCHING : STANDING;
-        }
+    private static String getCrouchingEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        boolean isCrouching = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_CROUCHING);
+        return isCrouching ? CROUCHING_CROUCHING_STATE : CROUCHING_STANDING_STATE;
     }
 
     public static PoseFunction<LocalSpacePose> constructAdditiveCrouchStateMachine() {
@@ -249,49 +242,49 @@ public class FirstPersonMovement {
                 .setPlayRate(0.9f)
                 .build();
 
-        PoseFunction<LocalSpacePose> crouchStateMachine = StateMachineFunction.builder(CrouchingStates::entryState)
+        PoseFunction<LocalSpacePose> crouchStateMachine = StateMachineFunction.builder(FirstPersonMovement::getCrouchingEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(CrouchingStates.STANDING, standingPoseFunction)
+                .defineState(StateDefinition.builder(CROUCHING_STANDING_STATE, standingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(CrouchingStates.CROUCH_IN)
+                        .addOutboundTransition(StateTransition.builder(CROUCHING_CROUCH_IN_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isCrouching)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(80)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(CrouchingStates.CROUCH_IN, crouchInPoseFunction)
+                .defineState(StateDefinition.builder(CROUCHING_CROUCH_IN_STATE, crouchInPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         // Start crouch idle animation if the crouch animation is finished and no other transition occurs.
-                        .addOutboundTransition(StateTransition.builder(CrouchingStates.CROUCH_IN)
+                        .addOutboundTransition(StateTransition.builder(CROUCHING_CROUCHING_STATE)
                                 .isTakenOnAnimationFinished(0)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(1f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(50)
                                 .build())
                         // Play the crouch out animation if the player is no longer crouching.
-                        .addOutboundTransition(StateTransition.builder(CrouchingStates.CROUCH_OUT)
+                        .addOutboundTransition(StateTransition.builder(CROUCHING_CROUCH_OUT_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNotCrouching)
                                 .setPriority(60)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(2)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(CrouchingStates.CROUCHING, crouchPoseFunction)
+                .defineState(StateDefinition.builder(CROUCHING_CROUCHING_STATE, crouchPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(CrouchingStates.CROUCH_OUT)
+                        .addOutboundTransition(StateTransition.builder(CROUCHING_CROUCH_OUT_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNotCrouching)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(80)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(CrouchingStates.CROUCH_OUT, crouchOutPoseFunction)
+                .defineState(StateDefinition.builder(CROUCHING_CROUCH_OUT_STATE, crouchOutPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         // Start idle animation if the crouch animation is finished and no other transition occurs.
-                        .addOutboundTransition(StateTransition.builder(CrouchingStates.STANDING)
+                        .addOutboundTransition(StateTransition.builder(CROUCHING_STANDING_STATE)
                                 .isTakenOnAnimationFinished(0)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(1f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(50)
                                 .build())
                         // Play the crouch in animation if the player begins to crouch again.
-                        .addOutboundTransition(StateTransition.builder(CrouchingStates.CROUCH_IN)
+                        .addOutboundTransition(StateTransition.builder(CROUCHING_CROUCH_IN_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isCrouching)
                                 .setPriority(60)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(2)).setEasement(Easing.SINE_IN_OUT).build())
@@ -314,18 +307,16 @@ public class FirstPersonMovement {
         return inputWithAdditiveCrouchPose;
     }
 
-    enum FallingStates {
-        STANDING,
-        STANDING_TO_FALLING,
-        FALLING,
-        JUMP,
-        LAND,
-        SOFT_LAND;
+    public static final String FALLING_STANDING_STATE = "standing";
+    public static final String FALLING_STANDING_TO_FALLING_STATE = "standing_to_falling";
+    public static final String FALLING_FALLING_STATE = "falling";
+    public static final String FALLING_JUMP_STATE = "jump";
+    public static final String FALLING_LAND_STATE = "land";
+    public static final String FALLING_SOFT_LAND_STATE = "soft_land";
 
-        private static FallingStates entryState(PoseFunction.FunctionEvaluationState evaluationState) {
-            boolean isGrounded = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
-            return isGrounded ? STANDING : FALLING;
-        }
+    private static String getFallingEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        boolean isGrounded = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+        return isGrounded ? FALLING_STANDING_STATE : FALLING_FALLING_STATE;
     }
 
     public static PoseFunction<LocalSpacePose> constructWithFallingStateMachine(CachedPoseContainer cachedPoseContainer, PoseFunction<LocalSpacePose> standingPose) {
@@ -347,30 +338,30 @@ public class FirstPersonMovement {
         standingToFallingPoseFunction = constructWithCrouchPose(cachedPoseContainer, standingToFallingPoseFunction);
 
         PoseFunction<LocalSpacePose> fallingStateMachine;
-        fallingStateMachine = StateMachineFunction.builder(FallingStates::entryState)
+        fallingStateMachine = StateMachineFunction.builder(FirstPersonMovement::getFallingEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(FallingStates.STANDING, standingPose)
+                .defineState(StateDefinition.builder(FALLING_STANDING_STATE, standingPose)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(FallingStates.STANDING_TO_FALLING, standingToFallingPoseFunction)
+                .defineState(StateDefinition.builder(FALLING_STANDING_TO_FALLING_STATE, standingToFallingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(FallingStates.FALLING)
+                        .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
                                 .isTakenIfTrue(StateTransition.ALWAYS_TRUE)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
                                         .setEasement(Easing.SINE_OUT)
                                         .build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(FallingStates.FALLING, fallingPoseFunction)
+                .defineState(StateDefinition.builder(FALLING_FALLING_STATE, fallingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         // Move into the landing animation if the player is no longer falling
-                        .addOutboundTransition(StateTransition.builder(FallingStates.LAND)
+                        .addOutboundTransition(StateTransition.builder(FALLING_LAND_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND))
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(50)
                                 .build())
                         // Move into the landing animation if the player is no longer falling, but only just began falling.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.SOFT_LAND)
+                        .addOutboundTransition(StateTransition.builder(FALLING_SOFT_LAND_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED.negate())
                                 )
@@ -378,7 +369,7 @@ public class FirstPersonMovement {
                                 .setPriority(60)
                                 .build())
                         // Move into the landing animation if the player is no longer falling, but only just began falling.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.STANDING)
+                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED.negate())
                                         .and(StateTransition.takeIfTimeInStateLessThan(TimeSpan.ofSeconds(0.1f)))
@@ -387,69 +378,69 @@ public class FirstPersonMovement {
                                 .setPriority(70)
                                 .build())
                         // Transition to the jumping animation if the player is jumping and grounded.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.JUMP)
+                        .addOutboundTransition(StateTransition.builder(FALLING_JUMP_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isJumping)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(80)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(FallingStates.JUMP, jumpPoseFunction)
+                .defineState(StateDefinition.builder(FALLING_JUMP_STATE, jumpPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         // Automatically move into the falling animation player
-                        .addOutboundTransition(StateTransition.builder(FallingStates.FALLING)
+                        .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
                                 .isTakenOnAnimationFinished(1f)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(19)).setEasement(Easing.CUBIC_OUT).build())
                                 .build())
                         // If the player lands before it can move into the falling animation, go straight to the landing animation as long as the jump state is fully transitioned.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.FALLING)
+                        .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
                                 .isTakenIfTrue(StateTransition.CURRENT_TRANSITION_FINISHED
                                         .and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND))
                                 )
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(FallingStates.LAND, landPoseFunction)
+                .defineState(StateDefinition.builder(FALLING_LAND_STATE, landPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(FallingStates.SOFT_LAND, softLandPoseFunction)
+                .defineState(StateDefinition.builder(FALLING_SOFT_LAND_STATE, softLandPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .addStateAlias(StateAlias.builder(Set.of(
-                        FallingStates.LAND,
-                        FallingStates.SOFT_LAND
+                                FALLING_LAND_STATE,
+                                FALLING_SOFT_LAND_STATE
                 ))
                         // If the falling animation is finishing and the player is not walking, play the idle animation.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.STANDING)
+                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
                                 .isTakenIfTrue(StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED.and(FirstPersonMovement::isNotWalking))
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(1)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(50)
                                 .build())
                         // If the falling animation is finishing and the player is walking, play the walking animation.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.STANDING)
+                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isWalking)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.5f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(60)
                                 .build())
                         // Transition to the jumping animation if the player is jumping, but the landing animation has only just begun to play.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.FALLING)
+                        .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isJumpingAndCanBypassJumpAnimation)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_OUT).build())
                                 .setPriority(70)
                                 .build())
                         .build())
                 .addStateAlias(StateAlias.builder(Set.of(
-                                FallingStates.LAND,
-                                FallingStates.SOFT_LAND,
-                                FallingStates.STANDING
+                                FALLING_LAND_STATE,
+                                FALLING_SOFT_LAND_STATE,
+                                FALLING_STANDING_STATE
                         ))
                         // Transition to the jumping animation if the player is jumping.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.JUMP)
+                        .addOutboundTransition(StateTransition.builder(FALLING_JUMP_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isJumping)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(60)
                                 .build())
                         // Transition to the falling animation if the player is falling.
-                        .addOutboundTransition(StateTransition.builder(FallingStates.STANDING_TO_FALLING)
+                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_TO_FALLING_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND).negate())
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(2))
                                         .setEasement(Easing.SINE_IN_OUT)
@@ -462,16 +453,14 @@ public class FirstPersonMovement {
         return fallingStateMachine;
     }
 
-    enum UnderwaterStates {
-        IDLE,
-        TREADING_UNDERWATER,
-        LAND_UNDERWATER,
-        ON_GROUND_UNDERWATER;
+    public static final String UNDERWATER_IDLE_STATE = "idle";
+    public static final String UNDERWATER_TREADING_STATE = "treading";
+    public static final String UNDERWATER_LAND_STATE = "land";
+    public static final String UNDERWATER_ON_GROUND_STATE = "on_ground";
 
-        private static UnderwaterStates entryState(PoseFunction.FunctionEvaluationState evaluationState) {
-            boolean onGround = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
-            return onGround ? ON_GROUND_UNDERWATER : IDLE;
-        }
+    private static String getUnderwaterEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        boolean onGround = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+        return onGround ? UNDERWATER_ON_GROUND_STATE : UNDERWATER_IDLE_STATE;
     }
 
     private static boolean isUnderWater(StateTransition.TransitionContext context) {
@@ -514,11 +503,11 @@ public class FirstPersonMovement {
                 .build();
 
         PoseFunction<LocalSpacePose> underwaterStateMachine;
-        underwaterStateMachine = StateMachineFunction.builder(UnderwaterStates::entryState)
+        underwaterStateMachine = StateMachineFunction.builder(FirstPersonMovement::getUnderwaterEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(UnderwaterStates.IDLE, inputPose)
+                .defineState(StateDefinition.builder(UNDERWATER_IDLE_STATE, inputPose)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(UnderwaterStates.TREADING_UNDERWATER)
+                        .addOutboundTransition(StateTransition.builder(UNDERWATER_TREADING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isUnderWater)
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
@@ -526,9 +515,9 @@ public class FirstPersonMovement {
                                         .build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(UnderwaterStates.TREADING_UNDERWATER, treadingUnderwaterPoseFunction)
+                .defineState(StateDefinition.builder(UNDERWATER_TREADING_STATE, treadingUnderwaterPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(UnderwaterStates.LAND_UNDERWATER)
+                        .addOutboundTransition(StateTransition.builder(UNDERWATER_LAND_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isOnGround)
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
@@ -536,16 +525,16 @@ public class FirstPersonMovement {
                                         .build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(UnderwaterStates.LAND_UNDERWATER, landUnderwaterPoseFunction)
+                .defineState(StateDefinition.builder(UNDERWATER_LAND_STATE, landUnderwaterPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(UnderwaterStates.ON_GROUND_UNDERWATER)
+                        .addOutboundTransition(StateTransition.builder(UNDERWATER_ON_GROUND_STATE)
                                 .isTakenOnAnimationFinished(1f)
                                 .setCanInterruptOtherTransitions(true)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
                                         .setEasement(Easing.CUBIC_IN_OUT)
                                         .build())
                                 .build())
-                        .addOutboundTransition(StateTransition.builder(UnderwaterStates.TREADING_UNDERWATER)
+                        .addOutboundTransition(StateTransition.builder(UNDERWATER_TREADING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNoLongerOnGround)
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
@@ -553,9 +542,9 @@ public class FirstPersonMovement {
                                         .build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(UnderwaterStates.ON_GROUND_UNDERWATER, onGroundUnderwaterPoseFunction)
+                .defineState(StateDefinition.builder(UNDERWATER_ON_GROUND_STATE, onGroundUnderwaterPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(UnderwaterStates.TREADING_UNDERWATER)
+                        .addOutboundTransition(StateTransition.builder(UNDERWATER_TREADING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNoLongerOnGround)
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
@@ -564,11 +553,11 @@ public class FirstPersonMovement {
                                 .build())
                         .build())
                 .addStateAlias(StateAlias.builder(Set.of(
-                        UnderwaterStates.TREADING_UNDERWATER,
-                        UnderwaterStates.ON_GROUND_UNDERWATER,
-                        UnderwaterStates.LAND_UNDERWATER
+                        UNDERWATER_TREADING_STATE,
+                        UNDERWATER_ON_GROUND_STATE,
+                        UNDERWATER_LAND_STATE
                 ))
-                        .addOutboundTransition(StateTransition.builder(UnderwaterStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(UNDERWATER_IDLE_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNoLongerUnderWater)
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.6f))
@@ -581,15 +570,13 @@ public class FirstPersonMovement {
         return underwaterStateMachine;
     }
 
-    enum MountStates {
-        STANDING,
-        MOUNT_ENTER,
-        MOUNTED;
+    public static final String MOUNT_STANDING_STATE = "standing";
+    public static final String MOUNT_MOUNT_ENTER_STATE = "mount_enter";
+    public static final String MOUNT_MOUNTED_STATE = "mounted";
 
-        private static MountStates entryState(PoseFunction.FunctionEvaluationState evaluationState) {
-            boolean isPassenger = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_PASSENGER);
-            return isPassenger ? MOUNTED : STANDING;
-        }
+    private static String getMountEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        boolean isPassenger = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_PASSENGER);
+        return isPassenger ? MOUNT_MOUNTED_STATE : MOUNT_STANDING_STATE;
     }
 
     private static boolean isPassenger(StateTransition.TransitionContext context) {
@@ -609,33 +596,33 @@ public class FirstPersonMovement {
         mountedPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build();
 
         PoseFunction<LocalSpacePose> mountStateMachine;
-        mountStateMachine = StateMachineFunction.builder(MountStates::entryState)
-                .defineState(StateDefinition.builder(MountStates.STANDING, inputPose)
+        mountStateMachine = StateMachineFunction.builder(FirstPersonMovement::getMountEntryState)
+                .defineState(StateDefinition.builder(MOUNT_STANDING_STATE, inputPose)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(MountStates.MOUNT_ENTER)
+                        .addOutboundTransition(StateTransition.builder(MOUNT_MOUNT_ENTER_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isPassenger)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(4f))
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(MountStates.MOUNT_ENTER, mountEnterPoseFunction)
+                .defineState(StateDefinition.builder(MOUNT_MOUNT_ENTER_STATE, mountEnterPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(MountStates.MOUNTED)
+                        .addOutboundTransition(StateTransition.builder(MOUNT_MOUNTED_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(MountStates.MOUNTED, mountedPoseFunction)
+                .defineState(StateDefinition.builder(MOUNT_MOUNTED_STATE, mountedPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .addStateAlias(StateAlias.builder(Set.of(
-                        MountStates.MOUNTED,
-                        MountStates.MOUNT_ENTER
+                                MOUNT_MOUNTED_STATE,
+                                MOUNT_MOUNT_ENTER_STATE
                         ))
-                        .addOutboundTransition(StateTransition.builder(MountStates.STANDING)
+                        .addOutboundTransition(StateTransition.builder(MOUNT_STANDING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNotPassenger)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
                                         .setEasement(Easing.EXPONENTIAL_OUT)
