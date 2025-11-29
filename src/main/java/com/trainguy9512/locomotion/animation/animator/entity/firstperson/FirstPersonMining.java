@@ -15,6 +15,10 @@ import com.trainguy9512.locomotion.util.Transition;
 
 public class FirstPersonMining {
 
+    public static final String MINING_IDLE_STATE = "idle";
+    public static final String MINING_SWING_STATE = "swing";
+    public static final String MINING_FINISH_STATE = "finish";
+
     public static PoseFunction<LocalSpacePose> constructPoseFunction(
             CachedPoseContainer cachedPoseContainer,
             PoseFunction<LocalSpacePose> idlePoseFunction,
@@ -22,17 +26,17 @@ public class FirstPersonMining {
             PoseFunction<LocalSpacePose> finishPoseFunction,
             Transition idleToMiningTiming
     ) {
-        return StateMachineFunction.builder(evaluationState -> MiningStates.IDLE)
+        return StateMachineFunction.builder(evaluationState -> MINING_IDLE_STATE)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(MiningStates.IDLE, idlePoseFunction)
-                        .addOutboundTransition(StateTransition.builder(MiningStates.SWING)
+                .defineState(StateDefinition.builder(MINING_IDLE_STATE, idlePoseFunction)
+                        .addOutboundTransition(StateTransition.builder(MINING_SWING_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING))
                                 .setTiming(idleToMiningTiming)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(MiningStates.SWING, swingPoseFunction)
+                .defineState(StateDefinition.builder(MINING_SWING_STATE, swingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(MiningStates.FINISH)
+                        .addOutboundTransition(StateTransition.builder(MINING_FINISH_STATE)
                                 .isTakenIfTrue(
                                         StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING.and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING).negate())
                                 )
@@ -40,26 +44,20 @@ public class FirstPersonMining {
                                 .setPriority(50)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(MiningStates.FINISH, finishPoseFunction)
+                .defineState(StateDefinition.builder(MINING_FINISH_STATE, finishPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(MiningStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(MINING_IDLE_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setPriority(50)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(20)).build())
                                 .build())
-                        .addOutboundTransition(StateTransition.builder(MiningStates.SWING)
+                        .addOutboundTransition(StateTransition.builder(MINING_SWING_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING).and(StateTransition.CURRENT_TRANSITION_FINISHED))
                                 .setPriority(60)
                                 .setTiming(idleToMiningTiming)
                                 .build())
                         .build())
                 .build();
-    }
-
-    enum MiningStates {
-        IDLE,
-        SWING,
-        FINISH
     }
 
     public static PoseFunction<LocalSpacePose> makePickaxeMiningPoseFunction(CachedPoseContainer cachedPoseContainer) {

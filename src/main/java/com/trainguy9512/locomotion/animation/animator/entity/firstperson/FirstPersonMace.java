@@ -32,17 +32,20 @@ public class FirstPersonMace {
         };
     }
 
+    public static final String MACE_PREPARE_IDLE_STATE = "idle";
+    public static final String MACE_PREPARE_FALLING_STATE = "falling";
+
     public static PoseFunction<LocalSpacePose> macePrepareStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
         PoseFunction<LocalSpacePose> fallAnticipationSequencePlayer = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_MACE_FALL_ANTICIPATION)
                 .setLooping(false)
                 .setPlayRate(1)
                 .build();
 
-        return StateMachineFunction.builder(evaluationState -> MacePrepareStates.IDLE)
+        return StateMachineFunction.builder(evaluationState -> MACE_PREPARE_IDLE_STATE)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(MacePrepareStates.IDLE, FirstPersonHandPose.MACE.getMiningStateMachine(cachedPoseContainer, interactionHand))
+                .defineState(StateDefinition.builder(MACE_PREPARE_IDLE_STATE, FirstPersonHandPose.MACE.getMiningStateMachine(cachedPoseContainer, interactionHand))
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(MacePrepareStates.FALLING)
+                        .addOutboundTransition(StateTransition.builder(MACE_PREPARE_FALLING_STATE)
                                 .isTakenIfTrue(FirstPersonMace::isFalling)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.25f))
                                         .setEasement(Easing.CUBIC_IN_OUT)
@@ -50,9 +53,9 @@ public class FirstPersonMace {
                                 .setCanInterruptOtherTransitions(false)
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(MacePrepareStates.FALLING, fallAnticipationSequencePlayer)
+                .defineState(StateDefinition.builder(MACE_PREPARE_FALLING_STATE, fallAnticipationSequencePlayer)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(MacePrepareStates.IDLE)
+                        .addOutboundTransition(StateTransition.builder(MACE_PREPARE_IDLE_STATE)
                                 .isTakenIfTrue(FirstPersonMace::isNoLongerFalling)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
                                         .setEasement(Easing.EXPONENTIAL_OUT)
@@ -61,10 +64,5 @@ public class FirstPersonMace {
                                 .build())
                         .build())
                 .build();
-    }
-
-    enum MacePrepareStates {
-        IDLE,
-        FALLING,
     }
 }
