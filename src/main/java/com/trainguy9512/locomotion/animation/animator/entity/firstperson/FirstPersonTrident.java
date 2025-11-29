@@ -6,7 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
@@ -24,10 +24,10 @@ public class FirstPersonTrident {
 
         PoseFunction<LocalSpacePose> tridentStateMachine = StateMachineFunction.builder(evaluationState -> TridentStates.IDLE)
                 .resetsUponRelevant(true)
-                .defineState(State.builder(TridentStates.IDLE, FirstPersonHandPose.TRIDENT.getMiningStateMachine(cachedPoseContainer, interactionHand))
+                .defineState(StateDefinition.builder(TridentStates.IDLE, FirstPersonHandPose.TRIDENT.getMiningStateMachine(cachedPoseContainer, interactionHand))
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(State.builder(TridentStates.CHARGE_THROW, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_CHARGE_THROW).build())
+                .defineState(StateDefinition.builder(TridentStates.CHARGE_THROW, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_CHARGE_THROW).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(TridentStates.RIPTIDE_END)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(usingItemDriverKey).negate())
@@ -35,7 +35,7 @@ public class FirstPersonTrident {
                                 .setPriority(50)
                                 .build())
                         .build())
-                .defineState(State.builder(TridentStates.RIPTIDE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RIPTIDE).build())
+                .defineState(StateDefinition.builder(TridentStates.RIPTIDE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RIPTIDE).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(TridentStates.RIPTIDE_END)
                                 .isTakenOnAnimationFinished(1)
@@ -43,7 +43,7 @@ public class FirstPersonTrident {
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(8)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())
-                .defineState(State.builder(TridentStates.RIPTIDE_END, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RIPTIDE_END).build())
+                .defineState(StateDefinition.builder(TridentStates.RIPTIDE_END, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RIPTIDE_END).build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(TridentStates.IDLE)
                                 .isTakenOnAnimationFinished(1)

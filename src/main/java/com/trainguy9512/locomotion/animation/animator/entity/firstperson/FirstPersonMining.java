@@ -6,7 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
 import com.trainguy9512.locomotion.util.Easing;
@@ -24,13 +24,13 @@ public class FirstPersonMining {
     ) {
         return StateMachineFunction.builder(evaluationState -> MiningStates.IDLE)
                 .resetsUponRelevant(true)
-                .defineState(State.builder(MiningStates.IDLE, idlePoseFunction)
+                .defineState(StateDefinition.builder(MiningStates.IDLE, idlePoseFunction)
                         .addOutboundTransition(StateTransition.builder(MiningStates.SWING)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_MINING))
                                 .setTiming(idleToMiningTiming)
                                 .build())
                         .build())
-                .defineState(State.builder(MiningStates.SWING, swingPoseFunction)
+                .defineState(StateDefinition.builder(MiningStates.SWING, swingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MiningStates.FINISH)
                                 .isTakenIfTrue(
@@ -40,7 +40,7 @@ public class FirstPersonMining {
                                 .setPriority(50)
                                 .build())
                         .build())
-                .defineState(State.builder(MiningStates.FINISH, finishPoseFunction)
+                .defineState(StateDefinition.builder(MiningStates.FINISH, finishPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MiningStates.IDLE)
                                 .isTakenOnAnimationFinished(1)

@@ -1,6 +1,5 @@
 package com.trainguy9512.locomotion.animation.pose.function.statemachine;
 
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import org.apache.logging.log4j.LogManager;
@@ -9,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class State<S extends Enum<S>> {
+public class StateDefinition<S extends Enum<S>> {
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/State");
 
@@ -18,7 +17,7 @@ public class State<S extends Enum<S>> {
     protected final List<StateTransition<S>> outboundTransitions;
     protected final boolean resetUponEntry;
 
-    protected State(S identifier, PoseFunction<LocalSpacePose> inputFunction, List<StateTransition<S>> outboundTransitions, boolean resetUponEntry) {
+    protected StateDefinition(S identifier, PoseFunction<LocalSpacePose> inputFunction, List<StateTransition<S>> outboundTransitions, boolean resetUponEntry) {
         this.identifier = identifier;
         this.inputFunction = inputFunction;
         this.outboundTransitions = outboundTransitions;
@@ -46,10 +45,10 @@ public class State<S extends Enum<S>> {
     /**
      * Creates a new state builder with the properties of the provided state.
      *
-     * @param state Identifier for the new state.
+     * @param stateDefinition Identifier for the new state.
      */
-    protected static <S extends Enum<S>> Builder<S> builder(State<S> state) {
-        return new Builder<>(state);
+    protected static <S extends Enum<S>> Builder<S> builder(StateDefinition<S> stateDefinition) {
+        return new Builder<>(stateDefinition);
     }
 
     public static class Builder<S extends Enum<S>> {
@@ -66,11 +65,11 @@ public class State<S extends Enum<S>> {
             this.resetUponEntry = false;
         }
 
-        private Builder(State<S> state) {
-            this.identifier = state.identifier;
-            this.inputFunction = state.inputFunction;
-            this.outboundTransitions = state.outboundTransitions;
-            this.resetUponEntry = state.resetUponEntry;
+        private Builder(StateDefinition<S> stateDefinition) {
+            this.identifier = stateDefinition.identifier;
+            this.inputFunction = stateDefinition.inputFunction;
+            this.outboundTransitions = stateDefinition.outboundTransitions;
+            this.resetUponEntry = stateDefinition.resetUponEntry;
         }
 
         /**
@@ -109,8 +108,8 @@ public class State<S extends Enum<S>> {
             return this;
         }
 
-        public State<S> build() {
-            return new State<>(this.identifier, this.inputFunction, this.outboundTransitions, this.resetUponEntry);
+        public StateDefinition<S> build() {
+            return new StateDefinition<>(this.identifier, this.inputFunction, this.outboundTransitions, this.resetUponEntry);
         }
     }
 }

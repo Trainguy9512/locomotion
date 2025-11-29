@@ -6,7 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.function.MirrorFunction;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
@@ -27,7 +27,7 @@ public class FirstPersonTwoHandedActions {
     public static PoseFunction<LocalSpacePose> constructPoseFunction(PoseFunction<LocalSpacePose> normalPoseFunction, CachedPoseContainer cachedPoseContainer) {
         StateMachineFunction.Builder<TwoHandedActionStates> builder = StateMachineFunction.builder(evaluationState -> TwoHandedActionStates.NORMAL)
                 .bindDriverToCurrentActiveState(FirstPersonDrivers.CURRENT_TWO_HANDED_OVERRIDE_STATE)
-                .defineState(State.builder(TwoHandedActionStates.NORMAL, normalPoseFunction)
+                .defineState(StateDefinition.builder(TwoHandedActionStates.NORMAL, normalPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build());
         defineBowStatesForHand(builder, InteractionHand.MAIN_HAND);
@@ -69,7 +69,7 @@ public class FirstPersonTwoHandedActions {
             blendOffhandArrowMoreQuickly = blendOffhandArrowMoreQuickly.getMirrored();
         }
 
-        stateMachineBuilder.defineState(State.builder(bowPullState, pullPoseFunction)
+        stateMachineBuilder.defineState(StateDefinition.builder(bowPullState, pullPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(bowReleaseState)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.getUsingItemDriver(interactionHand)).negate().and(StateTransition.CURRENT_TRANSITION_FINISHED))
@@ -81,7 +81,7 @@ public class FirstPersonTwoHandedActions {
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(1f)).setBlendProfile(releaseBlendProfile).build())
                                 .build())
                         .build())
-                .defineState(State.builder(bowReleaseState, releasePoseFunction)
+                .defineState(StateDefinition.builder(bowReleaseState, releasePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
                                 .isTakenOnAnimationFinished(1)
@@ -164,7 +164,7 @@ public class FirstPersonTwoHandedActions {
             crossbowFinishReloadPoseFunction = MirrorFunction.of(crossbowFinishReloadPoseFunction);
         }
 
-        stateMachineBuilder.defineState(State.builder(crossbowReloadState, crossbowReloadPoseFunction)
+        stateMachineBuilder.defineState(StateDefinition.builder(crossbowReloadState, crossbowReloadPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(crossbowFinishReloadState)
                                 .isTakenIfTrue(isReloadingEmptyCrossbow.negate())
@@ -174,7 +174,7 @@ public class FirstPersonTwoHandedActions {
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
-                .defineState(State.builder(crossbowFinishReloadState, crossbowFinishReloadPoseFunction)
+                .defineState(StateDefinition.builder(crossbowFinishReloadState, crossbowFinishReloadPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
                                 .isTakenOnAnimationFinished(1)

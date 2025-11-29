@@ -4,7 +4,7 @@ import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
 import com.trainguy9512.locomotion.util.Easing;
@@ -34,7 +34,7 @@ public class FirstPersonBrush {
                 .build();
 
         return StateMachineFunction.builder(functionEvaluationState -> BrushStates.IDLE)
-                .defineState(State.builder(BrushStates.IDLE, idlePoseFunction)
+                .defineState(StateDefinition.builder(BrushStates.IDLE, idlePoseFunction)
                         .addOutboundTransition(StateTransition.builder(BrushStates.SIFTING)
                                 .isTakenIfTrue(context -> isUsingItem(context, interactionHand))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(8))
@@ -44,7 +44,7 @@ public class FirstPersonBrush {
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(State.builder(BrushStates.SIFTING, siftingPoseFunction)
+                .defineState(StateDefinition.builder(BrushStates.SIFTING, siftingPoseFunction)
                         .addOutboundTransition(StateTransition.builder(BrushStates.IDLE)
                                 .isTakenIfTrue(context -> !isUsingItem(context, interactionHand))
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))

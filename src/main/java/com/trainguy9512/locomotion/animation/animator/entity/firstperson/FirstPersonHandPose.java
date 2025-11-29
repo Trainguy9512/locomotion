@@ -8,7 +8,7 @@ import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageSlotFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
@@ -464,17 +464,17 @@ public enum FirstPersonHandPose {
                 }
         );
         handPoseStateMachineBuilder.addStateAlias(fromLoweringAliasBuilder.build())
-                .defineState(State.builder(HandPoseStates.DROPPING_LAST_ITEM,
+                .defineState(StateDefinition.builder(HandPoseStates.DROPPING_LAST_ITEM,
                                 ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(), MakeDynamicAdditiveFunction.of(SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).build(), SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()))
                         )
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(State.builder(HandPoseStates.USING_LAST_ITEM,
+                .defineState(StateDefinition.builder(HandPoseStates.USING_LAST_ITEM,
                                 ApplyAdditiveFunction.of(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(), MakeDynamicAdditiveFunction.of(SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).build(), SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build()))
                         )
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(State.builder(HandPoseStates.THROWING_TRIDENT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RELEASE_THROW).build())
+                .defineState(StateDefinition.builder(HandPoseStates.THROWING_TRIDENT, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_RELEASE_THROW).build())
                         .addOutboundTransition(StateTransition.builder(HandPoseStates.EMPTY_RAISE)
                                 .isTakenOnAnimationFinished(0)
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(1)).build())
@@ -684,13 +684,13 @@ public enum FirstPersonHandPose {
             Transition raisingToPoseTiming
     ) {
         stateMachineBuilder
-                .defineState(State.builder(handPose.poseState, MontageSlotFunction.of(posePoseFunction, interactionHand == InteractionHand.MAIN_HAND ? FirstPersonMontages.MAIN_HAND_ATTACK_SLOT : FirstPersonMontages.OFF_HAND_ATTACK_SLOT))
+                .defineState(StateDefinition.builder(handPose.poseState, MontageSlotFunction.of(posePoseFunction, interactionHand == InteractionHand.MAIN_HAND ? FirstPersonMontages.MAIN_HAND_ATTACK_SLOT : FirstPersonMontages.OFF_HAND_ATTACK_SLOT))
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(State.builder(handPose.loweringState, loweringPoseFunction)
+                .defineState(StateDefinition.builder(handPose.loweringState, loweringPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(State.builder(handPose.raisingState, MontageSlotFunction.of(raisingPoseFunction, interactionHand == InteractionHand.MAIN_HAND ? FirstPersonMontages.MAIN_HAND_ATTACK_SLOT : FirstPersonMontages.OFF_HAND_ATTACK_SLOT))
+                .defineState(StateDefinition.builder(handPose.raisingState, MontageSlotFunction.of(raisingPoseFunction, interactionHand == InteractionHand.MAIN_HAND ? FirstPersonMontages.MAIN_HAND_ATTACK_SLOT : FirstPersonMontages.OFF_HAND_ATTACK_SLOT))
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(handPose.poseState)
                                 .isTakenOnAnimationFinished(1f)

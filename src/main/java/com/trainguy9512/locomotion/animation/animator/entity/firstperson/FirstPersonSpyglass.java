@@ -7,7 +7,7 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
 import com.trainguy9512.locomotion.util.Easing;
@@ -41,21 +41,21 @@ public class FirstPersonSpyglass {
                 .build();
 
         return StateMachineFunction.builder(functionEvaluationState -> SpyglassStates.IDLE)
-                .defineState(State.builder(SpyglassStates.IDLE, idlePoseFunction)
+                .defineState(StateDefinition.builder(SpyglassStates.IDLE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SpyglassStates.LOOKING)
                                 .isTakenIfTrue(context -> isUsingItem(context, interactionHand))
                                 .setTiming(Transition.INSTANT)
                                 .build())
                         .build())
-                .defineState(State.builder(SpyglassStates.LOOKING, lookingPoseFunction)
+                .defineState(StateDefinition.builder(SpyglassStates.LOOKING, lookingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SpyglassStates.LOOKING_EXIT)
                                 .isTakenIfTrue(context -> !isUsingItem(context, interactionHand))
                                 .setTiming(Transition.INSTANT)
                                 .build())
                         .build())
-                .defineState(State.builder(SpyglassStates.LOOKING_EXIT, lookingExitPoseFunction)
+                .defineState(StateDefinition.builder(SpyglassStates.LOOKING_EXIT, lookingExitPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SpyglassStates.IDLE)
                                 .isTakenOnAnimationFinished(1)

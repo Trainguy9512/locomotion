@@ -4,7 +4,7 @@ import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
 import com.trainguy9512.locomotion.util.Easing;
@@ -40,7 +40,7 @@ public class FirstPersonMace {
 
         return StateMachineFunction.builder(evaluationState -> MacePrepareStates.IDLE)
                 .resetsUponRelevant(true)
-                .defineState(State.builder(MacePrepareStates.IDLE, FirstPersonHandPose.MACE.getMiningStateMachine(cachedPoseContainer, interactionHand))
+                .defineState(StateDefinition.builder(MacePrepareStates.IDLE, FirstPersonHandPose.MACE.getMiningStateMachine(cachedPoseContainer, interactionHand))
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MacePrepareStates.FALLING)
                                 .isTakenIfTrue(FirstPersonMace::isFalling)
@@ -50,7 +50,7 @@ public class FirstPersonMace {
                                 .setCanInterruptOtherTransitions(false)
                                 .build())
                         .build())
-                .defineState(State.builder(MacePrepareStates.FALLING, fallAnticipationSequencePlayer)
+                .defineState(StateDefinition.builder(MacePrepareStates.FALLING, fallAnticipationSequencePlayer)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MacePrepareStates.IDLE)
                                 .isTakenIfTrue(FirstPersonMace::isNoLongerFalling)

@@ -4,7 +4,7 @@ import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.State;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
@@ -341,14 +341,14 @@ public enum FirstPersonGenericItemPose {
 
         return StateMachineFunction.builder(evaluationState -> ConsumableStates.IDLE)
                 .resetsUponRelevant(true)
-                .defineState(State.builder(ConsumableStates.IDLE, idlePoseFunction)
+                .defineState(StateDefinition.builder(ConsumableStates.IDLE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_BEGIN)
                                 .isTakenIfTrue(context -> isEating(context, interactionHand))
                                 .build())
                         .build())
                 // Drinking
-                .defineState(State.builder(ConsumableStates.DRINKING_BEGIN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_BEGIN)
+                .defineState(StateDefinition.builder(ConsumableStates.DRINKING_BEGIN, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_BEGIN)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.DRINKING_LOOP)
@@ -358,10 +358,10 @@ public enum FirstPersonGenericItemPose {
                                         .build())
                                 .build())
                         .build())
-                .defineState(State.builder(ConsumableStates.DRINKING_LOOP, drinkingLoopPoseFunction)
+                .defineState(StateDefinition.builder(ConsumableStates.DRINKING_LOOP, drinkingLoopPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(State.builder(ConsumableStates.DRINKING_FINISHED, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_FINISH)
+                .defineState(StateDefinition.builder(ConsumableStates.DRINKING_FINISHED, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_FINISH)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.IDLE)
@@ -415,14 +415,14 @@ public enum FirstPersonGenericItemPose {
                                 .build())
                         .build())
                 // Eating
-                .defineState(State.builder(ConsumableStates.EATING_BEGIN, eatingBeginPoseFunction)
+                .defineState(StateDefinition.builder(ConsumableStates.EATING_BEGIN, eatingBeginPoseFunction)
                         .addOutboundTransition(StateTransition.builder(ConsumableStates.EATING_LOOP)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .isTakenOnAnimationFinished(1)
                                 .build())
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(State.builder(ConsumableStates.EATING_LOOP, eatingLoopPoseFunction)
+                .defineState(StateDefinition.builder(ConsumableStates.EATING_LOOP, eatingLoopPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .addStateAlias(StateAlias.builder(
