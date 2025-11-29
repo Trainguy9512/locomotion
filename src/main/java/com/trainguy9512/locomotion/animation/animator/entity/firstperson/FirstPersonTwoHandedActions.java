@@ -25,9 +25,9 @@ import java.util.function.Predicate;
 public class FirstPersonTwoHandedActions {
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(PoseFunction<LocalSpacePose> normalPoseFunction, CachedPoseContainer cachedPoseContainer) {
-        StateMachineFunction.Builder<TwoHandedActionStates> builder = StateMachineFunction.builder(evaluationState -> TwoHandedActionStates.NORMAL)
+        StateMachineFunction.Builder builder = StateMachineFunction.builder(FirstPersonTwoHandedActions::getTwoHandedEntryState)
                 .bindDriverToCurrentActiveState(FirstPersonDrivers.CURRENT_TWO_HANDED_OVERRIDE_STATE)
-                .defineState(StateDefinition.builder(TwoHandedActionStates.NORMAL, normalPoseFunction)
+                .defineState(StateDefinition.builder(TWO_HANDED_ACTION_NORMAL_STATE, normalPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build());
         defineBowStatesForHand(builder, InteractionHand.MAIN_HAND);
@@ -37,10 +37,10 @@ public class FirstPersonTwoHandedActions {
         return builder.build();
     }
 
-    public static void defineBowStatesForHand(StateMachineFunction.Builder<TwoHandedActionStates> stateMachineBuilder, InteractionHand interactionHand) {
+    public static void defineBowStatesForHand(StateMachineFunction.Builder stateMachineBuilder, InteractionHand interactionHand) {
         InteractionHand oppositeHand = interactionHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
-        TwoHandedActionStates bowPullState = TwoHandedActionStates.getBowPullState(interactionHand);
-        TwoHandedActionStates bowReleaseState = TwoHandedActionStates.getBowReleaseState(interactionHand);
+        String bowPullState = getBowPullState(interactionHand);
+        String bowReleaseState = getBowReleaseState(interactionHand);
 
         PoseFunction<LocalSpacePose> pullPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_BOW_PULL)
                 .bindToTimeMarker("arrow_placed_in_bow", evaluationState -> {
@@ -83,14 +83,14 @@ public class FirstPersonTwoHandedActions {
                         .build())
                 .defineState(StateDefinition.builder(bowReleaseState, releasePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
+                        .addOutboundTransition(StateTransition.builder(TWO_HANDED_ACTION_NORMAL_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).build())
                                 .build())
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        TwoHandedActionStates.NORMAL,
+                                        TWO_HANDED_ACTION_NORMAL_STATE,
                                         bowReleaseState
                                 ))
                         .addOutboundTransition(StateTransition.builder(bowPullState)
@@ -116,7 +116,7 @@ public class FirstPersonTwoHandedActions {
                                         bowPullState,
                                         bowReleaseState
                                 ))
-                        .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
+                        .addOutboundTransition(StateTransition.builder(TWO_HANDED_ACTION_NORMAL_STATE)
                                 .isTakenIfTrue(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand)).getUseAnimation() != ItemUseAnimation.BOW)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
@@ -124,10 +124,10 @@ public class FirstPersonTwoHandedActions {
                 );
     }
 
-    public static void defineCrossbowStatesForHand(StateMachineFunction.Builder<TwoHandedActionStates> stateMachineBuilder, InteractionHand interactionHand) {
+    public static void defineCrossbowStatesForHand(StateMachineFunction.Builder stateMachineBuilder, InteractionHand interactionHand) {
         InteractionHand oppositeHand = interactionHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
-        TwoHandedActionStates crossbowReloadState = TwoHandedActionStates.getCrossbowReloadState(interactionHand);
-        TwoHandedActionStates crossbowFinishReloadState = TwoHandedActionStates.getCrossbowFinishReloadState(interactionHand);
+        String crossbowReloadState = getCrossbowReloadState(interactionHand);
+        String crossbowFinishReloadState = getCrossbowFinishReloadState(interactionHand);
 
         PoseFunction<LocalSpacePose> crossbowReloadPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_CROSSBOW_RELOAD)
                 .setPlayRate(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED))
@@ -176,14 +176,14 @@ public class FirstPersonTwoHandedActions {
                         .build())
                 .defineState(StateDefinition.builder(crossbowFinishReloadState, crossbowFinishReloadPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
+                        .addOutboundTransition(StateTransition.builder(TWO_HANDED_ACTION_NORMAL_STATE)
                                 .isTakenOnAnimationFinished(1)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).build())
                                 .build())
                         .build())
                 .addStateAlias(StateAlias.builder(
                                 Set.of(
-                                        TwoHandedActionStates.NORMAL
+                                        TWO_HANDED_ACTION_NORMAL_STATE
                                 ))
                         .addOutboundTransition(StateTransition.builder(crossbowReloadState)
                                 .isTakenIfTrue(isReloadingEmptyCrossbow)
@@ -202,7 +202,7 @@ public class FirstPersonTwoHandedActions {
                                         crossbowReloadState,
                                         crossbowFinishReloadState
                                 ))
-                        .addOutboundTransition(StateTransition.builder(TwoHandedActionStates.NORMAL)
+                        .addOutboundTransition(StateTransition.builder(TWO_HANDED_ACTION_NORMAL_STATE)
                                 .isTakenIfTrue(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand)).getUseAnimation() != ItemUseAnimation.CROSSBOW)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
                                 .bindToOnTransitionTaken(evaluationState -> {
@@ -212,47 +212,45 @@ public class FirstPersonTwoHandedActions {
                 );
     }
 
-    public enum TwoHandedActionStates {
-        NORMAL,
-        BOW_PULL_MAIN_HAND,
-        BOW_PULL_OFF_HAND,
-        BOW_RELEASE_MAIN_HAND,
-        BOW_RELEASE_OFF_HAND,
-        CROSSBOW_RELOAD_MAIN_HAND,
-        CROSSBOW_RELOAD_OFF_HAND,
-        CROSSBOW_FINISH_RELOAD_MAIN_HAND,
-        CROSSBOW_FINISH_RELOAD_OFF_HAND;
+    public static final String TWO_HANDED_ACTION_NORMAL_STATE = "normal";
+    public static final String TWO_HANDED_ACTION_BOW_PULL_MAIN_HAND_STATE = "bow_pull_main_hand";
+    public static final String TWO_HANDED_ACTION_BOW_PULL_OFF_HAND_STATE = "bow_pull_off_hand";
+    public static final String TWO_HANDED_ACTION_BOW_RELEASE_MAIN_HAND_STATE = "bow_release_main_hand";
+    public static final String TWO_HANDED_ACTION_BOW_RELEASE_OFF_HAND_STATE = "bow_release_off_hand";
+    public static final String TWO_HANDED_ACTION_CROSSBOW_RELOAD_MAIN_HAND_STATE = "crossbow_reload_main_hand";
+    public static final String TWO_HANDED_ACTION_CROSSBOW_RELOAD_MAIN_OFF_STATE = "crossbow_reload_off_hand";
+    public static final String TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_MAIN_HAND_STATE = "crossbow_finish_reload_main_hand";
+    public static final String TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_OFF_HAND_STATE = "crossbow_finish_reload_off_hand";
 
-        public boolean isOverriding() {
-            return this == NORMAL;
-        }
+    private static String getTwoHandedEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+        return TWO_HANDED_ACTION_NORMAL_STATE;
+    }
 
-        private static TwoHandedActionStates getBowPullState(InteractionHand hand) {
-            return switch (hand) {
-                case MAIN_HAND -> BOW_PULL_MAIN_HAND;
-                case OFF_HAND -> BOW_PULL_OFF_HAND;
-            };
-        }
+    private static String getBowPullState(InteractionHand hand) {
+        return switch (hand) {
+            case MAIN_HAND -> TWO_HANDED_ACTION_BOW_PULL_MAIN_HAND_STATE;
+            case OFF_HAND -> TWO_HANDED_ACTION_BOW_PULL_OFF_HAND_STATE;
+        };
+    }
 
-        private static TwoHandedActionStates getBowReleaseState(InteractionHand hand) {
-            return switch (hand) {
-                case MAIN_HAND -> BOW_RELEASE_MAIN_HAND;
-                case OFF_HAND -> BOW_RELEASE_OFF_HAND;
-            };
-        }
+    private static String getBowReleaseState(InteractionHand hand) {
+        return switch (hand) {
+            case MAIN_HAND -> TWO_HANDED_ACTION_BOW_RELEASE_MAIN_HAND_STATE;
+            case OFF_HAND -> TWO_HANDED_ACTION_BOW_RELEASE_OFF_HAND_STATE;
+        };
+    }
 
-        private static TwoHandedActionStates getCrossbowReloadState(InteractionHand hand) {
-            return switch (hand) {
-                case MAIN_HAND -> CROSSBOW_RELOAD_MAIN_HAND;
-                case OFF_HAND -> CROSSBOW_RELOAD_OFF_HAND;
-            };
-        }
+    private static String getCrossbowReloadState(InteractionHand hand) {
+        return switch (hand) {
+            case MAIN_HAND -> TWO_HANDED_ACTION_CROSSBOW_RELOAD_MAIN_HAND_STATE;
+            case OFF_HAND -> TWO_HANDED_ACTION_CROSSBOW_RELOAD_MAIN_OFF_STATE;
+        };
+    }
 
-        private static TwoHandedActionStates getCrossbowFinishReloadState(InteractionHand hand) {
-            return switch (hand) {
-                case MAIN_HAND -> CROSSBOW_FINISH_RELOAD_MAIN_HAND;
-                case OFF_HAND -> CROSSBOW_FINISH_RELOAD_OFF_HAND;
-            };
-        }
+    private static String getCrossbowFinishReloadState(InteractionHand hand) {
+        return switch (hand) {
+            case MAIN_HAND -> TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_MAIN_HAND_STATE;
+            case OFF_HAND -> TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_OFF_HAND_STATE;
+        };
     }
 }

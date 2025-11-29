@@ -544,7 +544,7 @@ public enum FirstPersonHandPose {
     }
 
     private static boolean areAnyTwoHandedOverridesActive(StateTransition.TransitionContext context) {
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.CURRENT_TWO_HANDED_OVERRIDE_STATE) != FirstPersonTwoHandedActions.TwoHandedActionStates.NORMAL;
+        return !Objects.equals(context.driverContainer().getDriverValue(FirstPersonDrivers.CURRENT_TWO_HANDED_OVERRIDE_STATE), FirstPersonTwoHandedActions.TWO_HANDED_ACTION_NORMAL_STATE);
     }
 
     private static boolean shouldTakeHardSwitchTransition(StateTransition.TransitionContext context, InteractionHand interactionHand) {
