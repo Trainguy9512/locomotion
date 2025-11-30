@@ -1,0 +1,42 @@
+{
+  "locomotion.config.yacl_not_found.header": "設定APIがインストールされていません",
+  "locomotion.config.yacl_not_found.description": "Locomotionは、ゲーム内の設定画面を生成するために設定ライブラリ「YetAnotherConfigLib」を使用しています。必須の依存関係ではありませんが、ゲーム内で設定を調整したい場合はインストールする必要があります。それ以外の場合は、.minecraft/config/locomotion.jsonで手動で設定を変更できます。",
+  "locomotion.config.yacl_not_found.close": "閉じる",
+
+  "locomotion.config.title": "Locomotion 設定",
+  "locomotion.config.category.general.name": "全般",
+  "locomotion.config.category.general.tooltip": "全アニメーションの共通設定",
+  "locomotion.config.category.first_person_player.name": "一人称視点プレイヤー",
+  "locomotion.config.category.first_person_player.tooltip": "一人称視点プレイヤーのアニメーション設定",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "一人称視点アニメーション",
+  "locomotion.config.option.enable_first_person_renderer.description": "Locomotionの一人称視点プレイヤーアニメーションを使用するかどうか。他のアニメーションとは異なり、これはバニラの一人称視点レンダラーを完全に上書きする独自のレンダラーを持っています。バニラの一人称視点レンダラーを表示したい場合や、バニラの一人称視点レンダラーと統合する他のModとの互換性のために無効にしてください。",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "有効",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "無効",
+
+  "locomotion.config.group.first_person_camera_shake.name": "カメラ揺れ",
+  "locomotion.config.group.first_person_camera_shake.description": "カメラ揺れアニメーションの強度を調整する設定。",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "全体強度",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "すべてのカメラ揺れアニメーションの強度を制御します。",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "移動時の強度",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "視点の揺れを含む、移動アニメーションによるカメラ揺れの強度を制御します。",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "アイテム操作時の強度",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "攻撃や採掘を含む、アイテム操作アニメーションによるカメラ揺れの強度を制御します。",
+  "locomotion.config.group.first_person_arm_camera_damping.name": "カメラ回転時の腕の減衰",
+
+  "locomotion.config.group.first_person_arm_camera_damping.description": "カメラを動かした際の腕の回転を調整する設定。",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "有効化",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "一人称視点の腕の減衰を有効にするかどうか。無効にすると、カメラを動かしても腕が全く動かなくなります。",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "減衰係数",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "スプリングアニメーションの摩擦の大きさを制御します。減衰が高いほど、揺れ戻りが少なくなります。",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "剛性係数",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "腕がカメラの回転に追従する速さを制御します。",
+
+  "locomotion.config.option.first_person_mining_speed.name": "採掘アニメーション速度倍率",
+  "locomotion.config.option.first_person_mining_speed.description": "採掘アニメーションの再生速度を調整します。1が通常速度、0.5が半分の速度、2が2倍の速度です。",
+
+  "locomotion.config.group.first_person_map.name": "地図アイテム",
+  "locomotion.config.group.first_person_map.description": "地図アイテムの表示とアニメーションの設定。",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "地図移動アニメーション強度",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "地図アイテムを持っている時の移動アニメーションの強度を制御します。強度を下げると地図が読みやすくなります。"
+}
