@@ -1,0 +1,42 @@
+{
+  "locomotion.config.yacl_not_found.header": "Konfiguracyjne API nie jest zainstalowane",
+  "locomotion.config.yacl_not_found.description": "Locomotion używa biblioteki \"YetAnotherConfigLib\", by generować ustawienia w grze. Nie jest ona wymagana, ale musi być zainstalowana, aby zarządzać ustawieniami w grze. W przeciwnym wypadku zawsze możesz edytować ustawienia w .minecraft/config/locomotion.json",
+  "locomotion.config.yacl_not_found.close": "Zamknij",
+
+  "locomotion.config.title": "Konfiguracja Locomotion",
+  "locomotion.config.category.general.name": "Ogólne",
+  "locomotion.config.category.general.tooltip": "Ogólne ustawienia dla wszystkich animacji",
+  "locomotion.config.category.first_person_player.name": "Animacje Pierwszoosobowe",
+  "locomotion.config.category.first_person_player.tooltip": "Ustawienia animacji pierwszoosobowych.",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "Animacje Pierwszoosobowe",
+  "locomotion.config.option.enable_first_person_renderer.description": "Możesz wyłączyć lub włączyć animacje pierwszoosobowe. Ta modyfikacja zawiera kompletnie osobny silnik renderowania pierwszej osoby, który jest kompletnie inny od tego podstawowego. Wyłącz tą opcję, jeśli chcesz używać normalnych animacji lub potrzebujesz, aby jedna z twoich modyfikacja używała podstawowego silnika renderowania.",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "Włączone",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "Wyłączone",
+
+  "locomotion.config.group.first_person_camera_shake.name": "Trzęsienie kamery",
+  "locomotion.config.group.first_person_camera_shake.description": "Ustaw, jak mocne powinny być trzęsienia kamery.",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "Intensywność Globalna",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "Kontroluje intensywność kamery we wszystkich animacjach.",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "Intensywność Ruchu",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "Kontroluje intensywność animacji chodzenia.",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "Intensywność Interakcji",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "Kontroluje intensywność interakcji z przedmiotami, włączając animacje atakowania oraz kopania.",
+
+  "locomotion.config.group.first_person_arm_camera_damping.name": "Ruch Ręki Podczas Obrotu",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "Ustawienie pozwalające ustawić ręke, kiedy kamera się obraca.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Włączone",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Twoja ręka nie będzie się w ogóle ruszać podczas obrotu kamerą.",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Tłumienie Odbicia",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Kontroluje sprężystość animacji. Czym większa wartość, tym słabsze odbicie.",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Współczynnik Sztywności",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "Kontroluje jak szybko animacja ruchu rąk ma pasować do obrotu kamery",
+
+  "locomotion.config.option.first_person_mining_speed.name": "Przyśpieszenie Animacji Kopania",
+  "locomotion.config.option.first_person_mining_speed.description": "Kontroluje animacje kopania. 1 oznacza normalną szybkość, 0.5 połowę wolniej, 2 oznacza dwa razy szybciej.",
+
+  "locomotion.config.group.first_person_map.name": "Mapopodobne",
+  "locomotion.config.group.first_person_map.description": "Pozwala na ustawienia w jaki sposób mają się wyświetlać itemy związane z mapą.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Intensywność Animacji Ruchu Map",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Kontroluje intensywność animacji chodzenia podczas trzyamania mapy. Mniejsze wartości mogą poprawić czytelność mapy." 
+}
