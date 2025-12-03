@@ -1,23 +1,17 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableMap;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,21 +23,21 @@ public class FirstPersonItemUpdateAnimations {
     private static final ArrayList<ItemUpdateAnimationRule> ITEM_UPDATE_ANIMATION_RULES = new ArrayList<>();
 
     static {
-        registerItemUpdateAnimationRule(
+        register(ItemUpdateAnimationRule.of(
                 LocomotionMain.makeResourceLocation("crossbow_fire"),
                 FirstPersonMontages::getCrossbowFireMontage,
                 FirstPersonItemUpdateAnimations::shouldPlayCrossbowFire
-        );
-        registerItemUpdateAnimationRule(
+        ));
+        register(ItemUpdateAnimationRule.of(
                 LocomotionMain.makeResourceLocation("bucket_collect"),
                 FirstPersonMontages::getBucketCollectMontage,
                 FirstPersonItemUpdateAnimations::shouldPlayBucketCollect
-        );
-        registerItemUpdateAnimationRule(
+        ));
+        register(ItemUpdateAnimationRule.of(
                 LocomotionMain.makeResourceLocation("bucket_empty"),
                 FirstPersonMontages::getBucketEmptyMontage,
                 FirstPersonItemUpdateAnimations::shouldPlayBucketEmpty
-        );
+        ));
     }
 
     private static boolean shouldPlayCrossbowFire(ItemUpdateAnimationConditionContext context) {
@@ -56,7 +50,7 @@ public class FirstPersonItemUpdateAnimations {
         return !currentCrossbowHasCharge && previousCrossbowHasCharge;
     }
 
-    private static List<Item> FULL_BUCKET_ITEMS = List.of(
+    private static final List<Item> FULL_BUCKET_ITEMS = List.of(
             Items.WATER_BUCKET,
             Items.LAVA_BUCKET,
             Items.AXOLOTL_BUCKET,
@@ -80,12 +74,8 @@ public class FirstPersonItemUpdateAnimations {
         return currentItemIsEmptyBucket && previousItemIsCollectedBucket;
     }
 
-    public static void registerItemUpdateAnimationRule(
-            ResourceLocation identifier,
-            Function<InteractionHand, MontageConfiguration> montageProvider,
-            Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation
-    ) {
-        ITEM_UPDATE_ANIMATION_RULES.addFirst(new ItemUpdateAnimationRule(identifier, montageProvider, shouldPlayAnimation));
+    public static void register(ItemUpdateAnimationRule itemUpdateAnimationRule) {
+        ITEM_UPDATE_ANIMATION_RULES.addFirst(itemUpdateAnimationRule);
     }
 
     public record ItemUpdateAnimationRule(
@@ -93,7 +83,13 @@ public class FirstPersonItemUpdateAnimations {
             Function<InteractionHand, MontageConfiguration> montageProvider,
             Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation
     ) {
-
+        public static ItemUpdateAnimationRule of(
+                ResourceLocation identifier,
+                Function<InteractionHand, MontageConfiguration> montageProvider,
+                Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation
+        ) {
+            return new ItemUpdateAnimationRule(identifier, montageProvider, shouldPlayAnimation);
+        }
     }
 
     public record ItemUpdateAnimationConditionContext(
