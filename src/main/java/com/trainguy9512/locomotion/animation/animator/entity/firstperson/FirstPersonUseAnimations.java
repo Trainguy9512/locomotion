@@ -34,36 +34,31 @@ public class FirstPersonUseAnimations {
     private static final ArrayList<UseAnimationRule> USE_ANIMATION_RULES = new ArrayList<>();
 
     static {
-        registerUseAnimationRule(
+        register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("default"),
                 FirstPersonMontages::getUseAnimationMontage,
                 UseAnimationConditionContext::swingFromClient
-        );
-//        registerUseAnimationRule(
-//                LocomotionMain.makeResourceLocation("crossbow_fire"),
-//                FirstPersonMontages::getCrossbowFireMontage,
-//                FirstPersonUseAnimations::shouldPlayCrossbowFire
-//        );
-        registerUseAnimationRule(
+        ));
+        register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("axe_scrape"),
                 FirstPersonMontages::getAxeScrapeMontage,
                 FirstPersonUseAnimations::shouldPlayAxeScrape
-        );
-        registerUseAnimationRule(
+        ));
+        register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("hoe_till"),
                 FirstPersonMontages::getHoeTillMontage,
                 FirstPersonUseAnimations::shouldPlayHoeTill
-        );
-        registerUseAnimationRule(
+        ));
+        register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("shovel_flatten"),
                 FirstPersonMontages::getShovelFlattenMontage,
                 FirstPersonUseAnimations::shouldPlayShovelFlatten
-        );
-        registerUseAnimationRule(
+        ));
+        register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("shears_use"),
                 FirstPersonMontages::getShearsUseMontage,
                 FirstPersonUseAnimations::shouldPlayShearsUse
-        );
+        ));
     }
 
     private static boolean shouldPlayAxeScrape(UseAnimationConditionContext context) {
@@ -73,7 +68,7 @@ public class FirstPersonUseAnimations {
         if (WeatheringCopper.getPrevious(context.lastTargetedBlock()).isPresent()) {
             return true;
         }
-        if (HoneycombItem.WAX_OFF_BY_BLOCK.get().get(context.lastTargetedBlock()) != null) {
+        if (HoneycombItem.WAX_OFF_BY_BLOCK.get().get(context.lastTargetedBlock().getBlock()) != null) {
             return true;
         }
         if (context.lastTargetedBlock().getBlock().asItem().getDefaultInstance().is(ItemTags.LOGS)) {
@@ -126,12 +121,8 @@ public class FirstPersonUseAnimations {
         return context.currentItem.is(Items.SHEARS) && context.useAnimationType() == UseAnimationType.INTERACT_ENTITY;
     }
 
-    public static void registerUseAnimationRule(
-            ResourceLocation identifier,
-            Function<InteractionHand, MontageConfiguration> montageProvider,
-            Predicate<UseAnimationConditionContext> shouldChooseUseAnimation
-    ) {
-        USE_ANIMATION_RULES.addFirst(new UseAnimationRule(identifier, montageProvider, shouldChooseUseAnimation));
+    public static void register(UseAnimationRule useAnimationRule) {
+        USE_ANIMATION_RULES.addFirst(useAnimationRule);
     }
 
     public record UseAnimationRule(
@@ -139,7 +130,13 @@ public class FirstPersonUseAnimations {
             Function<InteractionHand, MontageConfiguration> montageProvider,
             Predicate<UseAnimationConditionContext> shouldChooseUseAnimation
     ) {
-
+        public static UseAnimationRule of(
+                ResourceLocation identifier,
+                Function<InteractionHand, MontageConfiguration> montageProvider,
+                Predicate<UseAnimationConditionContext> shouldChooseUseAnimation
+        ) {
+            return new UseAnimationRule(identifier, montageProvider, shouldChooseUseAnimation);
+        }
     }
 
     public record UseAnimationConditionContext(
