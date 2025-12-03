@@ -19,7 +19,7 @@
   "locomotion.config.option.first_person_camera_shake_intensity_master.name": "전체 강도",
   "locomotion.config.option.first_person_camera_shake_intensity_master.description": "모든 카메라 흔들림 애니메이션의 강도를 조절합니다.",
   "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "이동 흔들림 강도",
-  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "이동 애니메이션(뷰 바빙 포함)으로 인해 발생하는 카메라 흔들림의 강도를 조절합니다.",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "이동 애니메이션(화면 흔들림 포함)으로 인해 발생하는 카메라 흔들림의 강도를 조절합니다.",
   "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "아이템 상호작용 흔들림 강도",
   "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "공격, 채광 등 아이템 상호작용 애니메이션으로 인한 카메라 흔들림의 강도를 조절합니다.",
 
