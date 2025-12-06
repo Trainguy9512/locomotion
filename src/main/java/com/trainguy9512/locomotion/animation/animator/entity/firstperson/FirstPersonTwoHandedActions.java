@@ -46,7 +46,7 @@ public class FirstPersonTwoHandedActions {
                 .bindToTimeMarker("arrow_placed_in_bow", evaluationState -> {
                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPose.EMPTY);
-                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItemPose.DEFAULT_2D_ITEM);
+                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
                 })
                 .bindToTimeMarker("get_new_arrow", evaluationState -> {
                 })
@@ -76,7 +76,7 @@ public class FirstPersonTwoHandedActions {
                                 .bindToOnTransitionTaken(evaluationState -> {
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPose.EMPTY);
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItemPose.DEFAULT_2D_ITEM);
+                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
                                 })
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(1f)).setBlendProfile(releaseBlendProfile).build())
                                 .build())
@@ -102,7 +102,7 @@ public class FirstPersonTwoHandedActions {
                                 .bindToOnTransitionTaken(evaluationState -> {
                                     ItemStack projectileStack = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.PROJECTILE_ITEM);
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(projectileStack);
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItemPose.fromItemStack(projectileStack));
+                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getConfigurationFromItem(projectileStack));
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPose.GENERIC_ITEM);
                                 })
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(12))
@@ -190,7 +190,7 @@ public class FirstPersonTwoHandedActions {
                                 .bindToOnTransitionTaken(evaluationState -> {
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
                                     evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPose.EMPTY);
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItemPose.DEFAULT_2D_ITEM);
+                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
                                 })
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(12))
                                         .setEasement(Easing.SINE_IN_OUT)

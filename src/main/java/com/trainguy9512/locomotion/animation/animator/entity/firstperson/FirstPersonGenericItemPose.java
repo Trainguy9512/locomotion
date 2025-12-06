@@ -304,20 +304,12 @@ public enum FirstPersonGenericItemPose {
     }
 
     private static PoseFunction<LocalSpacePose> constructBasePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        return SequenceEvaluatorFunction.builder(context ->
-                        context.driverContainer()
-                        .getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1)
-                        .basePoseLocation)
-                .build();
-    }
-
-    public enum ConsumableStates {
-        IDLE,
-        DRINKING_BEGIN,
-        DRINKING_LOOP,
-        DRINKING_FINISHED,
-        EATING_BEGIN,
-        EATING_LOOP
+        return SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build();
+//        return SequenceEvaluatorFunction.builder(context ->
+//                        context.driverContainer()
+//                        .getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1)
+//                        .basePoseLocation)
+//                .build();
     }
 
     public static final String CONSUMABLE_IDLE_STATE = "idle";
