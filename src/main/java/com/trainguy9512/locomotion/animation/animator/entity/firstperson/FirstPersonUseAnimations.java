@@ -24,40 +24,44 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class FirstPersonUseAnimations {
 
-    private static final ArrayList<UseAnimationRule> USE_ANIMATION_RULES = new ArrayList<>();
+    private static final Set<UseAnimationRule> USE_ANIMATION_RULES = new HashSet<>();
 
     static {
         register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("default"),
                 FirstPersonMontages::getUseAnimationMontage,
-                UseAnimationConditionContext::swingFromClient
+                UseAnimationConditionContext::swingFromClient,
+                0
         ));
         register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("axe_scrape"),
                 FirstPersonMontages::getAxeScrapeMontage,
-                FirstPersonUseAnimations::shouldPlayAxeScrape
+                FirstPersonUseAnimations::shouldPlayAxeScrape,
+                10
         ));
         register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("hoe_till"),
                 FirstPersonMontages::getHoeTillMontage,
-                FirstPersonUseAnimations::shouldPlayHoeTill
+                FirstPersonUseAnimations::shouldPlayHoeTill,
+                20
         ));
         register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("shovel_flatten"),
                 FirstPersonMontages::getShovelFlattenMontage,
-                FirstPersonUseAnimations::shouldPlayShovelFlatten
+                FirstPersonUseAnimations::shouldPlayShovelFlatten,
+                30
         ));
         register(UseAnimationRule.of(
                 LocomotionMain.makeResourceLocation("shears_use"),
                 FirstPersonMontages::getShearsUseMontage,
-                FirstPersonUseAnimations::shouldPlayShearsUse
+                FirstPersonUseAnimations::shouldPlayShearsUse,
+                40
         ));
     }
 
@@ -121,21 +125,34 @@ public class FirstPersonUseAnimations {
         return context.currentItem.is(Items.SHEARS) && context.useAnimationType() == UseAnimationType.INTERACT_ENTITY;
     }
 
+    /**
+     * Registers a use animation rule that plays a specified montage upon a use animation being triggered if it meets a condition.
+     * @param useAnimationRule      Use animation rule
+     */
     public static void register(UseAnimationRule useAnimationRule) {
-        USE_ANIMATION_RULES.addFirst(useAnimationRule);
+        USE_ANIMATION_RULES.add(useAnimationRule);
     }
 
     public record UseAnimationRule(
             ResourceLocation identifier,
             Function<InteractionHand, MontageConfiguration> montageProvider,
-            Predicate<UseAnimationConditionContext> shouldChooseUseAnimation
+            Predicate<UseAnimationConditionContext> shouldChooseUseAnimation,
+            int evaluationPriority
     ) {
+        /**
+         * Creates a use animation rule.
+         * @param identifier                    Name to give the use animation rule.
+         * @param montageProvider               Function that provides the montage given the interaction hand.
+         * @param shouldChooseUseAnimation      Function that determines whether this animation should play given the current context upon being triggered.
+         * @param evaluationPriority            Order in which to evaluate this rule. If a rule with a higher priority passes, all below will be skipped.
+         */
         public static UseAnimationRule of(
                 ResourceLocation identifier,
                 Function<InteractionHand, MontageConfiguration> montageProvider,
-                Predicate<UseAnimationConditionContext> shouldChooseUseAnimation
+                Predicate<UseAnimationConditionContext> shouldChooseUseAnimation,
+                int evaluationPriority
         ) {
-            return new UseAnimationRule(identifier, montageProvider, shouldChooseUseAnimation);
+            return new UseAnimationRule(identifier, montageProvider, shouldChooseUseAnimation, evaluationPriority);
         }
     }
 
@@ -200,7 +217,11 @@ public class FirstPersonUseAnimations {
                 lastSwingFromClient
         );
 
-        for (UseAnimationRule rule : USE_ANIMATION_RULES) {
+        List<UseAnimationRule> sortedUseAnimationRules = USE_ANIMATION_RULES.stream()
+                .sorted(Comparator.comparingInt(UseAnimationRule::evaluationPriority).reversed())
+                .toList();
+
+        for (UseAnimationRule rule : sortedUseAnimationRules) {
             if (rule.shouldChooseUseAnimation.test(context)) {
                 LocomotionMain.DEBUG_LOGGER.info("Playing use animation \"{}\"", rule.identifier);
                 montageManager.playMontage(rule.montageProvider.apply(interactionHand));
