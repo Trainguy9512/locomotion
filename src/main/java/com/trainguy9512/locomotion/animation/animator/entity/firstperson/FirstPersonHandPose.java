@@ -250,11 +250,11 @@ public enum FirstPersonHandPose {
                 FirstPersonHandPose.GENERIC_ITEM,
                 FirstPersonGenericItemPose.constructPoseFunction(cachedPoseContainer, interactionHand),
                 ApplyAdditiveFunction.of(
-                        SequenceEvaluatorFunction.builder(context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build(),
+                        SequenceEvaluatorFunction.builder(context -> FirstPersonGenericItems.getOrThrowFromIdentifier(context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1)).basePoseAnimationSequence()).build(),
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
                 ),
                 ApplyAdditiveFunction.of(
-                        SequenceEvaluatorFunction.builder(context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1).basePoseLocation).build(),
+                        SequenceEvaluatorFunction.builder(context -> FirstPersonGenericItems.getOrThrowFromIdentifier(context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1)).basePoseAnimationSequence()).build(),
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE).isAdditive(true, SequenceReferencePoint.END).build()
                 ),
                 Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),

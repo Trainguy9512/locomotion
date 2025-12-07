@@ -3,6 +3,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.driver.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -29,8 +30,8 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_OFF_HAND_ITEM = DriverKey.of("rendered_off_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<FirstPersonHandPose>> MAIN_HAND_POSE = DriverKey.of("main_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPose.EMPTY));
     public static final DriverKey<VariableDriver<FirstPersonHandPose>> OFF_HAND_POSE = DriverKey.of("off_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPose.EMPTY));
-    public static final DriverKey<VariableDriver<FirstPersonGenericItemPose>> MAIN_HAND_GENERIC_ITEM_POSE = DriverKey.of("main_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItemPose.DEFAULT_2D_ITEM));
-    public static final DriverKey<VariableDriver<FirstPersonGenericItemPose>> OFF_HAND_GENERIC_ITEM_POSE = DriverKey.of("off_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItemPose.DEFAULT_2D_ITEM));
+    public static final DriverKey<VariableDriver<ResourceLocation>> MAIN_HAND_GENERIC_ITEM_POSE = DriverKey.of("main_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItems.GENERIC_2D_ITEM));
+    public static final DriverKey<VariableDriver<ResourceLocation>> OFF_HAND_GENERIC_ITEM_POSE = DriverKey.of("off_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItems.GENERIC_2D_ITEM));
 
     public static final DriverKey<VariableDriver<String>> CURRENT_TWO_HANDED_OVERRIDE_STATE = DriverKey.of("current_two_handed_override_state", () -> VariableDriver.ofConstant(() -> FirstPersonTwoHandedActions.TWO_HANDED_ACTION_NORMAL_STATE));
 
@@ -77,10 +78,10 @@ public class FirstPersonDrivers {
         FirstPersonHandPose handPose = FirstPersonHandPose.fromItemStack(newRenderedItem);
         driverContainer.getDriver(getHandPoseDriver(interactionHand)).setValue(handPose);
         if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
-            FirstPersonGenericItemPose genericItemPose = FirstPersonGenericItemPose.fromItemStack(newRenderedItem);
+            ResourceLocation genericItemPose = FirstPersonGenericItems.getConfigurationFromItem(newRenderedItem);
             driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(genericItemPose);
         } else {
-            driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(FirstPersonGenericItemPose.DEFAULT_2D_ITEM);
+            driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(FirstPersonGenericItems.getFallback());
         }
     }
 
@@ -97,7 +98,7 @@ public class FirstPersonDrivers {
         };
     }
 
-    public static DriverKey<VariableDriver<FirstPersonGenericItemPose>> getGenericItemPoseDriver(InteractionHand interactionHand) {
+    public static DriverKey<VariableDriver<ResourceLocation>> getGenericItemPoseDriver(InteractionHand interactionHand) {
         return switch (interactionHand) {
             case MAIN_HAND -> MAIN_HAND_GENERIC_ITEM_POSE;
             case OFF_HAND -> OFF_HAND_GENERIC_ITEM_POSE;
