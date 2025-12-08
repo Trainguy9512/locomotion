@@ -2,6 +2,8 @@ package com.trainguy9512.locomotion.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.access.FirstPersonSingleBlockRenderer;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
@@ -139,7 +141,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                                     combinedLight,
                                     HumanoidArm.RIGHT,
                                     !leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
-                                    rightHandPose,
                                     rightHandItemRenderType
                             );
                             this.renderItem(
@@ -152,7 +153,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                                     combinedLight,
                                     HumanoidArm.LEFT,
                                     leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
-                                    leftHandPose,
                                     leftHandItemRenderType
                             );
 
@@ -250,7 +250,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             int combinedLight,
             HumanoidArm side,
             InteractionHand interactionHand,
-            FirstPersonHandPose handPose,
             ItemRenderType renderType
     ) {
         if (!itemStack.isEmpty()) {
@@ -260,12 +259,12 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             poseStack.pushPose();
             jointChannel.transformPoseStack(poseStack, 16f);
 
-            if (renderType == ItemRenderType.MIRRORED_THIRD_PERSON_ITEM) {
+            if (renderType.isMirrored() && side == HumanoidArm.LEFT) {
                 SHOULD_FLIP_ITEM_TRANSFORM = true;
             }
             switch (renderType) {
                 case MAP -> this.renderMap(nodeCollector, poseStack, itemStack, combinedLight);
-                case THIRD_PERSON_ITEM -> {
+                case THIRD_PERSON_ITEM, MIRRORED_THIRD_PERSON_ITEM -> {
                     //? if >= 1.21.9 {
 
                     ItemStackRenderState itemStackRenderState = new ItemStackRenderState();
@@ -350,17 +349,18 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 
         // Render the block through the special block renderer if it has one (skulls, beds, banners)
 
-        nodeCollector.submitBlockModel(
-                poseStack,
-                ItemBlockRenderTypes.getRenderType(blockState),
-                this.blockRenderer.getBlockModel(blockState),
-                1.0F,
-                1.0F,
-                1.0F,
-                combinedLight,
-                OverlayTexture.NO_OVERLAY,
-                0
-        );
+        ((FirstPersonSingleBlockRenderer) Minecraft.getInstance().getBlockRenderer()).locomotion$renderSingleBlockWithEmission(blockState, poseStack, nodeCollector, combinedLight);
+//        nodeCollector.submitBlockModel(
+//                poseStack,
+//                ItemBlockRenderTypes.getRenderType(blockState),
+//                this.blockRenderer.getBlockModel(blockState),
+//                1.0F,
+//                1.0F,
+//                1.0F,
+//                combinedLight,
+//                OverlayTexture.NO_OVERLAY,
+//                0
+//        );
 //        nodeCollector.submitBlockModel(poseStack, RenderType.entitySolidZOffsetForward(TextureAtlas.LOCATION_BLOCKS), this.blockRenderer.getBlockModel(blockState), );
 //        nodeCollector.submitBlock(poseStack, blockState, combinedLight, OverlayTexture.NO_OVERLAY, 0);
     }
