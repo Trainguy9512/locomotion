@@ -2,7 +2,6 @@ package com.trainguy9512.locomotion.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.access.FirstPersonSingleBlockRenderer;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
@@ -276,7 +275,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                     *///?} else
                     /*this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, side == HumanoidArm.LEFT, poseStack, buffer, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());*/
                 }
-                case SINGLE_BLOCK_STATE -> {
+                case BLOCK_STATE -> {
                     Block block = ((BlockItem)itemStack.getItem()).getBlock();
                     BlockState blockState = this.getDefaultBlockState(block);
 

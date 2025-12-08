@@ -2,8 +2,10 @@ package com.trainguy9512.locomotion.mixin.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.trainguy9512.locomotion.access.AlternateSingleBlockRenderer;
+import com.trainguy9512.locomotion.access.FirstPersonSingleBlockRenderer;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -25,7 +27,7 @@ import java.util.function.Supplier;
 
 
 @Mixin(BlockRenderDispatcher.class)
-public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlockRenderer {
+public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlockRenderer {
 
     @Shadow public abstract BlockStateModel getBlockModel(BlockState arg);
 
@@ -34,7 +36,7 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
     @Shadow @Final private Supplier<SpecialBlockModelRenderer> specialBlockModelRenderer;
 
     @Unique
-    public void locomotion$renderSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, MultiBufferSource bufferSource, SubmitNodeCollector nodeCollector, int combinedLight) {
+    public void locomotion$renderSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight) {
         RenderShape renderShape = blockState.getRenderShape();
         // Don't do anything more if the render shape is nothing.
         if (renderShape == RenderShape.INVISIBLE) {
@@ -51,11 +53,11 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
         for (BlockModelPart blockModelPart : blockStateModel.collectParts(RandomSource.create(42L))) {
             for (Direction direction : Direction.values()) {
                 for (BakedQuad bakedQuad : blockModelPart.getQuads(direction)) {
-                    this.locomotion$renderBakedQuad(bakedQuad, poseStack, bufferSource, r, g, b, combinedLight, blockState);
+                    this.locomotion$renderBakedQuad(bakedQuad, poseStack, nodeCollector, r, g, b, combinedLight, blockState);
                 }
             }
             for (BakedQuad bakedQuad : blockModelPart.getQuads(null)) {
-                this.locomotion$renderBakedQuad(bakedQuad, poseStack, bufferSource, r, g, b, combinedLight, blockState);
+                this.locomotion$renderBakedQuad(bakedQuad, poseStack, nodeCollector, r, g, b, combinedLight, blockState);
             }
         }
         // Render the block through the special block renderer if it has one (skulls, beds, banners)
@@ -63,7 +65,16 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
     }
 
     @Unique
-    private void locomotion$renderBakedQuad(BakedQuad bakedQuad, PoseStack poseStack, MultiBufferSource bufferSource, float r, float g, float b, int combinedLight, BlockState blockState) {
+    private void locomotion$renderBakedQuad(
+            BakedQuad bakedQuad,
+            PoseStack poseStack,
+            SubmitNodeCollector nodeCollector,
+            float r,
+            float g,
+            float b,
+            int combinedLight,
+            BlockState blockState
+    ) {
         if (bakedQuad.isTinted()) {
             r = Mth.clamp(r, 0.0f, 1.0f);
             g = Mth.clamp(g, 0.0f, 1.0f);
@@ -73,29 +84,22 @@ public abstract class MixinBlockRenderDispatcher implements AlternateSingleBlock
             g = 1.0f;
             b = 1.0f;
         }
-        // Use the chunk render type vertex consumer for baked quad parts that don't get shaded.
-        VertexConsumer vertexConsumer;
-        if (bakedQuad.shade()) {
-            vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState));
-        } else {
-            //? if <= 1.21.5 {
-            /*vertexConsumer = bufferSource.getBuffer(ItemBlockRenderTypes.getChunkRenderType(blockState));
-            *///?} else {
-            vertexConsumer = bufferSource.getBuffer(RenderType.cutoutMipped());
-            //?}
-        }
 
-        vertexConsumer.putBulkData(
-                poseStack.last(),
+        RenderType usedLayer = bakedQuad.shade() && blockState.getLightEmission() == 0 ? RenderType.cutoutMipped() : RenderType.cutoutMipped();
+        float finalR = r;
+        float finalG = g;
+        float finalB = b;
+        nodeCollector.submitCustomGeometry(poseStack, usedLayer, (matricesEntry, consumer) -> consumer.putBulkData(
+                matricesEntry,
                 bakedQuad,
                 new float[]{1, 1, 1, 1},
-                r,
-                g,
-                b,
+                finalR,
+                finalG,
+                finalB,
                 1.0f,
                 new int[]{combinedLight, combinedLight, combinedLight, combinedLight},
                 OverlayTexture.NO_OVERLAY,
                 true
-        );
+        ));
     }
 }
