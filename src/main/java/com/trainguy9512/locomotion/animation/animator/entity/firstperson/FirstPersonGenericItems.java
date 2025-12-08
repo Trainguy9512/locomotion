@@ -1,9 +1,15 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.driver.DriverKey;
+import com.trainguy9512.locomotion.animation.driver.VariableDriver;
+import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.animation.pose.function.*;
+import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -45,7 +51,7 @@ public class FirstPersonGenericItems {
             FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ARROW_POSE,
             FirstPersonGenericItems::isArrowItem,
             80)
-            .setIsMirroredInOffHand(true)
+            .setItemRenderType(ItemRenderType.MIRRORED_THIRD_PERSON_ITEM)
             .build());
 
     private static final List<Item> ROD_ITEMS = List.of(
@@ -85,7 +91,6 @@ public class FirstPersonGenericItems {
             ResourceLocation basePoseAnimationSequence,
             Predicate<ItemStack> usePoseCondition,
             int evaluationPriority,
-            boolean isMirroredInOffHand,
             ItemRenderType itemRenderType
     ) {
 
@@ -102,7 +107,6 @@ public class FirstPersonGenericItems {
             private final ResourceLocation basePoseAnimationSequence;
             private final int evaluationPriority;
             private final Predicate<ItemStack> usePoseCondition;
-            private boolean isMirroredInOffHand;
             private ItemRenderType itemRenderType;
 
             private Builder(
@@ -113,7 +117,6 @@ public class FirstPersonGenericItems {
                 this.basePoseAnimationSequence = basePoseAnimationSequence;
                 this.usePoseCondition = usePoseCondition;
                 this.evaluationPriority = evaluationPriority;
-                this.isMirroredInOffHand = false;
                 this.itemRenderType = ItemRenderType.THIRD_PERSON_ITEM;
             }
 
@@ -122,17 +125,11 @@ public class FirstPersonGenericItems {
                 return this;
             }
 
-            public Builder setIsMirroredInOffHand(boolean isMirroredInOffHand) {
-                this.isMirroredInOffHand = isMirroredInOffHand;
-                return this;
-            }
-
             public GenericItemPoseDefinition build() {
                 return new GenericItemPoseDefinition(
                         basePoseAnimationSequence,
                         usePoseCondition,
                         evaluationPriority,
-                        isMirroredInOffHand,
                         itemRenderType
                 );
             }
@@ -165,5 +162,38 @@ public class FirstPersonGenericItems {
         }
         // Fallback if nothing passes
         return getFallback();
+    }
+
+    public static ResourceLocation getGenericItemPoseSequence(PoseFunction.FunctionInterpolationContext context, InteractionHand interactionHand) {
+        DriverKey<VariableDriver<ResourceLocation>> driver = FirstPersonDrivers.getGenericItemPoseDriver(interactionHand);
+        ResourceLocation genericItemPoseIdentifier = context.driverContainer().getInterpolatedDriverValue(driver, context.partialTicks());
+        GenericItemPoseDefinition definition = getOrThrowFromIdentifier(genericItemPoseIdentifier);
+        return definition.basePoseAnimationSequence;
+    }
+
+    public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
+        PoseFunction<LocalSpacePose> pose = SequenceEvaluatorFunction.builder(context -> getGenericItemPoseSequence(context, interactionHand)).build();
+
+        if (interactionHand == InteractionHand.MAIN_HAND) {
+            PoseFunction<LocalSpacePose> additiveMiningPose = MakeDynamicAdditiveFunction.of(
+                    FirstPersonMining.makePickaxeMiningPoseFunction(cachedPoseContainer),
+                    SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build());
+            pose = ApplyAdditiveFunction.of(pose, additiveMiningPose);
+        }
+
+        PoseFunction<LocalSpacePose> consumablePose;
+        consumablePose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build();
+        consumablePose = FirstPersonEating.constructWithEatingStateMachine(cachedPoseContainer, interactionHand, consumablePose);
+        consumablePose = FirstPersonDrinking.constructWithDrinkingStateMachine(cachedPoseContainer, interactionHand, consumablePose);
+
+        pose = ApplyAdditiveFunction.of(
+                pose,
+                MakeDynamicAdditiveFunction.of(
+                        consumablePose,
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build()
+                )
+        );
+
+        return pose;
     }
 }

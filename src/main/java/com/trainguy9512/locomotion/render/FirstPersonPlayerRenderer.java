@@ -4,10 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonGenericItemPose;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonHandPose;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import net.minecraft.client.Minecraft;
@@ -116,10 +113,15 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 //                            ItemStack mainHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.MAIN_HAND_ITEM : FirstPersonDrivers.OFF_HAND_ITEM);
 //                            ItemStack offHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.OFF_HAND_ITEM : FirstPersonDrivers.MAIN_HAND_ITEM);
 
-                            FirstPersonGenericItemPose leftHandGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
-                            FirstPersonGenericItemPose rightHandGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            ResourceLocation leftHandGenericItemPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            ResourceLocation rightHandGenericItemPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            FirstPersonGenericItems.GenericItemPoseDefinition leftHandGenericItemPoseDefinition = FirstPersonGenericItems.getOrThrowFromIdentifier(leftHandGenericItemPoseIdentifier);
+                            FirstPersonGenericItems.GenericItemPoseDefinition rightHandGenericItemPoseDefinition = FirstPersonGenericItems.getOrThrowFromIdentifier(rightHandGenericItemPoseIdentifier);
                             FirstPersonHandPose leftHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
                             FirstPersonHandPose rightHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+
+                            ItemRenderType leftHandItemRenderType = leftHandPose == FirstPersonHandPose.GENERIC_ITEM ? leftHandGenericItemPoseDefinition.itemRenderType() : leftHandPose.itemRenderType;
+                            ItemRenderType rightHandItemRenderType = rightHandPose == FirstPersonHandPose.GENERIC_ITEM ? rightHandGenericItemPoseDefinition.itemRenderType() : rightHandPose.itemRenderType;
 
                             ItemStack mainHandItem = getItemStackInHandToRender(dataContainer, player, InteractionHand.MAIN_HAND);
                             ItemStack offHandItem = getItemStackInHandToRender(dataContainer, player, InteractionHand.OFF_HAND);
@@ -138,7 +140,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                                     HumanoidArm.RIGHT,
                                     !leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
                                     rightHandPose,
-                                    rightHandGenericItemPose
+                                    rightHandItemRenderType
                             );
                             this.renderItem(
                                     player,
@@ -151,7 +153,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                                     HumanoidArm.LEFT,
                                     leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
                                     leftHandPose,
-                                    leftHandGenericItemPose
+                                    leftHandItemRenderType
                             );
 
 
@@ -249,17 +251,16 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             HumanoidArm side,
             InteractionHand interactionHand,
             FirstPersonHandPose handPose,
-            FirstPersonGenericItemPose genericItemPose
+            ItemRenderType renderType
     ) {
         if (!itemStack.isEmpty()) {
             IS_RENDERING_LOCOMOTION_FIRST_PERSON = true;
             CURRENT_ITEM_INTERACTION_HAND = interactionHand;
-            ItemRenderType renderType = ItemRenderType.fromItemStack(itemStack, handPose, genericItemPose);
 
             poseStack.pushPose();
             jointChannel.transformPoseStack(poseStack, 16f);
 
-            if (genericItemPose.shouldMirrorItemModel(handPose, side)) {
+            if (renderType == ItemRenderType.MIRRORED_THIRD_PERSON_ITEM) {
                 SHOULD_FLIP_ITEM_TRANSFORM = true;
             }
             switch (renderType) {
@@ -276,7 +277,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                     *///?} else
                     /*this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, side == HumanoidArm.LEFT, poseStack, buffer, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());*/
                 }
-                case DEFAULT_BLOCK_STATE -> {
+                case SINGLE_BLOCK_STATE -> {
                     Block block = ((BlockItem)itemStack.getItem()).getBlock();
                     BlockState blockState = this.getDefaultBlockState(block);
 
@@ -332,7 +333,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         poseStack.translate(-2, -4, -1);
         poseStack.scale(1f/8f, 1f/8f, 1f/8f);
         poseStack.scale(1/4f, 1/4f, 1/4f);
-        nodeCollector.submitCustomGeometry(poseStack, renderType, /* method_73476 */ (pose, vertexConsumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, vertexConsumer) -> {
             vertexConsumer.addVertex(pose, -7.0F, 135.0F, 0.0F).setColor(-1).setUv(0.0F, 1.0F).setLight(combinedLight);
             vertexConsumer.addVertex(pose, 135.0F, 135.0F, 0.0F).setColor(-1).setUv(1.0F, 1.0F).setLight(combinedLight);
             vertexConsumer.addVertex(pose, 135.0F, -7.0F, 0.0F).setColor(-1).setUv(1.0F, 0.0F).setLight(combinedLight);
@@ -454,20 +455,20 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         return entityRenderDispatcher.getPlayerRenderer(minecraft.player).getModel();
     }
 
-    private enum ItemRenderType {
-        THIRD_PERSON_ITEM,
-        DEFAULT_BLOCK_STATE,
-        MAP;
-
-        public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
-            Item item = itemStack.getItem();
-            if (handPose == FirstPersonHandPose.MAP) {
-                return MAP;
-            }
-            if (genericItemPose.shouldRenderBlockstate() && item instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {
-                return DEFAULT_BLOCK_STATE;
-            }
-            return THIRD_PERSON_ITEM;
-        }
-    }
+//    private enum ItemRenderType {
+//        THIRD_PERSON_ITEM,
+//        DEFAULT_BLOCK_STATE,
+//        MAP;
+//
+//        public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
+//            Item item = itemStack.getItem();
+//            if (handPose == FirstPersonHandPose.MAP) {
+//                return MAP;
+//            }
+//            if (genericItemPose.shouldRenderBlockstate() && item instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {
+//                return DEFAULT_BLOCK_STATE;
+//            }
+//            return THIRD_PERSON_ITEM;
+//        }
+//    }
 }

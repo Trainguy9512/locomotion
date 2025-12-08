@@ -12,6 +12,7 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDef
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.render.ItemRenderType;
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
@@ -37,51 +38,63 @@ import java.util.Set;
 public enum FirstPersonHandPose {
     EMPTY (
             "empty",
-            FirstPersonAnimationSequences.HAND_EMPTY_POSE
+            FirstPersonAnimationSequences.HAND_EMPTY_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     GENERIC_ITEM (
             "generic_item",
-            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     TOOL (
             "tool",
-            FirstPersonAnimationSequences.HAND_TOOL_POSE
+            FirstPersonAnimationSequences.HAND_TOOL_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     SWORD (
             "sword",
-            FirstPersonAnimationSequences.HAND_TOOL_POSE
+            FirstPersonAnimationSequences.HAND_TOOL_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     SHIELD (
             "shield",
-            FirstPersonAnimationSequences.HAND_SHIELD_POSE
+            FirstPersonAnimationSequences.HAND_SHIELD_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     BOW (
             "bow",
-            FirstPersonAnimationSequences.HAND_BOW_POSE
+            FirstPersonAnimationSequences.HAND_BOW_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     CROSSBOW (
             "crossbow",
-            FirstPersonAnimationSequences.HAND_CROSSBOW_POSE
+            FirstPersonAnimationSequences.HAND_CROSSBOW_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     TRIDENT (
             "trident",
-            FirstPersonAnimationSequences.HAND_TRIDENT_POSE
+            FirstPersonAnimationSequences.HAND_TRIDENT_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     BRUSH (
             "brush",
-            FirstPersonAnimationSequences.HAND_BRUSH_POSE
+            FirstPersonAnimationSequences.HAND_BRUSH_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     MACE (
             "mace",
-            FirstPersonAnimationSequences.HAND_MACE_POSE
+            FirstPersonAnimationSequences.HAND_MACE_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     SPYGLASS (
             "spyglass",
-            FirstPersonAnimationSequences.HAND_SPYGLASS_POSE
+            FirstPersonAnimationSequences.HAND_SPYGLASS_POSE,
+            ItemRenderType.THIRD_PERSON_ITEM
     ),
     MAP (
             "map",
-            FirstPersonAnimationSequences.HAND_MAP_SINGLE_HAND_POSE
+            FirstPersonAnimationSequences.HAND_MAP_SINGLE_HAND_POSE,
+            ItemRenderType.MAP
     );
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator/HandPose");
@@ -90,15 +103,18 @@ public enum FirstPersonHandPose {
     public final String loweringState;
     public final String poseState;
     public final ResourceLocation basePoseLocation;
+    public final ItemRenderType itemRenderType;
 
     FirstPersonHandPose(
             String handPoseStateIdentifier,
-            ResourceLocation basePoseLocation
+            ResourceLocation basePoseLocation,
+            ItemRenderType itemRenderType
     ) {
         this.raisingState = handPoseStateIdentifier + "_raise";
         this.loweringState = handPoseStateIdentifier + "_lower";
         this.poseState = handPoseStateIdentifier;
         this.basePoseLocation = basePoseLocation;
+        this.itemRenderType = itemRenderType;
     }
 
     public static final List<TagKey<Item>> TOOL_ITEM_TAGS = List.of(
@@ -191,48 +207,6 @@ public enum FirstPersonHandPose {
     public static final String HAND_POSE_USING_LAST_ITEM_STATE = "using_last_item";
     public static final String HAND_POSE_THROWING_TRIDENT_STATE = "throwing_trident";
 
-//    public enum HandPoseStates {
-//        DROPPING_LAST_ITEM,
-//        USING_LAST_ITEM,
-//        THROWING_TRIDENT,
-//        EMPTY,
-//        EMPTY_RAISE,
-//        EMPTY_LOWER,
-//        GENERIC_ITEM,
-//        GENERIC_ITEM_RAISE,
-//        GENERIC_ITEM_LOWER,
-//        TOOL,
-//        TOOL_RAISE,
-//        TOOL_LOWER,
-//        SWORD,
-//        SWORD_RAISE,
-//        SWORD_LOWER,
-//        SHIELD,
-//        SHIELD_RAISE,
-//        SHIELD_LOWER,
-//        BOW,
-//        BOW_RAISE,
-//        BOW_LOWER,
-//        CROSSBOW,
-//        CROSSBOW_RAISE,
-//        CROSSBOW_LOWER,
-//        TRIDENT,
-//        TRIDENT_RAISE,
-//        TRIDENT_LOWER,
-//        BRUSH,
-//        BRUSH_RAISE,
-//        BRUSH_LOWER,
-//        MACE,
-//        MACE_RAISE,
-//        MACE_LOWER,
-//        SPYGLASS,
-//        SPYGLASS_RAISE,
-//        SPYGLASS_LOWER,
-//        MAP,
-//        MAP_RAISE,
-//        MAP_LOWER
-//    }
-
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
 
         StateMachineFunction.Builder handPoseStateMachineBuilder = switch (interactionHand) {
@@ -248,7 +222,7 @@ public enum FirstPersonHandPose {
                 fromLoweringAliasBuilder,
                 interactionHand,
                 FirstPersonHandPose.GENERIC_ITEM,
-                FirstPersonGenericItemPose.constructPoseFunction(cachedPoseContainer, interactionHand),
+                FirstPersonGenericItems.constructPoseFunction(cachedPoseContainer, interactionHand),
                 ApplyAdditiveFunction.of(
                         SequenceEvaluatorFunction.builder(context -> FirstPersonGenericItems.getOrThrowFromIdentifier(context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), 1)).basePoseAnimationSequence()).build(),
                         SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER).isAdditive(true, SequenceReferencePoint.BEGINNING).build()
