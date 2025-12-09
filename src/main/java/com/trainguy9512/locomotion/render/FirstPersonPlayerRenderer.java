@@ -2,6 +2,7 @@ package com.trainguy9512.locomotion.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import com.trainguy9512.locomotion.access.FirstPersonSingleBlockRenderer;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
@@ -139,7 +140,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                                     combinedLight,
                                     HumanoidArm.RIGHT,
                                     !leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
-                                    rightHandPose,
                                     rightHandItemRenderType
                             );
                             this.renderItem(
@@ -152,7 +152,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                                     combinedLight,
                                     HumanoidArm.LEFT,
                                     leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
-                                    leftHandPose,
                                     leftHandItemRenderType
                             );
 
@@ -250,7 +249,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             int combinedLight,
             HumanoidArm side,
             InteractionHand interactionHand,
-            FirstPersonHandPose handPose,
             ItemRenderType renderType
     ) {
         if (!itemStack.isEmpty()) {
@@ -260,12 +258,12 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             poseStack.pushPose();
             jointChannel.transformPoseStack(poseStack, 16f);
 
-            if (renderType == ItemRenderType.MIRRORED_THIRD_PERSON_ITEM) {
+            if (renderType.isMirrored() && side == HumanoidArm.LEFT) {
                 SHOULD_FLIP_ITEM_TRANSFORM = true;
             }
             switch (renderType) {
                 case MAP -> this.renderMap(nodeCollector, poseStack, itemStack, combinedLight);
-                case THIRD_PERSON_ITEM -> {
+                case THIRD_PERSON_ITEM, MIRRORED_THIRD_PERSON_ITEM -> {
                     //? if >= 1.21.9 {
 
                     ItemStackRenderState itemStackRenderState = new ItemStackRenderState();
@@ -277,22 +275,28 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                     *///?} else
                     /*this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, side == HumanoidArm.LEFT, poseStack, buffer, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());*/
                 }
-                case SINGLE_BLOCK_STATE -> {
-                    Block block = ((BlockItem)itemStack.getItem()).getBlock();
-                    BlockState blockState = this.getDefaultBlockState(block);
-
-                    if (side == HumanoidArm.LEFT) {
-                        poseStack.translate(-1, 0, 0);
-                    }
-                    if (block instanceof FenceGateBlock || block instanceof ConduitBlock) {
-                        poseStack.translate(0, -0.4f, 0);
-                    }
-                    if (block instanceof SporeBlossomBlock) {
-                        poseStack.translate(0, 1, 1);
-                        poseStack.mulPose(Axis.XP.rotation(Mth.PI));
-                    }
-
-                    this.renderBlock(nodeCollector, poseStack, blockState, combinedLight);
+                case BLOCK_STATE -> {
+                    FirstPersonBlockItemRenderer.submit(
+                            itemStack,
+                            poseStack,
+                            nodeCollector,
+                            combinedLight,
+                            side
+                    );
+//
+//                    Block block = ((BlockItem)itemStack.getItem()).getBlock();
+//                    BlockState blockState = this.getDefaultBlockState(block);
+//
+//
+//                    if (block instanceof FenceGateBlock || block instanceof ConduitBlock) {
+//                        poseStack.translate(0, -0.4f, 0);
+//                    }
+//                    if (block instanceof SporeBlossomBlock) {
+//                        poseStack.translate(0, 1, 1);
+//                        poseStack.mulPose(Axis.XP.rotation(Mth.PI));
+//                    }
+//
+//                    this.renderBlock(nodeCollector, poseStack, blockState, combinedLight);
 //                    if (block instanceof WallBlock) {
 //                        this.renderWallBlock(blockState, poseStack, nodeCollector, combinedLight);
 //                    } else if (block instanceof FenceBlock) {
@@ -350,17 +354,18 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 
         // Render the block through the special block renderer if it has one (skulls, beds, banners)
 
-        nodeCollector.submitBlockModel(
-                poseStack,
-                ItemBlockRenderTypes.getRenderType(blockState),
-                this.blockRenderer.getBlockModel(blockState),
-                1.0F,
-                1.0F,
-                1.0F,
-                combinedLight,
-                OverlayTexture.NO_OVERLAY,
-                0
-        );
+        ((FirstPersonSingleBlockRenderer) Minecraft.getInstance().getBlockRenderer()).locomotion$submitSingleBlockWithEmission(blockState, poseStack, nodeCollector, combinedLight);
+//        nodeCollector.submitBlockModel(
+//                poseStack,
+//                ItemBlockRenderTypes.getRenderType(blockState),
+//                this.blockRenderer.getBlockModel(blockState),
+//                1.0F,
+//                1.0F,
+//                1.0F,
+//                combinedLight,
+//                OverlayTexture.NO_OVERLAY,
+//                0
+//        );
 //        nodeCollector.submitBlockModel(poseStack, RenderType.entitySolidZOffsetForward(TextureAtlas.LOCATION_BLOCKS), this.blockRenderer.getBlockModel(blockState), );
 //        nodeCollector.submitBlock(poseStack, blockState, combinedLight, OverlayTexture.NO_OVERLAY, 0);
     }

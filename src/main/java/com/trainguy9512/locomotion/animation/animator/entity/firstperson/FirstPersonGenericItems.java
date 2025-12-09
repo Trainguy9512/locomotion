@@ -7,13 +7,18 @@ import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Block;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -53,8 +58,20 @@ public class FirstPersonGenericItems {
             80)
             .setItemRenderType(ItemRenderType.MIRRORED_THIRD_PERSON_ITEM)
             .build());
+    public static final ResourceLocation BLOCK = register(LocomotionMain.makeResourceLocation("block"), GenericItemPoseDefinition.builder(
+                    FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE,
+                    FirstPersonGenericItems::isBlockItem,
+                    80)
+            .setItemRenderType(ItemRenderType.BLOCK_STATE)
+            .build());
+    public static final ResourceLocation DOOR = register(LocomotionMain.makeResourceLocation("door"), GenericItemPoseDefinition.builder(
+                    FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE,
+                    FirstPersonGenericItems::isDoorItem,
+                    90)
+            .setItemRenderType(ItemRenderType.BLOCK_STATE)
+            .build());
 
-    private static final List<Item> ROD_ITEMS = List.of(
+    public static final List<Item> ROD_ITEMS = List.of(
             Items.BONE,
             Items.STICK,
             Items.BLAZE_ROD,
@@ -70,10 +87,10 @@ public class FirstPersonGenericItems {
     }
 
     private static boolean isShearsItem(ItemStack itemStack) {
-        return itemStack.is(Items.SHEARS);
+        return itemStack.getItem() instanceof ShearsItem;
     }
 
-    private static final List<Item> FISHING_ROD_ITEMS = List.of(
+    public static final List<Item> FISHING_ROD_ITEMS = List.of(
             Items.FISHING_ROD,
             Items.CARROT_ON_A_STICK,
             Items.WARPED_FUNGUS_ON_A_STICK
@@ -85,6 +102,39 @@ public class FirstPersonGenericItems {
 
     private static boolean isArrowItem(ItemStack itemStack) {
         return itemStack.is(ItemTags.ARROWS);
+    }
+
+    public static final List<Item> BLOCK_ITEM_OVERRIDES = List.of(
+            Items.CHEST,
+            Items.TRAPPED_CHEST,
+            Items.ENDER_CHEST
+    );
+
+    public static final List<TagKey<Item>> BLOCK_ITEM_TAG_OVERRIDES = List.of(
+            ItemTags.COPPER_CHESTS,
+            ItemTags.SHULKER_BOXES,
+            ItemTags.SKULLS,
+            ItemTags.BEDS
+    );
+
+    private static boolean isBlockItem(ItemStack itemStack) {
+        for (Item item : BLOCK_ITEM_OVERRIDES) {
+            if (itemStack.is(item)) {
+                return true;
+            }
+        }
+        for (TagKey<Item> tag : BLOCK_ITEM_TAG_OVERRIDES) {
+            if (itemStack.is(tag)) {
+                return true;
+            }
+        }
+        ResourceLocation identifier = BuiltInRegistries.ITEM.getKey(itemStack.getItem());
+        ResourceLocation modelLocation = ResourceLocation.fromNamespaceAndPath(identifier.getNamespace(), "models/item/" + identifier.getPath() + ".json");
+        return Minecraft.getInstance().getResourceManager().getResource(modelLocation).isEmpty();
+    }
+
+    private static boolean isDoorItem(ItemStack itemStack) {
+        return itemStack.is(ItemTags.DOORS);
     }
 
     public record GenericItemPoseDefinition(
