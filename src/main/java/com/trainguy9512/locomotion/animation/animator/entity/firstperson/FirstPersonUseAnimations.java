@@ -8,7 +8,7 @@ import com.trainguy9512.locomotion.animation.driver.TriggerDriver;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -34,31 +34,31 @@ public class FirstPersonUseAnimations {
 
     static {
         register(UseAnimationRule.of(
-                LocomotionMain.makeResourceLocation("default"),
+                LocomotionMain.makeIdentifier("default"),
                 FirstPersonMontages::getUseAnimationMontage,
                 UseAnimationConditionContext::swingFromClient,
                 0
         ));
         register(UseAnimationRule.of(
-                LocomotionMain.makeResourceLocation("axe_scrape"),
+                LocomotionMain.makeIdentifier("axe_scrape"),
                 FirstPersonMontages::getAxeScrapeMontage,
                 FirstPersonUseAnimations::shouldPlayAxeScrape,
                 10
         ));
         register(UseAnimationRule.of(
-                LocomotionMain.makeResourceLocation("hoe_till"),
+                LocomotionMain.makeIdentifier("hoe_till"),
                 FirstPersonMontages::getHoeTillMontage,
                 FirstPersonUseAnimations::shouldPlayHoeTill,
                 20
         ));
         register(UseAnimationRule.of(
-                LocomotionMain.makeResourceLocation("shovel_flatten"),
+                LocomotionMain.makeIdentifier("shovel_flatten"),
                 FirstPersonMontages::getShovelFlattenMontage,
                 FirstPersonUseAnimations::shouldPlayShovelFlatten,
                 30
         ));
         register(UseAnimationRule.of(
-                LocomotionMain.makeResourceLocation("shears_use"),
+                LocomotionMain.makeIdentifier("shears_use"),
                 FirstPersonMontages::getShearsUseMontage,
                 FirstPersonUseAnimations::shouldPlayShearsUse,
                 40
@@ -134,7 +134,7 @@ public class FirstPersonUseAnimations {
     }
 
     public record UseAnimationRule(
-            ResourceLocation identifier,
+            Identifier identifier,
             Function<InteractionHand, MontageConfiguration> montageProvider,
             Predicate<UseAnimationConditionContext> shouldChooseUseAnimation,
             int evaluationPriority
@@ -147,7 +147,7 @@ public class FirstPersonUseAnimations {
          * @param evaluationPriority            Order in which to evaluate this rule. If a rule with a higher priority passes, all below will be skipped.
          */
         public static UseAnimationRule of(
-                ResourceLocation identifier,
+                Identifier identifier,
                 Function<InteractionHand, MontageConfiguration> montageProvider,
                 Predicate<UseAnimationConditionContext> shouldChooseUseAnimation,
                 int evaluationPriority

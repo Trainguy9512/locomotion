@@ -6,7 +6,7 @@ import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.util.TimeSpan;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
@@ -107,7 +107,7 @@ public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSp
         return builder(evaluationState -> evaluationState.driverContainer().getDriverValue(floatDriverKey));
     }
 
-    private record BlendSpace1DEntry(ResourceLocation animationSequence, float playRate) {
+    private record BlendSpace1DEntry(Identifier animationSequence, float playRate) {
 
     }
 
@@ -123,12 +123,12 @@ public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSp
         }
 
         @SuppressWarnings("unchecked")
-        public B addEntry(float position, ResourceLocation animationSequence, float playRate) {
+        public B addEntry(float position, Identifier animationSequence, float playRate) {
             this.blendSpaceEntries.put(position, new BlendSpace1DEntry(animationSequence, playRate));
             return (B) this;
         }
 
-        public B addEntry(float position, ResourceLocation animationSequence) {
+        public B addEntry(float position, Identifier animationSequence) {
             return this.addEntry(position, animationSequence, 1);
         }
 

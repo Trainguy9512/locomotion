@@ -76,6 +76,10 @@ repositories {
 
     maven("https://maven.isxander.dev/releases")
     maven("https://api.modrinth.com/maven")
+    maven {
+        name = "Gegy"
+        url = uri("https://maven.gegy.dev/releases/")
+    }
 }
 
 dependencies {
@@ -83,6 +87,7 @@ dependencies {
     mappings(loom.layered {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-${versionProp("parchment_minecraft_version")}:${versionProp("parchment_mappings_version")}@zip")
+//        mappings("dev.lambdaurora:${versionProp("yalmm")}")
     })
     neoForge("net.neoforged:neoforge:${versionProp("neoforge_loader")}")
 

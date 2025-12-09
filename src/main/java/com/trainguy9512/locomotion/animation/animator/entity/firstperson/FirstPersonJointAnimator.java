@@ -18,7 +18,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -91,8 +91,8 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     }
 
     @Override
-    public ResourceLocation getJointSkeleton() {
-        return ResourceLocation.fromNamespaceAndPath(LocomotionMain.MOD_ID, "skeletons/entity/player/first_person.json");
+    public Identifier getJointSkeleton() {
+        return Identifier.fromNamespaceAndPath(LocomotionMain.MOD_ID, "skeletons/entity/player/first_person.json");
     }
 
     @Override

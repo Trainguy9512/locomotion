@@ -3,7 +3,7 @@ package com.trainguy9512.locomotion.animation.pose.function;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.util.TimeSpan;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -12,19 +12,19 @@ import java.util.function.Predicate;
 
 public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
 
-    private final Function<FunctionInterpolationContext, ResourceLocation> animationSequenceFunction;
+    private final Function<FunctionInterpolationContext, Identifier> animationSequenceFunction;
     private final Function<FunctionInterpolationContext, TimeSpan> sequenceTimeFunction;
 
-    private SequenceEvaluatorFunction(Function<FunctionInterpolationContext, ResourceLocation> animationSequenceFunction, Function<FunctionInterpolationContext, TimeSpan> sequenceTimeFunction) {
+    private SequenceEvaluatorFunction(Function<FunctionInterpolationContext, Identifier> animationSequenceFunction, Function<FunctionInterpolationContext, TimeSpan> sequenceTimeFunction) {
         this.animationSequenceFunction = animationSequenceFunction;
         this.sequenceTimeFunction = sequenceTimeFunction;
     }
 
-    public static Builder builder(Function<FunctionInterpolationContext, ResourceLocation> animationSequenceFunction) {
+    public static Builder builder(Function<FunctionInterpolationContext, Identifier> animationSequenceFunction) {
         return new Builder(animationSequenceFunction);
     }
 
-    public static Builder builder(ResourceLocation animationSequence) {
+    public static Builder builder(Identifier animationSequence) {
         return builder(context -> animationSequence);
     }
 
@@ -55,10 +55,10 @@ public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
     }
 
     public static class Builder {
-        private final Function<FunctionInterpolationContext, ResourceLocation> animationSequenceFunction;
+        private final Function<FunctionInterpolationContext, Identifier> animationSequenceFunction;
         private Function<FunctionInterpolationContext, TimeSpan> sequenceTimeFunction;
 
-        public Builder(Function<FunctionInterpolationContext, ResourceLocation> animationSequenceFunction) {
+        public Builder(Function<FunctionInterpolationContext, Identifier> animationSequenceFunction) {
             this.animationSequenceFunction = animationSequenceFunction;
             this.sequenceTimeFunction = context -> TimeSpan.ZERO;
         }

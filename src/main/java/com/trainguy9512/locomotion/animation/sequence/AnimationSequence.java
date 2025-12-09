@@ -10,7 +10,7 @@ import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.util.Interpolator;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Timeline;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -23,7 +23,7 @@ public record AnimationSequence(
         Map<String, Timeline<Boolean>> visibilityTimelines,
         Map<String, Timeline<Float>> customAttributeTimelines,
         Map<String, List<TimeSpan>> timeMarkers,
-        ResourceLocation jointSkeletonLocation,
+        Identifier jointSkeletonLocation,
         TimeSpan length
 ) {
 
@@ -35,7 +35,7 @@ public record AnimationSequence(
      * @param looping               Whether the animation should be looped or not.
      * @return                      New animation pose
      */
-    public static LocalSpacePose samplePose(JointSkeleton jointSkeleton, ResourceLocation sequenceLocation, TimeSpan time, boolean looping) {
+    public static LocalSpacePose samplePose(JointSkeleton jointSkeleton, Identifier sequenceLocation, TimeSpan time, boolean looping) {
         AnimationSequence animationSequence = LocomotionResources.getOrThrowAnimationSequence(sequenceLocation);
         LocalSpacePose pose = LocalSpacePose.of(jointSkeleton);
         for (String joint : jointSkeleton.getJoints()) {
@@ -111,7 +111,7 @@ public record AnimationSequence(
         return bakedSequenceBuilder.build();
     }
 
-    public static Builder builder(TimeSpan frameLength, ResourceLocation jointSkeletonLocation) {
+    public static Builder builder(TimeSpan frameLength, Identifier jointSkeletonLocation) {
         return new Builder(frameLength, jointSkeletonLocation);
     }
 
@@ -122,10 +122,10 @@ public record AnimationSequence(
         private final Map<String, Timeline<Boolean>> visibilityTimelines;
         private final Map<String, Timeline<Float>> customAttributeTimelines;
         private final Map<String, List<TimeSpan>> timeMarkers;
-        private final ResourceLocation jointSkeletonLocation;
+        private final Identifier jointSkeletonLocation;
         private final TimeSpan length;
 
-        protected Builder(TimeSpan length, ResourceLocation jointSkeletonLocation) {
+        protected Builder(TimeSpan length, Identifier jointSkeletonLocation) {
             this.translationTimelines = Maps.newHashMap();
             this.rotationTimelines = Maps.newHashMap();
             this.scaleTimelines = Maps.newHashMap();

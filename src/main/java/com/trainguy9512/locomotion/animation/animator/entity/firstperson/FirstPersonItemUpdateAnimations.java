@@ -7,7 +7,7 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManage
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,17 +24,17 @@ public class FirstPersonItemUpdateAnimations {
 
     static {
         register(ItemUpdateAnimationRule.of(
-                LocomotionMain.makeResourceLocation("crossbow_fire"),
+                LocomotionMain.makeIdentifier("crossbow_fire"),
                 FirstPersonMontages::getCrossbowFireMontage,
                 FirstPersonItemUpdateAnimations::shouldPlayCrossbowFire
         ));
         register(ItemUpdateAnimationRule.of(
-                LocomotionMain.makeResourceLocation("bucket_collect"),
+                LocomotionMain.makeIdentifier("bucket_collect"),
                 FirstPersonMontages::getBucketCollectMontage,
                 FirstPersonItemUpdateAnimations::shouldPlayBucketCollect
         ));
         register(ItemUpdateAnimationRule.of(
-                LocomotionMain.makeResourceLocation("bucket_empty"),
+                LocomotionMain.makeIdentifier("bucket_empty"),
                 FirstPersonMontages::getBucketEmptyMontage,
                 FirstPersonItemUpdateAnimations::shouldPlayBucketEmpty
         ));
@@ -79,12 +79,12 @@ public class FirstPersonItemUpdateAnimations {
     }
 
     public record ItemUpdateAnimationRule(
-            ResourceLocation identifier,
+            Identifier identifier,
             Function<InteractionHand, MontageConfiguration> montageProvider,
             Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation
     ) {
         public static ItemUpdateAnimationRule of(
-                ResourceLocation identifier,
+                Identifier identifier,
                 Function<InteractionHand, MontageConfiguration> montageProvider,
                 Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation
         ) {

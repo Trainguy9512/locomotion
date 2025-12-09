@@ -6,7 +6,7 @@ import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.util.TimeSpan;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ import java.util.function.Predicate;
 
 public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose> implements AnimationPlayer {
 
-    private final ResourceLocation animationSequence;
+    private final Identifier animationSequence;
     private final boolean isLooping;
     private final boolean ignoredByRelevancyTest;
     private final Map<String, Consumer<FunctionEvaluationState>> timeMarkerBindings;
@@ -33,7 +33,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
             Function<FunctionEvaluationState, Boolean> isPlayingFunction,
             Function<FunctionEvaluationState, Float> playRateFunction,
             TimeSpan resetStartTimeOffset,
-            ResourceLocation animationSequence,
+            Identifier animationSequence,
             boolean isLooping,
             boolean ignoredByRelevancyTest,
             Map<String, Consumer<FunctionEvaluationState>> timeMarkerBindings,
@@ -106,7 +106,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
         return findCondition.test(this) && !this.ignoredByRelevancyTest ? Optional.of(this) : Optional.empty();
     }
 
-    public static Builder<?> builder(ResourceLocation animationSequence) {
+    public static Builder<?> builder(Identifier animationSequence) {
         return new Builder<>(animationSequence);
     }
 
@@ -132,14 +132,14 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
 
     public static class Builder<B extends Builder<B>> extends TimeBasedPoseFunction.Builder<B>{
 
-        private final ResourceLocation animationSequence;
+        private final Identifier animationSequence;
         private boolean looping;
         private boolean ignoredForRelevancyTest;
         private final Map<String, Consumer<FunctionEvaluationState>> timeMarkerBindings;
         private boolean isAdditive;
         private SequenceReferencePoint additiveSubtractionReferencePoint;
 
-        protected Builder(ResourceLocation animationSequence) {
+        protected Builder(Identifier animationSequence) {
             super();
             this.animationSequence = animationSequence;
             this.looping = false;

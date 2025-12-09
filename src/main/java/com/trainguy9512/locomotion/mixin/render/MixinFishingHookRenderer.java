@@ -77,7 +77,7 @@ public abstract class MixinFishingHookRenderer {
                     float playerRotationY = player.getYRot(partialTick) * -Mth.DEG_TO_RAD;
                     Quaternionf playerRotation = new Quaternionf().rotateY(playerRotationY).rotateX(playerRotationX);
                     Matrix4f playerTransform = new Matrix4f()
-                            .translate(entityRenderDispatcher.camera.getPosition().toVector3f())
+                            .translate(entityRenderDispatcher.camera.position().toVector3f())
                             .rotate(playerRotation);
 
 //                    entityRenderDispatcher.camera.getNearPlane().
@@ -88,7 +88,7 @@ public abstract class MixinFishingHookRenderer {
                             .mul(animationPose.getJointChannel(FirstPersonJointAnimator.CAMERA_JOINT).getTransform())
                             .translate(0, 0, -5);
 
-                    Vector3f cameraPosition = entityRenderDispatcher.camera.getPosition().add(player.getEyePosition(partialTick)).toVector3f();
+                    Vector3f cameraPosition = entityRenderDispatcher.camera.position().add(player.getEyePosition(partialTick)).toVector3f();
                     Quaternionf cameraRotation = entityRenderDispatcher.camera.rotation();
                     Matrix4f cameraTransform = new Matrix4f().translate(cameraPosition);
 

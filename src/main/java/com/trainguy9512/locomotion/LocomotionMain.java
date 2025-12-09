@@ -5,7 +5,7 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPe
 import com.trainguy9512.locomotion.config.LocomotionConfig;
 import com.trainguy9512.locomotion.debug.DebugEntryFirstPersonDrivers;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,8 +21,8 @@ public class LocomotionMain {
 		registerEntityAnimators();
 	}
 
-	public static ResourceLocation makeResourceLocation(String location) {
-		return ResourceLocation.fromNamespaceAndPath(MOD_ID, location);
+	public static Identifier makeIdentifier(String location) {
+		return Identifier.fromNamespaceAndPath(MOD_ID, location);
 	}
 
 	/*
