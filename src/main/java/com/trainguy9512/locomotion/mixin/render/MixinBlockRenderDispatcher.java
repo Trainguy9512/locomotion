@@ -36,7 +36,7 @@ public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlo
     @Shadow @Final private Supplier<SpecialBlockModelRenderer> specialBlockModelRenderer;
 
     @Unique
-    public void locomotion$renderSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight) {
+    public void locomotion$submitSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight) {
         RenderShape renderShape = blockState.getRenderShape();
         // Don't do anything more if the render shape is nothing.
         if (renderShape == RenderShape.INVISIBLE) {
@@ -85,7 +85,7 @@ public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlo
             b = 1.0f;
         }
 
-        RenderType usedLayer = bakedQuad.shade() && blockState.getLightEmission() == 0 ? RenderType.cutoutMipped() : RenderType.cutoutMipped();
+        RenderType usedLayer = bakedQuad.shade() && blockState.getLightEmission() == 0 ? ItemBlockRenderTypes.getRenderType(blockState) : RenderType.cutoutMipped();
         float finalR = r;
         float finalG = g;
         float finalB = b;

@@ -276,21 +276,27 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                     /*this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, side == HumanoidArm.LEFT, poseStack, buffer, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());*/
                 }
                 case BLOCK_STATE -> {
-                    Block block = ((BlockItem)itemStack.getItem()).getBlock();
-                    BlockState blockState = this.getDefaultBlockState(block);
-
-                    if (side == HumanoidArm.LEFT) {
-                        poseStack.translate(-1, 0, 0);
-                    }
-                    if (block instanceof FenceGateBlock || block instanceof ConduitBlock) {
-                        poseStack.translate(0, -0.4f, 0);
-                    }
-                    if (block instanceof SporeBlossomBlock) {
-                        poseStack.translate(0, 1, 1);
-                        poseStack.mulPose(Axis.XP.rotation(Mth.PI));
-                    }
-
-                    this.renderBlock(nodeCollector, poseStack, blockState, combinedLight);
+                    FirstPersonBlockItemRenderer.submit(
+                            itemStack,
+                            poseStack,
+                            nodeCollector,
+                            combinedLight,
+                            side
+                    );
+//
+//                    Block block = ((BlockItem)itemStack.getItem()).getBlock();
+//                    BlockState blockState = this.getDefaultBlockState(block);
+//
+//
+//                    if (block instanceof FenceGateBlock || block instanceof ConduitBlock) {
+//                        poseStack.translate(0, -0.4f, 0);
+//                    }
+//                    if (block instanceof SporeBlossomBlock) {
+//                        poseStack.translate(0, 1, 1);
+//                        poseStack.mulPose(Axis.XP.rotation(Mth.PI));
+//                    }
+//
+//                    this.renderBlock(nodeCollector, poseStack, blockState, combinedLight);
 //                    if (block instanceof WallBlock) {
 //                        this.renderWallBlock(blockState, poseStack, nodeCollector, combinedLight);
 //                    } else if (block instanceof FenceBlock) {
@@ -348,7 +354,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 
         // Render the block through the special block renderer if it has one (skulls, beds, banners)
 
-        ((FirstPersonSingleBlockRenderer) Minecraft.getInstance().getBlockRenderer()).locomotion$renderSingleBlockWithEmission(blockState, poseStack, nodeCollector, combinedLight);
+        ((FirstPersonSingleBlockRenderer) Minecraft.getInstance().getBlockRenderer()).locomotion$submitSingleBlockWithEmission(blockState, poseStack, nodeCollector, combinedLight);
 //        nodeCollector.submitBlockModel(
 //                poseStack,
 //                ItemBlockRenderTypes.getRenderType(blockState),
