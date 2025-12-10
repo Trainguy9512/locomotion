@@ -3,6 +3,7 @@ package com.trainguy9512.locomotion.mixin.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.trainguy9512.locomotion.access.FirstPersonSingleBlockRenderer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -11,6 +12,8 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -33,7 +36,7 @@ public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlo
 
     @Shadow @Final private BlockColors blockColors;
 
-    @Shadow @Final private Supplier<SpecialBlockModelRenderer> specialBlockModelRenderer;
+//    @Shadow @Final private Supplier<SpecialBlockModelRenderer> specialBlockModelRenderer;
 
     @Unique
     public void locomotion$submitSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight) {
@@ -61,7 +64,7 @@ public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlo
             }
         }
         // Render the block through the special block renderer if it has one (skulls, beds, banners)
-        this.specialBlockModelRenderer.get().renderByBlock(blockState.getBlock(), ItemDisplayContext.NONE, poseStack, nodeCollector, combinedLight, OverlayTexture.NO_OVERLAY, 0);
+        Minecraft.getInstance().getModelManager().specialBlockModelRenderer().renderByBlock(blockState.getBlock(), ItemDisplayContext.NONE, poseStack, nodeCollector, combinedLight, OverlayTexture.NO_OVERLAY, 0);
     }
 
     @Unique
@@ -85,7 +88,7 @@ public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlo
             b = 1.0f;
         }
 
-        RenderType usedLayer = bakedQuad.shade() && blockState.getLightEmission() == 0 ? ItemBlockRenderTypes.getRenderType(blockState) : RenderType.cutoutMipped();
+        RenderType usedLayer = bakedQuad.shade() && blockState.getLightEmission() == 0 ? ItemBlockRenderTypes.getRenderType(blockState) : RenderTypes.cutoutMovingBlock();
         float finalR = r;
         float finalG = g;
         float finalB = b;
@@ -98,8 +101,8 @@ public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlo
                 finalB,
                 1.0f,
                 new int[]{combinedLight, combinedLight, combinedLight, combinedLight},
-                OverlayTexture.NO_OVERLAY,
-                true
+                OverlayTexture.NO_OVERLAY
+//                true
         ));
     }
 }

@@ -18,7 +18,7 @@ import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
@@ -102,12 +102,12 @@ public enum FirstPersonHandPose {
     public final String raisingState;
     public final String loweringState;
     public final String poseState;
-    public final ResourceLocation basePoseLocation;
+    public final Identifier basePoseLocation;
     public final ItemRenderType itemRenderType;
 
     FirstPersonHandPose(
             String handPoseStateIdentifier,
-            ResourceLocation basePoseLocation,
+            Identifier basePoseLocation,
             ItemRenderType itemRenderType
     ) {
         this.raisingState = handPoseStateIdentifier + "_raise";

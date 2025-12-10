@@ -7,7 +7,7 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import java.util.function.Function;
 public record MontageConfiguration(
         String identifier,
         List<String> slots,
-        ResourceLocation animationSequence,
+        Identifier animationSequence,
         Function<OnTickDriverContainer, Float> playRateFunction,
         Map<String, Consumer<PoseFunction.FunctionEvaluationState>> timeMarkerBindings,
         @Nullable BlendMask blendMask,
@@ -48,11 +48,11 @@ public record MontageConfiguration(
         float transitionOutCrossfadeWeight,
         TimeSpan cooldownDuration,
         boolean isAdditive,
-        Function<OnTickDriverContainer, ResourceLocation> additiveBasePoseProvider,
+        Function<OnTickDriverContainer, Identifier> additiveBasePoseProvider,
         SequenceReferencePoint additiveReferencePosePoint
 ) {
 
-    public static Builder builder(String identifier, ResourceLocation animationSequence) {
+    public static Builder builder(String identifier, Identifier animationSequence) {
         return new Builder(identifier, animationSequence);
     }
 
@@ -62,7 +62,7 @@ public record MontageConfiguration(
      * @param animationSequence     Animation sequence to play as the montage.
      * @return New montage configuration builder.
      */
-    public Builder makeBuilderCopy(String identifier, ResourceLocation animationSequence) {
+    public Builder makeBuilderCopy(String identifier, Identifier animationSequence) {
         Builder builder = MontageConfiguration.builder(identifier, animationSequence)
                 .setPlayRate(this.playRateFunction)
                 .setBlendMask(this.blendMask)
@@ -86,7 +86,7 @@ public record MontageConfiguration(
     public static class Builder {
 
         private final String identifier;
-        private final ResourceLocation animationSequence;
+        private final Identifier animationSequence;
         private final List<String> slots;
         private Function<OnTickDriverContainer, Float> playRateFunction;
         private Map<String, Consumer<PoseFunction.FunctionEvaluationState>> timeMarkerBindings;
@@ -97,11 +97,11 @@ public record MontageConfiguration(
         private float transitionOutCrossfadeWeight;
         private TimeSpan cooldownDuration;
         private boolean isAdditive;
-        private Function<OnTickDriverContainer, ResourceLocation> additiveBasePoseProvider;
+        private Function<OnTickDriverContainer, Identifier> additiveBasePoseProvider;
         private SequenceReferencePoint additiveReferencePosePoint;
 
 
-        private Builder(String identifier, ResourceLocation animationSequence) {
+        private Builder(String identifier, Identifier animationSequence) {
             this.identifier = identifier;
             this.animationSequence = animationSequence;
             this.slots = new ArrayList<>();
@@ -235,7 +235,7 @@ public record MontageConfiguration(
          * @param additiveBasePoseProvider          Base pose provider, retrieved every time a montage of this configuration is fired.
          */
         public Builder makeAdditive(
-                Function<OnTickDriverContainer, ResourceLocation> additiveBasePoseProvider,
+                Function<OnTickDriverContainer, Identifier> additiveBasePoseProvider,
                 SequenceReferencePoint additiveReferencePosePoint
         ) {
             this.isAdditive = true;

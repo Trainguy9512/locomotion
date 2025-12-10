@@ -9,7 +9,7 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -18,12 +18,14 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -114,8 +116,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 //                            ItemStack mainHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.MAIN_HAND_ITEM : FirstPersonDrivers.OFF_HAND_ITEM);
 //                            ItemStack offHandItem = dataContainer.getDriverValue(leftHanded ? FirstPersonDrivers.OFF_HAND_ITEM : FirstPersonDrivers.MAIN_HAND_ITEM);
 
-                            ResourceLocation leftHandGenericItemPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
-                            ResourceLocation rightHandGenericItemPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            Identifier leftHandGenericItemPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            Identifier rightHandGenericItemPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
                             FirstPersonGenericItems.GenericItemPoseDefinition leftHandGenericItemPoseDefinition = FirstPersonGenericItems.getOrThrowFromIdentifier(leftHandGenericItemPoseIdentifier);
                             FirstPersonGenericItems.GenericItemPoseDefinition rightHandGenericItemPoseDefinition = FirstPersonGenericItems.getOrThrowFromIdentifier(rightHandGenericItemPoseIdentifier);
                             FirstPersonHandPose leftHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
@@ -212,7 +214,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         PlayerSkin skin = abstractClientPlayer.getSkin();
         boolean isUsingSlimArms = skin.model() == PlayerModelType.SLIM;
         boolean leftArm = arm == HumanoidArm.LEFT;
-        ResourceLocation skinTextureLocation = skin.body().texturePath();
+        Identifier skinTextureLocation = skin.body().texturePath();
 
         // Getting the model parts
         ModelPart armModelPart = leftArm ? playerModel.leftArm : playerModel.rightArm;
@@ -230,7 +232,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         nodeCollector.submitModelPart(
                 armModelPart,
                 poseStack,
-                RenderType.entityTranslucent(skinTextureLocation),
+                RenderTypes.entityTranslucent(skinTextureLocation),
                 combinedLight,
                 OverlayTexture.NO_OVERLAY,
                 null
@@ -318,9 +320,9 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         }
     }
 
-    private static final RenderType MAP_BACKGROUND = RenderType.text(ResourceLocation.withDefaultNamespace("textures/map/map_background.png"));
-    private static final RenderType MAP_BACKGROUND_CHECKERBOARD = RenderType.text(
-            ResourceLocation.withDefaultNamespace("textures/map/map_background_checkerboard.png")
+    private static final RenderType MAP_BACKGROUND = RenderTypes.text(Identifier.withDefaultNamespace("textures/map/map_background.png"));
+    private static final RenderType MAP_BACKGROUND_CHECKERBOARD = RenderTypes.text(
+            Identifier.withDefaultNamespace("textures/map/map_background_checkerboard.png")
     );
     private final MapRenderState mapRenderState = new MapRenderState();
 

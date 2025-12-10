@@ -7,7 +7,7 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.resource.json.GsonConfiguration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -28,26 +28,26 @@ public class LocomotionResources implements PreparableReloadListener {
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/Resources");
 
-    public static final ResourceLocation RELOADER_IDENTIFIER = ResourceLocation.fromNamespaceAndPath(LocomotionMain.MOD_ID, "locomotion_asset_loader");
+    public static final Identifier RELOADER_IDENTIFIER = Identifier.fromNamespaceAndPath(LocomotionMain.MOD_ID, "locomotion_asset_loader");
     private static final String JOINT_SKELETON_PATH = "skeletons";
     private static final String ANIMATION_SEQUENCE_PATH = "sequences";
-    private static final Map<ResourceLocation, AnimationSequence> ANIMATION_SEQUENCES;
-    private static final Map<ResourceLocation, JointSkeleton> JOINT_SKELETONS;
+    private static final Map<Identifier, AnimationSequence> ANIMATION_SEQUENCES;
+    private static final Map<Identifier, JointSkeleton> JOINT_SKELETONS;
 
     static {
         JOINT_SKELETONS = Maps.newHashMap();
         ANIMATION_SEQUENCES = Maps.newHashMap();
     }
 
-    public static Map<ResourceLocation, JointSkeleton> getJointSkeletons() {
+    public static Map<Identifier, JointSkeleton> getJointSkeletons() {
         return JOINT_SKELETONS;
     }
 
-    public static Map<ResourceLocation, AnimationSequence> getAnimationSequences() {
+    public static Map<Identifier, AnimationSequence> getAnimationSequences() {
         return ANIMATION_SEQUENCES;
     }
 
-    public static JointSkeleton getOrThrowJointSkeleton(ResourceLocation jointSkeletonLocation) {
+    public static JointSkeleton getOrThrowJointSkeleton(Identifier jointSkeletonLocation) {
         if (JOINT_SKELETONS.containsKey(jointSkeletonLocation)) {
             return JOINT_SKELETONS.get(jointSkeletonLocation);
         } else {
@@ -55,7 +55,7 @@ public class LocomotionResources implements PreparableReloadListener {
         }
     }
 
-    public static AnimationSequence getOrThrowAnimationSequence(ResourceLocation sequenceLocation) {
+    public static AnimationSequence getOrThrowAnimationSequence(Identifier sequenceLocation) {
         if (ANIMATION_SEQUENCES.containsKey(sequenceLocation)) {
             return ANIMATION_SEQUENCES.get(sequenceLocation);
         } else {
@@ -65,8 +65,8 @@ public class LocomotionResources implements PreparableReloadListener {
 
     @Override
     public CompletableFuture<Void> reload(SharedState sharedState, Executor exectutor, PreparationBarrier barrier, Executor applyExectutor) {
-        CompletableFuture<Map<ResourceLocation, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(sharedState.resourceManager(), exectutor);
-        CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(sharedState.resourceManager(), exectutor);
+        CompletableFuture<Map<Identifier, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(sharedState.resourceManager(), exectutor);
+        CompletableFuture<Map<Identifier, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(sharedState.resourceManager(), exectutor);
 
         return CompletableFuture.allOf(loadedJointSkeletons, loadedAnimationSequences)
                 .thenCompose(barrier::wait)
@@ -75,14 +75,14 @@ public class LocomotionResources implements PreparableReloadListener {
                     JOINT_SKELETONS.putAll(loadedJointSkeletons.join());
                     ANIMATION_SEQUENCES.clear();
                     ANIMATION_SEQUENCES.putAll(loadedAnimationSequences.join());
-                    ANIMATION_SEQUENCES.replaceAll((resourceLocation, animationSequence) -> animationSequence.getBaked());
+                    ANIMATION_SEQUENCES.replaceAll((Identifier, animationSequence) -> animationSequence.getBaked());
                     LOGGER.info("Cleared and replaced Locomotion resource data.");
                 }));
     }
 
 //    public static CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier barrier, ResourceManager manager, Executor backgroundExecutor, Executor gameExecutor) {
-//        CompletableFuture<Map<ResourceLocation, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(manager, backgroundExecutor);
-//        CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(manager, backgroundExecutor);
+//        CompletableFuture<Map<Identifier, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(manager, backgroundExecutor);
+//        CompletableFuture<Map<Identifier, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(manager, backgroundExecutor);
 //
 //        return CompletableFuture.allOf(loadedJointSkeletons, loadedAnimationSequences)
 //                .thenCompose(barrier::wait)
@@ -91,50 +91,50 @@ public class LocomotionResources implements PreparableReloadListener {
 //                    JOINT_SKELETONS.putAll(loadedJointSkeletons.join());
 //                    ANIMATION_SEQUENCES.clear();
 //                    ANIMATION_SEQUENCES.putAll(loadedAnimationSequences.join());
-//                    ANIMATION_SEQUENCES.replaceAll((resourceLocation, animationSequence) -> animationSequence.getBaked());
+//                    ANIMATION_SEQUENCES.replaceAll((Identifier, animationSequence) -> animationSequence.getBaked());
 //                    LOGGER.info("Cleared and replaced Locomotion resource data.");
 //                }));
 //    }
 
-    private static CompletableFuture<Map<ResourceLocation, AnimationSequence>> loadAnimationSequences(ResourceManager manager, Executor backgroundExecutor) {
+    private static CompletableFuture<Map<Identifier, AnimationSequence>> loadAnimationSequences(ResourceManager manager, Executor backgroundExecutor) {
         return loadJsonResources(
                 manager,
                 backgroundExecutor,
                 AnimationSequence.class,
                 ANIMATION_SEQUENCE_PATH,
-                resourceLocation -> LOGGER.info("Successfully loaded animation sequence {}", resourceLocation)
+                Identifier -> LOGGER.info("Successfully loaded animation sequence {}", Identifier)
         );
     }
 
-    private static CompletableFuture<Map<ResourceLocation, JointSkeleton>> loadJointSkeletons(ResourceManager manager, Executor backgroundExecutor) {
+    private static CompletableFuture<Map<Identifier, JointSkeleton>> loadJointSkeletons(ResourceManager manager, Executor backgroundExecutor) {
         return loadJsonResources(
                 manager,
                 backgroundExecutor,
                 JointSkeleton.class,
                 JOINT_SKELETON_PATH,
-                resourceLocation -> LOGGER.info("Successfully loaded joint skeleton {}", resourceLocation)
+                Identifier -> LOGGER.info("Successfully loaded joint skeleton {}", Identifier)
         );
     }
 
-    private static <D> CompletableFuture<Map<ResourceLocation, D>> loadJsonResources(ResourceManager manager, Executor backgroundExecutor, Class<D> type, String pathToListFrom, Consumer<ResourceLocation> onSuccessfullyLoaded) {
+    private static <D> CompletableFuture<Map<Identifier, D>> loadJsonResources(ResourceManager manager, Executor backgroundExecutor, Class<D> type, String pathToListFrom, Consumer<Identifier> onSuccessfullyLoaded) {
         return CompletableFuture.supplyAsync(() -> {
-            Predicate<ResourceLocation> isAssetJson = resourceLocation -> resourceLocation.getPath().endsWith(".json");
-            Map<ResourceLocation, Resource> foundResources = manager.listResources(pathToListFrom, isAssetJson);
+            Predicate<Identifier> isAssetJson = Identifier -> Identifier.getPath().endsWith(".json");
+            Map<Identifier, Resource> foundResources = manager.listResources(pathToListFrom, isAssetJson);
 
-            Map<ResourceLocation, D> deserializedResources = Maps.newHashMap();
-            foundResources.forEach((resourceLocation, resource) -> {
+            Map<Identifier, D> deserializedResources = Maps.newHashMap();
+            foundResources.forEach((Identifier, resource) -> {
                 try {
                     try (BufferedReader reader = resource.openAsReader()) {
                         JsonElement jsonElement = GsonHelper.fromJson(GsonConfiguration.getInstance(), reader, JsonElement.class);
                         D deserializedAsset = GsonConfiguration.getInstance().fromJson(jsonElement, type);
-                        deserializedResources.put(resourceLocation, deserializedAsset);
-                        onSuccessfullyLoaded.accept(resourceLocation);
+                        deserializedResources.put(Identifier, deserializedAsset);
+                        onSuccessfullyLoaded.accept(Identifier);
                     } catch (JsonParseException exception) {
-                        LOGGER.warn("Skipping loading of JSON asset {} of type {} due to a JSON parsing error:", resourceLocation, type.getSimpleName());
+                        LOGGER.warn("Skipping loading of JSON asset {} of type {} due to a JSON parsing error:", Identifier, type.getSimpleName());
                         LOGGER.warn("--- {}", exception.getMessage());
                     }
                 } catch (IOException exception) {
-                    LOGGER.error("Encountered error while reading asset {} of type {}:", resourceLocation, type.getSimpleName());
+                    LOGGER.error("Encountered error while reading asset {} of type {}:", Identifier, type.getSimpleName());
                     LOGGER.error("--- {}", exception.getMessage());
                     throw new RuntimeException(exception);
                 }
