@@ -118,6 +118,9 @@ public class FirstPersonGenericItems {
     );
 
     private static boolean isBlockItem(ItemStack itemStack) {
+        if (!(itemStack.getItem() instanceof BlockItem)) {
+            return false;
+        }
         for (Item item : BLOCK_ITEM_OVERRIDES) {
             if (itemStack.is(item)) {
                 return true;
