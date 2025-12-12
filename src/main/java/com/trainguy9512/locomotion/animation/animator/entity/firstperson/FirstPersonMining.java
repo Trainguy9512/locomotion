@@ -61,8 +61,14 @@ public class FirstPersonMining {
 
     public static Identifier getCurrentBasePose(PoseFunction.FunctionInterpolationContext context, InteractionHand interactionHand) {
         Identifier currentHandPoseIdentifier = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getHandPoseDriver(interactionHand), context.partialTicks());
-        FirstPersonHandPoses.HandPoseConfiguration configuration = FirstPersonHandPoses.getOrThrowFromIdentifier(currentHandPoseIdentifier);
-        return configuration.basePoseSequence();
+        if (currentHandPoseIdentifier == FirstPersonHandPoses.GENERIC_ITEM) {
+            Identifier currentGenericItemPoseIdentifier = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(interactionHand), context.partialTicks());
+            FirstPersonGenericItems.GenericItemPoseDefinition definition = FirstPersonGenericItems.getOrThrowFromIdentifier(currentHandPoseIdentifier);
+            return definition.basePoseSequence();
+        } else {
+            FirstPersonHandPoses.HandPoseDefinition definition = FirstPersonHandPoses.getOrThrowFromIdentifier(currentHandPoseIdentifier);
+            return definition.basePoseSequence();
+        }
     }
 
     public static PoseFunction<LocalSpacePose> makeMainHandMiningPoseFunction(

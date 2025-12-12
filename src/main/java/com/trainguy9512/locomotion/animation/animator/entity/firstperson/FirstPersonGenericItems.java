@@ -137,7 +137,7 @@ public class FirstPersonGenericItems {
     }
 
     public record GenericItemPoseDefinition(
-            Identifier basePoseAnimationSequence,
+            Identifier basePoseSequence,
             Predicate<ItemStack> usePoseCondition,
             int evaluationPriority,
             ItemRenderType itemRenderType
@@ -213,22 +213,15 @@ public class FirstPersonGenericItems {
         return getFallback();
     }
 
-    public static Identifier getGenericItemPoseSequence(PoseFunction.FunctionInterpolationContext context, InteractionHand interactionHand) {
-        DriverKey<VariableDriver<Identifier>> driver = FirstPersonDrivers.getGenericItemPoseDriver(interactionHand);
-        Identifier genericItemPoseIdentifier = context.driverContainer().getInterpolatedDriverValue(driver, context.partialTicks());
-        GenericItemPoseDefinition definition = getOrThrowFromIdentifier(genericItemPoseIdentifier);
-        return definition.basePoseAnimationSequence;
-    }
+//    public static Identifier getGenericItemPoseSequence(PoseFunction.FunctionInterpolationContext context, InteractionHand interactionHand) {
+//        DriverKey<VariableDriver<Identifier>> driver = FirstPersonDrivers.getGenericItemPoseDriver(interactionHand);
+//        Identifier genericItemPoseIdentifier = context.driverContainer().getInterpolatedDriverValue(driver, context.partialTicks());
+//        GenericItemPoseDefinition definition = getOrThrowFromIdentifier(genericItemPoseIdentifier);
+//        return definition.basePoseSequence;
+//    }
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        PoseFunction<LocalSpacePose> pose = SequenceEvaluatorFunction.builder(context -> getGenericItemPoseSequence(context, interactionHand)).build();
-
-        if (interactionHand == InteractionHand.MAIN_HAND) {
-            PoseFunction<LocalSpacePose> additiveMiningPose = MakeDynamicAdditiveFunction.of(
-                    FirstPersonMining.makePickaxeMiningPoseFunction(cachedPoseContainer),
-                    SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build());
-            pose = ApplyAdditiveFunction.of(pose, additiveMiningPose);
-        }
+        PoseFunction<LocalSpacePose> pose = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand);
 
         PoseFunction<LocalSpacePose> consumablePose;
         consumablePose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build();

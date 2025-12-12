@@ -28,7 +28,7 @@ public class FirstPersonMontages {
             .makeAdditive(driverContainer -> {
                 FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
                 if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
-                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseAnimationSequence();
+                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
                 }
                 return handPose.basePoseLocation;
             }, SequenceReferencePoint.END)
@@ -62,7 +62,7 @@ public class FirstPersonMontages {
             .makeAdditive(driverContainer -> {
                 FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
                 if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
-                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseAnimationSequence();
+                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
                 }
                 return handPose.basePoseLocation;
             }, SequenceReferencePoint.END)
@@ -73,7 +73,7 @@ public class FirstPersonMontages {
             .makeAdditive(driverContainer -> {
                 FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_POSE);
                 if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
-                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_GENERIC_ITEM_POSE)).basePoseAnimationSequence();
+                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
                 }
                 return handPose.basePoseLocation;
             }, SequenceReferencePoint.END)

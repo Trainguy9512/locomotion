@@ -28,7 +28,7 @@ public class FirstPersonShield {
 
     public static boolean isUsingShield(StateTransition.TransitionContext context, InteractionHand hand) {
         boolean isUsing = context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
-        boolean handPoseIsShield = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPose.SHIELD;
+        boolean handPoseIsShield = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.SHIELD;
         return isUsing && handPoseIsShield;
     }
 
@@ -109,7 +109,7 @@ public class FirstPersonShield {
         PoseFunction<LocalSpacePose> shieldStateMachine;
         shieldStateMachine = StateMachineFunction.builder(FirstPersonShield::getShieldEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(SHIELD_LOWERED_STATE, FirstPersonHandPose.SHIELD.getMiningStateMachine(cachedPoseContainer, hand))
+                .defineState(StateDefinition.builder(SHIELD_LOWERED_STATE, FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand))
                         .build())
                 .defineState(StateDefinition.builder(SHIELD_BLOCKING_IN_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_IN).build())
                         .resetsPoseFunctionUponEntry(true)

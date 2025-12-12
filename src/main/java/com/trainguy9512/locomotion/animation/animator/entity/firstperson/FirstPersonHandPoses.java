@@ -8,9 +8,13 @@ import com.trainguy9512.locomotion.render.ItemRenderType;
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.ShieldItem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,22 +23,147 @@ import java.util.function.Predicate;
 
 public class FirstPersonHandPoses {
 
-    private static final Map<Identifier, HandPoseConfiguration> HAND_POSES_BY_IDENTIFIER = new HashMap<>();
+    private static final Map<Identifier, HandPoseDefinition> HAND_POSES_BY_IDENTIFIER = new HashMap<>();
 
-    public static Identifier register(Identifier identifier, HandPoseConfiguration configuration) {
+    public static Identifier register(Identifier identifier, HandPoseDefinition configuration) {
         HAND_POSES_BY_IDENTIFIER.put(identifier, configuration);
         return identifier;
     }
 
-    public static final Identifier EMPTY = register(LocomotionMain.makeIdentifier("empty"), HandPoseConfiguration.builder(
+    public static final Identifier EMPTY = register(LocomotionMain.makeIdentifier("empty"), HandPoseDefinition.builder(
             "empty",
             FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_EMPTY_POSE,
             ItemStack::isEmpty,
-            0
-            ).build());
+            10)
+            .build());
+    public static final Identifier GENERIC_ITEM = register(LocomotionMain.makeIdentifier("generic_item"), HandPoseDefinition.builder(
+            "generic_item",
+            FirstPersonGenericItems::constructPoseFunction,
+            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE,
+            itemStack -> true,
+            0)
+            .build());
+    public static final Identifier PICKAXE = register(LocomotionMain.makeIdentifier("pickaxe"), HandPoseDefinition.builder(
+            "pickaxe",
+            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonAnimationSequences.HAND_TOOL_POSE,
+            itemStack -> itemStack.is(ItemTags.PICKAXES),
+            60)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier AXE = register(LocomotionMain.makeIdentifier("axe"), HandPoseDefinition.builder(
+            "axe",
+            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonAnimationSequences.HAND_TOOL_POSE,
+            itemStack -> itemStack.is(ItemTags.AXES),
+            50)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier SHOVEL = register(LocomotionMain.makeIdentifier("shovel"), HandPoseDefinition.builder(
+            "shovel",
+            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonAnimationSequences.HAND_TOOL_POSE,
+            itemStack -> itemStack.is(ItemTags.SHOVELS),
+            40)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier HOE = register(LocomotionMain.makeIdentifier("hoe"), HandPoseDefinition.builder(
+            "hoe",
+            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonAnimationSequences.HAND_TOOL_POSE,
+            itemStack -> itemStack.is(ItemTags.HOES),
+            40)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier SWORD = register(LocomotionMain.makeIdentifier("sword"), HandPoseDefinition.builder(
+            "sword",
+            FirstPersonSword::handSwordPoseFunction,
+            FirstPersonAnimationSequences.HAND_TOOL_POSE,
+            itemStack -> itemStack.is(ItemTags.SWORDS),
+            100)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier SHIELD = register(LocomotionMain.makeIdentifier("shield"), HandPoseDefinition.builder(
+            "shield",
+            FirstPersonShield::constructShieldPoseFunction,
+            FirstPersonAnimationSequences.HAND_SHIELD_POSE,
+            itemStack -> itemStack.getItem() instanceof ShieldItem,
+            90)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier BOW = register(LocomotionMain.makeIdentifier("bow"), HandPoseDefinition.builder(
+                    "bow",
+                    FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+                    FirstPersonAnimationSequences.HAND_BOW_POSE,
+                    itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.BOW,
+                    100)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier CROSSBOW = register(LocomotionMain.makeIdentifier("crossbow"), HandPoseDefinition.builder(
+                    "crossbow",
+                    FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+                    FirstPersonAnimationSequences.HAND_CROSSBOW_POSE,
+                    itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.CROSSBOW,
+                    100)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_CROSSBOW_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier TRIDENT = register(LocomotionMain.makeIdentifier("trident"), HandPoseDefinition.builder(
+                    "trident",
+                    FirstPersonTrident::handTridentPoseFunction,
+                    FirstPersonAnimationSequences.HAND_TRIDENT_POSE,
+                    itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.TRIDENT,
+                    100)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier BRUSH = register(LocomotionMain.makeIdentifier("brush"), HandPoseDefinition.builder(
+                    "brush",
+                    FirstPersonBrush::handBrushPoseFunction,
+                    FirstPersonAnimationSequences.HAND_BRUSH_POSE,
+                    itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.BRUSH,
+                    100)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier MACE = register(LocomotionMain.makeIdentifier("mace"), HandPoseDefinition.builder(
+                    "mace",
+                    FirstPersonMace::handMacePoseFunction,
+                    FirstPersonAnimationSequences.HAND_MACE_POSE,
+                    itemStack -> itemStack.is(ItemTags.MACE_ENCHANTABLE),
+                    110)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier SPYGLASS = register(LocomotionMain.makeIdentifier("spyglass"), HandPoseDefinition.builder(
+                    "spyglass",
+                    FirstPersonSpyglass::handSpyglassPoseFunction,
+                    FirstPersonAnimationSequences.HAND_SPYGLASS_POSE,
+                    itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.SPYGLASS,
+                    100)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
+    public static final Identifier MAP = register(LocomotionMain.makeIdentifier("map"), HandPoseDefinition.builder(
+                    "map",
+                    FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+                    FirstPersonAnimationSequences.HAND_MAP_SINGLE_HAND_POSE,
+                    itemStack -> itemStack.has(DataComponents.MAP_ID),
+                    100)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .build());
 
-    public record HandPoseConfiguration(
+
+    public record HandPoseDefinition(
             String stateIdentifier,
             Predicate<ItemStack> choosePoseIfTrue,
             int chooseEvaluationPriority,
@@ -114,8 +243,8 @@ public class FirstPersonHandPoses {
                 return this;
             }
 
-            public HandPoseConfiguration build() {
-                return new HandPoseConfiguration(
+            public HandPoseDefinition build() {
+                return new HandPoseDefinition(
                         stateIdentifier,
                         choosePoseIfTrue,
                         chooseEvaluationPriority,
@@ -132,10 +261,10 @@ public class FirstPersonHandPoses {
     }
 
     public static Identifier getFallback() {
-        return EMPTY;
+        return GENERIC_ITEM;
     }
 
-    public static HandPoseConfiguration getOrThrowFromIdentifier(Identifier identifier) {
+    public static HandPoseDefinition getOrThrowFromIdentifier(Identifier identifier) {
         return HAND_POSES_BY_IDENTIFIER.get(identifier);
     }
 

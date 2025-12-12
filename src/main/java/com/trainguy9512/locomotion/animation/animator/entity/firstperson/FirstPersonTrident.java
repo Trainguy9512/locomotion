@@ -34,7 +34,7 @@ public class FirstPersonTrident {
         PoseFunction<LocalSpacePose> tridentStateMachine;
         tridentStateMachine = StateMachineFunction.builder(FirstPersonTrident::getTridentEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(TRIDENT_IDLE_STATE, FirstPersonHandPose.TRIDENT.getMiningStateMachine(cachedPoseContainer, interactionHand))
+                .defineState(StateDefinition.builder(TRIDENT_IDLE_STATE, FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand))
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .defineState(StateDefinition.builder(TRIDENT_CHARGE_THROW_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_CHARGE_THROW).build())
