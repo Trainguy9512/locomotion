@@ -28,8 +28,11 @@ public class FirstPersonHandPoses {
 
     public static final Identifier EMPTY = register(LocomotionMain.makeIdentifier("empty"), HandPoseConfiguration.builder(
             "empty",
-
-    ))
+            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonAnimationSequences.HAND_EMPTY_POSE,
+            ItemStack::isEmpty,
+            0
+            ).build());
 
     public record HandPoseConfiguration(
             String stateIdentifier,
@@ -126,5 +129,17 @@ public class FirstPersonHandPoses {
                 );
             }
         }
+    }
+
+    public static Identifier getFallback() {
+        return EMPTY;
+    }
+
+    public static HandPoseConfiguration getOrThrowFromIdentifier(Identifier identifier) {
+        return HAND_POSES_BY_IDENTIFIER.get(identifier);
+    }
+
+    public static Identifier getConfigurationFromItem(ItemStack itemStack) {
+        return getFallback();
     }
 }
