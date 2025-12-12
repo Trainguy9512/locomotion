@@ -35,7 +35,7 @@ public class FirstPersonSword {
         return switch (interactionHand) {
             case MAIN_HAND -> StateMachineFunction.builder(FirstPersonSword::getSwordEntryState)
                     .resetsUponRelevant(true)
-                    .defineState(StateDefinition.builder(SWORD_IDLE_STATE, FirstPersonHandPose.SWORD.getMiningStateMachine(cachedPoseContainer, interactionHand))
+                    .defineState(StateDefinition.builder(SWORD_IDLE_STATE, FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand))
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SWORD_SWING_DOWN_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.HAS_ATTACKED))

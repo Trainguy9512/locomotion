@@ -28,7 +28,7 @@ public class FirstPersonMace {
     public static PoseFunction<LocalSpacePose> handMacePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
         return switch (interactionHand) {
             case MAIN_HAND -> macePrepareStateMachine(cachedPoseContainer, interactionHand);
-            case OFF_HAND -> FirstPersonHandPose.MACE.getMiningStateMachine(cachedPoseContainer, interactionHand);
+            case OFF_HAND -> FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand);
         };
     }
 
@@ -43,7 +43,7 @@ public class FirstPersonMace {
 
         return StateMachineFunction.builder(evaluationState -> MACE_PREPARE_IDLE_STATE)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(MACE_PREPARE_IDLE_STATE, FirstPersonHandPose.MACE.getMiningStateMachine(cachedPoseContainer, interactionHand))
+                .defineState(StateDefinition.builder(MACE_PREPARE_IDLE_STATE, FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand))
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MACE_PREPARE_FALLING_STATE)
                                 .isTakenIfTrue(FirstPersonMace::isFalling)
