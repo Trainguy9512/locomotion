@@ -28,8 +28,8 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<ItemStack>> OFF_HAND_ITEM_COPY_REFERENCE = DriverKey.of("off_hand_item_copy_reference", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_MAIN_HAND_ITEM = DriverKey.of("rendered_main_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_OFF_HAND_ITEM = DriverKey.of("rendered_off_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
-    public static final DriverKey<VariableDriver<FirstPersonHandPose>> MAIN_HAND_POSE = DriverKey.of("main_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPose.EMPTY));
-    public static final DriverKey<VariableDriver<FirstPersonHandPose>> OFF_HAND_POSE = DriverKey.of("off_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPose.EMPTY));
+    public static final DriverKey<VariableDriver<Identifier>> MAIN_HAND_POSE = DriverKey.of("main_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPoses.EMPTY));
+    public static final DriverKey<VariableDriver<Identifier>> OFF_HAND_POSE = DriverKey.of("off_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPoses.EMPTY));
     public static final DriverKey<VariableDriver<Identifier>> MAIN_HAND_GENERIC_ITEM_POSE = DriverKey.of("main_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItems.GENERIC_2D_ITEM));
     public static final DriverKey<VariableDriver<Identifier>> OFF_HAND_GENERIC_ITEM_POSE = DriverKey.of("off_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItems.GENERIC_2D_ITEM));
 
@@ -75,9 +75,9 @@ public class FirstPersonDrivers {
     public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
         ItemStack newRenderedItem = driverContainer.getDriverValue(getItemDriver(interactionHand)).copy();
         driverContainer.getDriver(getRenderedItemDriver(interactionHand)).setValue(newRenderedItem);
-        FirstPersonHandPose handPose = FirstPersonHandPose.fromItemStack(newRenderedItem);
+        Identifier handPose = FirstPersonHandPoses.getConfigurationFromItem(newRenderedItem);
         driverContainer.getDriver(getHandPoseDriver(interactionHand)).setValue(handPose);
-        if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
+        if (handPose == FirstPersonHandPoses.GENERIC_ITEM) {
             Identifier genericItemPose = FirstPersonGenericItems.getConfigurationFromItem(newRenderedItem);
             driverContainer.getDriver(getGenericItemPoseDriver(interactionHand)).setValue(genericItemPose);
         } else {
@@ -91,7 +91,7 @@ public class FirstPersonDrivers {
         }
     }
 
-    public static DriverKey<VariableDriver<FirstPersonHandPose>> getHandPoseDriver(InteractionHand interactionHand) {
+    public static DriverKey<VariableDriver<Identifier>> getHandPoseDriver(InteractionHand interactionHand) {
         return switch (interactionHand) {
             case MAIN_HAND -> MAIN_HAND_POSE;
             case OFF_HAND -> OFF_HAND_POSE;
