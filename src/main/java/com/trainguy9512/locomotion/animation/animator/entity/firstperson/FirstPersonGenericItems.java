@@ -8,17 +8,13 @@ import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.Block;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -159,16 +155,16 @@ public class FirstPersonGenericItems {
 
             private final Identifier basePoseAnimationSequence;
             private final int evaluationPriority;
-            private final Predicate<ItemStack> usePoseCondition;
+            private final Predicate<ItemStack> choosePoseIfTrue;
             private ItemRenderType itemRenderType;
 
             private Builder(
                     Identifier basePoseAnimationSequence,
-                    Predicate<ItemStack> usePoseCondition,
+                    Predicate<ItemStack> choosePoseIfTrue,
                     int evaluationPriority
             ) {
                 this.basePoseAnimationSequence = basePoseAnimationSequence;
-                this.usePoseCondition = usePoseCondition;
+                this.choosePoseIfTrue = choosePoseIfTrue;
                 this.evaluationPriority = evaluationPriority;
                 this.itemRenderType = ItemRenderType.THIRD_PERSON_ITEM;
             }
@@ -181,7 +177,7 @@ public class FirstPersonGenericItems {
             public GenericItemPoseDefinition build() {
                 return new GenericItemPoseDefinition(
                         basePoseAnimationSequence,
-                        usePoseCondition,
+                        choosePoseIfTrue,
                         evaluationPriority,
                         itemRenderType
                 );

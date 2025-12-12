@@ -128,7 +128,7 @@ public enum FirstPersonHandPose {
 
     static {
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.BRUSH, BRUSH);
-        POSES_BY_USE_ANIMATION.put(ItemUseAnimation.SPEAR, TRIDENT);
+        POSES_BY_USE_ANIMATION.put(ItemUseAnimation.TRIDENT, TRIDENT);
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.CROSSBOW, CROSSBOW);
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.BOW, BOW);
         POSES_BY_USE_ANIMATION.put(ItemUseAnimation.SPYGLASS, SPYGLASS);
