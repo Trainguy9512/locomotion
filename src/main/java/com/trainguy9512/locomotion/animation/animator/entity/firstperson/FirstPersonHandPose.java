@@ -210,8 +210,8 @@ public enum FirstPersonHandPose {
     public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
 
         StateMachineFunction.Builder handPoseStateMachineBuilder = switch (interactionHand) {
-            case MAIN_HAND -> StateMachineFunction.builder(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE).poseState);
-            case OFF_HAND -> StateMachineFunction.builder(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.OFF_HAND_POSE).poseState);
+            case MAIN_HAND -> StateMachineFunction.builder(evaluationState -> HAND_POSE_DROPPING_LAST_ITEM_STATE);
+            case OFF_HAND -> StateMachineFunction.builder(evaluationState -> HAND_POSE_DROPPING_LAST_ITEM_STATE);
         };
 
         handPoseStateMachineBuilder.resetsUponRelevant(true);

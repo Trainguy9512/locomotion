@@ -8,6 +8,7 @@ import com.trainguy9512.locomotion.animation.pose.function.BlendPosesFunction;
 import com.trainguy9512.locomotion.animation.pose.function.EmptyPoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 
 public class FirstPersonMap {
@@ -42,8 +43,8 @@ public class FirstPersonMap {
     }
 
     public static float getMapMovementAnimationWeight(PoseFunction.FunctionEvaluationState context, InteractionHand interactionHand) {
-        FirstPersonHandPose handPose = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(interactionHand));
-        if (handPose == FirstPersonHandPose.MAP) {
+        Identifier handPose = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(interactionHand));
+        if (handPose == FirstPersonHandPoses.MAP) {
             return 1 - LocomotionMain.CONFIG.data().firstPersonPlayer.mapMovementAnimationIntensity;
         }
         return 0;

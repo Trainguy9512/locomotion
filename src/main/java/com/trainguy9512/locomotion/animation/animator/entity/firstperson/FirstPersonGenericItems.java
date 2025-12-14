@@ -1,8 +1,6 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.LocomotionMain;
-import com.trainguy9512.locomotion.animation.driver.DriverKey;
-import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -21,10 +19,10 @@ import java.util.stream.Collectors;
 
 public class FirstPersonGenericItems {
 
-    private static final Map<Identifier, GenericItemPoseDefinition> GENERIC_ITEM_POSES_BY_LOCATION = new HashMap<>();
+    private static final Map<Identifier, GenericItemPoseDefinition> GENERIC_ITEM_POSES_BY_IDENTIFIER = new HashMap<>();
 
     public static Identifier register(Identifier identifier, GenericItemPoseDefinition genericItemPoseDefinition) {
-        GENERIC_ITEM_POSES_BY_LOCATION.put(identifier, genericItemPoseDefinition);
+        GENERIC_ITEM_POSES_BY_IDENTIFIER.put(identifier, genericItemPoseDefinition);
         return identifier;
     }
 
@@ -138,17 +136,17 @@ public class FirstPersonGenericItems {
 
     public record GenericItemPoseDefinition(
             Identifier basePoseSequence,
-            Predicate<ItemStack> usePoseCondition,
+            Predicate<ItemStack> choosePoseIfTrue,
             int evaluationPriority,
             ItemRenderType itemRenderType
     ) {
 
         public static Builder builder(
                 Identifier basePoseAnimationSequence,
-                Predicate<ItemStack> usePoseCondition,
+                Predicate<ItemStack> choosePoseIfTrue,
                 int evaluationPriority
         ) {
-            return new Builder(basePoseAnimationSequence, usePoseCondition, evaluationPriority);
+            return new Builder(basePoseAnimationSequence, choosePoseIfTrue, evaluationPriority);
         }
 
         public static class Builder {
@@ -190,11 +188,15 @@ public class FirstPersonGenericItems {
     }
 
     public static GenericItemPoseDefinition getOrThrowFromIdentifier(Identifier identifier) {
-        return GENERIC_ITEM_POSES_BY_LOCATION.get(identifier);
+        GenericItemPoseDefinition definition = GENERIC_ITEM_POSES_BY_IDENTIFIER.get(identifier);
+        if (definition == null) {
+            throw new RuntimeException("Identifier " + identifier + " is not a registered generic item pose.");
+        }
+        return definition;
     }
 
     public static Identifier getConfigurationFromItem(ItemStack itemStack) {
-        Map<Identifier, GenericItemPoseDefinition> genericItemPosesSortedByPriority = GENERIC_ITEM_POSES_BY_LOCATION.entrySet()
+        Map<Identifier, GenericItemPoseDefinition> genericItemPosesSortedByPriority = GENERIC_ITEM_POSES_BY_IDENTIFIER.entrySet()
                 .stream()
                 .sorted(Comparator.comparingInt(entry -> -entry.getValue().evaluationPriority()))
                 .collect(Collectors.toMap(
@@ -204,8 +206,8 @@ public class FirstPersonGenericItems {
                         LinkedHashMap::new
                 ));
         for (Identifier key : genericItemPosesSortedByPriority.keySet()) {
-            GenericItemPoseDefinition definition = GENERIC_ITEM_POSES_BY_LOCATION.get(key);
-            if (definition.usePoseCondition().test(itemStack)) {
+            GenericItemPoseDefinition definition = GENERIC_ITEM_POSES_BY_IDENTIFIER.get(key);
+            if (definition.choosePoseIfTrue().test(itemStack)) {
                 return key;
             }
         }
