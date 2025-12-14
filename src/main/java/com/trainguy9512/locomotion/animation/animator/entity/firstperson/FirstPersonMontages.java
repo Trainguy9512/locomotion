@@ -7,6 +7,7 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManage
 import com.trainguy9512.locomotion.util.Easing;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 
 
@@ -16,8 +17,16 @@ public class FirstPersonMontages {
     public static final String OFF_HAND_ATTACK_SLOT = "off_hand_attack";
     public static final String SHIELD_BLOCK_SLOT = "shield_block";
 
-    public static String getAttackSlot(InteractionHand interactionHand) {
-        return interactionHand == InteractionHand.MAIN_HAND ? MAIN_HAND_ATTACK_SLOT : OFF_HAND_ATTACK_SLOT;
+    public static String getAttackSlot(InteractionHand hand) {
+        return hand == InteractionHand.MAIN_HAND ? MAIN_HAND_ATTACK_SLOT : OFF_HAND_ATTACK_SLOT;
+    }
+
+    public static Identifier getBaseHandPose(OnTickDriverContainer driverContainer) {
+        Identifier handPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
+        if (handPose == FirstPersonHandPoses.GENERIC_ITEM) {
+            return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
+        }
+        return FirstPersonHandPoses.getOrThrowFromIdentifier(handPose).basePoseSequence();
     }
 
     public static final MontageConfiguration HAND_TOOL_ATTACK_PICKAXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_pickaxe", FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_ATTACK)
@@ -25,13 +34,7 @@ public class FirstPersonMontages {
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(40)).setEasement(Easing.SINE_IN_OUT).build())
-            .makeAdditive(driverContainer -> {
-                FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
-                if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
-                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
-                }
-                return handPose.basePoseLocation;
-            }, SequenceReferencePoint.END)
+            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
             .build();
     public static final MontageConfiguration HAND_TOOL_ATTACK_AXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_axe", FirstPersonAnimationSequences.HAND_TOOL_AXE_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
@@ -59,24 +62,12 @@ public class FirstPersonMontages {
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(5))
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(16)).setEasement(Easing.SINE_IN_OUT).build())
-            .makeAdditive(driverContainer -> {
-                FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
-                if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
-                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
-                }
-                return handPose.basePoseLocation;
-            }, SequenceReferencePoint.END)
+            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration USE_OFF_HAND_MONTAGE = USE_MAIN_HAND_MONTAGE.makeBuilderCopy("hand_use_off_hand", USE_MAIN_HAND_MONTAGE.animationSequence())
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
-            .makeAdditive(driverContainer -> {
-                FirstPersonHandPose handPose = driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_POSE);
-                if (handPose == FirstPersonHandPose.GENERIC_ITEM) {
-                    return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.OFF_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
-                }
-                return handPose.basePoseLocation;
-            }, SequenceReferencePoint.END)
+            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration SHIELD_BLOCK_IMPACT_MONTAGE = MontageConfiguration.builder("shield_block_impact", FirstPersonAnimationSequences.HAND_SHIELD_IMPACT)
@@ -213,10 +204,10 @@ public class FirstPersonMontages {
     }
 
     public static void playAttackMontage(OnTickDriverContainer driverContainer, MontageManager montageManager) {
-        FirstPersonHandPose firstPersonHandPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
-        MontageConfiguration montage = firstPersonHandPose.getAttackMontage(driverContainer);
-        if (montage != null) {
-            montageManager.playMontage(montage);
-        }
+//        FirstPersonHandPose firstPersonHandPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
+//        MontageConfiguration montage = firstPersonHandPose.getAttackMontage(driverContainer);
+//        if (montage != null) {
+//            montageManager.playMontage(montage);
+//        }
     }
 }

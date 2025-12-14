@@ -106,8 +106,8 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     @Override
     public PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer) {
 
-        PoseFunction<LocalSpacePose> mainHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.MAIN_HAND);
-        PoseFunction<LocalSpacePose> offHandPose = FirstPersonHandPose.constructPoseFunction(cachedPoseContainer, InteractionHand.OFF_HAND);
+        PoseFunction<LocalSpacePose> mainHandPose = FirstPersonHandPoseSwitching.constructPoseFunction(cachedPoseContainer, InteractionHand.MAIN_HAND);
+        PoseFunction<LocalSpacePose> offHandPose = FirstPersonHandPoseSwitching.constructPoseFunction(cachedPoseContainer, InteractionHand.OFF_HAND);
         cachedPoseContainer.register(MAIN_HAND_POSE_CACHE, mainHandPose, true);
         cachedPoseContainer.register(OFF_HAND_POSE_CACHE, MirrorFunction.of(offHandPose), true);
 

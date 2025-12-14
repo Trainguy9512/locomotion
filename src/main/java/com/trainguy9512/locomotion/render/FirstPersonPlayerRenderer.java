@@ -120,11 +120,13 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                             Identifier rightHandGenericItemPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
                             FirstPersonGenericItems.GenericItemPoseDefinition leftHandGenericItemPoseDefinition = FirstPersonGenericItems.getOrThrowFromIdentifier(leftHandGenericItemPoseIdentifier);
                             FirstPersonGenericItems.GenericItemPoseDefinition rightHandGenericItemPoseDefinition = FirstPersonGenericItems.getOrThrowFromIdentifier(rightHandGenericItemPoseIdentifier);
-                            FirstPersonHandPose leftHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
-                            FirstPersonHandPose rightHandPose = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            Identifier leftHandPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            Identifier rightHandPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(!leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND));
+                            FirstPersonHandPoses.HandPoseDefinition leftHandPose = FirstPersonHandPoses.getOrThrowFromIdentifier(leftHandPoseIdentifier);
+                            FirstPersonHandPoses.HandPoseDefinition rightHandPose = FirstPersonHandPoses.getOrThrowFromIdentifier(rightHandPoseIdentifier);
 
-                            ItemRenderType leftHandItemRenderType = leftHandPose == FirstPersonHandPose.GENERIC_ITEM ? leftHandGenericItemPoseDefinition.itemRenderType() : leftHandPose.itemRenderType;
-                            ItemRenderType rightHandItemRenderType = rightHandPose == FirstPersonHandPose.GENERIC_ITEM ? rightHandGenericItemPoseDefinition.itemRenderType() : rightHandPose.itemRenderType;
+                            ItemRenderType leftHandItemRenderType = leftHandPoseIdentifier == FirstPersonHandPoses.GENERIC_ITEM ? leftHandGenericItemPoseDefinition.itemRenderType() : leftHandPose.itemRenderType();
+                            ItemRenderType rightHandItemRenderType = rightHandPoseIdentifier == FirstPersonHandPoses.GENERIC_ITEM ? rightHandGenericItemPoseDefinition.itemRenderType() : rightHandPose.itemRenderType();
 
                             ItemStack mainHandItem = getItemStackInHandToRender(dataContainer, player, InteractionHand.MAIN_HAND);
                             ItemStack offHandItem = getItemStackInHandToRender(dataContainer, player, InteractionHand.OFF_HAND);

@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
@@ -99,6 +100,24 @@ public class FirstPersonShield {
         return inputWithAdditivePose;
     }
 
+
+    public static PoseFunction<LocalSpacePose> constructStaticShieldMiningStateMachine(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand
+    ) {
+        PoseFunction<LocalSpacePose> shieldPose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_POSE).build();
+        PoseFunction<LocalSpacePose> pose;
+        if (hand == InteractionHand.MAIN_HAND) {
+            PoseFunction<LocalSpacePose> baseMiningPose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build();
+            pose = FirstPersonMining.constructPickaxeMiningPoseFunction();
+            pose = MakeDynamicAdditiveFunction.of(pose, baseMiningPose);
+            pose = ApplyAdditiveFunction.of(shieldPose, pose);
+        } else {
+            pose = shieldPose;
+        }
+        return pose;
+    }
+
     private static PoseFunction<LocalSpacePose> constructShieldStateMachine(
             CachedPoseContainer cachedPoseContainer,
             InteractionHand hand
@@ -109,7 +128,7 @@ public class FirstPersonShield {
         PoseFunction<LocalSpacePose> shieldStateMachine;
         shieldStateMachine = StateMachineFunction.builder(FirstPersonShield::getShieldEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(SHIELD_LOWERED_STATE, FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand))
+                .defineState(StateDefinition.builder(SHIELD_LOWERED_STATE, constructStaticShieldMiningStateMachine(cachedPoseContainer, hand))
                         .build())
                 .defineState(StateDefinition.builder(SHIELD_BLOCKING_IN_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_IN).build())
                         .resetsPoseFunctionUponEntry(true)
