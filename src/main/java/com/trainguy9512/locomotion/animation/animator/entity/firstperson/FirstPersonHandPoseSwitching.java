@@ -83,7 +83,7 @@ public class FirstPersonHandPoseSwitching {
             InteractionHand hand
     ) {
         ItemStack currentItemStack = context.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(hand));
-        Identifier handPoseFromCurrentItemStack = FirstPersonHandPoses.getConfigurationFromItem(currentItemStack);
+        Identifier handPoseFromCurrentItemStack = FirstPersonHandPoses.testForNextHandPose(currentItemStack, hand);
         return handPoseIdentifier == handPoseFromCurrentItemStack;
     }
 
@@ -175,7 +175,7 @@ public class FirstPersonHandPoseSwitching {
     }
 
     public static void defineExtraStates(StateMachineFunction.Builder stateMachineBuilder, InteractionHand hand) {
-        FirstPersonHandPoses.HandPoseDefinition emptyHandPose = FirstPersonHandPoses.getOrThrowFromIdentifier(FirstPersonHandPoses.EMPTY);
+        FirstPersonHandPoses.HandPoseDefinition emptyHandPose = FirstPersonHandPoses.getOrThrowFromIdentifier(FirstPersonHandPoses.getEmptyHandPose(hand));
 
         PoseFunction<LocalSpacePose> useLastItemPoseFunction;
         useLastItemPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).isAdditive(true, SequenceReferencePoint.END).build();
@@ -215,8 +215,8 @@ public class FirstPersonHandPoseSwitching {
                         .build());
     }
 
-    private static void clearMontagesInAttackSlot(PoseFunction.FunctionEvaluationState evaluationState, InteractionHand interactionHand) {
-        evaluationState.montageManager().interruptMontagesInSlot(FirstPersonMontages.getAttackSlot(interactionHand), Transition.INSTANT);
+    private static void clearMontagesInAttackSlot(PoseFunction.FunctionEvaluationState evaluationState, InteractionHand hand) {
+        evaluationState.montageManager().interruptMontagesInSlot(FirstPersonMontages.getAttackSlot(hand), Transition.INSTANT);
     }
 
 
@@ -341,11 +341,17 @@ public class FirstPersonHandPoseSwitching {
         if (context.driverContainer().getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).hasBeenTriggered()) {
             return false;
         }
+        // Don't play the throw animation if the player has a screen open
+        if (context.driverContainer().getDriverValue(FirstPersonDrivers.HAS_SCREEN_OPEN)) {
+            return false;
+        }
 //        if (!context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getPreviousValue()) {
 //            return false;
 //        }
         // If any of these conditions are met, use the "throw trident" transition
-        if (context.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(hand)).getCurrentValue().getUseAnimation() == ItemUseAnimation.SPEAR) {
+        boolean previousItemWasTrident = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.TRIDENT;
+        boolean wasJustUsingItem = context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getPreviousValue();
+        if (previousItemWasTrident) {
             return true;
         }
         return false;

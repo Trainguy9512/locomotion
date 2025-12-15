@@ -1,5 +1,6 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
@@ -13,32 +14,30 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class FirstPersonItemUpdateAnimations {
 
-    private static final ArrayList<ItemUpdateAnimationRule> ITEM_UPDATE_ANIMATION_RULES = new ArrayList<>();
+    private static final Map<Identifier, ItemUpdateAnimationRule> ITEM_UPDATE_ANIMATION_RULES_BY_IDENTIFIER = Maps.newHashMap();
 
-    static {
-        register(ItemUpdateAnimationRule.of(
-                LocomotionMain.makeIdentifier("crossbow_fire"),
-                FirstPersonMontages::getCrossbowFireMontage,
-                FirstPersonItemUpdateAnimations::shouldPlayCrossbowFire
-        ));
-        register(ItemUpdateAnimationRule.of(
-                LocomotionMain.makeIdentifier("bucket_collect"),
-                FirstPersonMontages::getBucketCollectMontage,
-                FirstPersonItemUpdateAnimations::shouldPlayBucketCollect
-        ));
-        register(ItemUpdateAnimationRule.of(
-                LocomotionMain.makeIdentifier("bucket_empty"),
-                FirstPersonMontages::getBucketEmptyMontage,
-                FirstPersonItemUpdateAnimations::shouldPlayBucketEmpty
-        ));
-    }
+    public static final Identifier CROSSBOW_FIRE = register(LocomotionMain.makeIdentifier("crossbow_fire"), ItemUpdateAnimationRule.of(
+            FirstPersonMontages::getCrossbowFireMontage,
+            FirstPersonItemUpdateAnimations::shouldPlayCrossbowFire,
+            0
+    ));
+    public static final Identifier BUCKET_COLLECT = register(LocomotionMain.makeIdentifier("bucket_collect"), ItemUpdateAnimationRule.of(
+            FirstPersonMontages::getBucketCollectMontage,
+            FirstPersonItemUpdateAnimations::shouldPlayBucketCollect,
+            0
+    ));
+    public static final Identifier BUCKET_EMPTY = register(LocomotionMain.makeIdentifier("bucket_empty"), ItemUpdateAnimationRule.of(
+            FirstPersonMontages::getBucketEmptyMontage,
+            FirstPersonItemUpdateAnimations::shouldPlayBucketEmpty,
+            0
+    ));
 
     private static boolean shouldPlayCrossbowFire(ItemUpdateAnimationConditionContext context) {
         boolean bothItemsAreCrossbows = context.bothItemsMeetPredicate(itemStack -> itemStack.has(DataComponents.CHARGED_PROJECTILES));
@@ -74,21 +73,22 @@ public class FirstPersonItemUpdateAnimations {
         return currentItemIsEmptyBucket && previousItemIsCollectedBucket;
     }
 
-    public static void register(ItemUpdateAnimationRule itemUpdateAnimationRule) {
-        ITEM_UPDATE_ANIMATION_RULES.addFirst(itemUpdateAnimationRule);
+    public static Identifier register(Identifier identifier, ItemUpdateAnimationRule itemUpdateAnimationRule) {
+        ITEM_UPDATE_ANIMATION_RULES_BY_IDENTIFIER.put(identifier, itemUpdateAnimationRule);
+        return identifier;
     }
 
     public record ItemUpdateAnimationRule(
-            Identifier identifier,
             Function<InteractionHand, MontageConfiguration> montageProvider,
-            Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation
+            Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation,
+            int evaluationPriority
     ) {
         public static ItemUpdateAnimationRule of(
-                Identifier identifier,
                 Function<InteractionHand, MontageConfiguration> montageProvider,
-                Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation
+                Predicate<ItemUpdateAnimationConditionContext> shouldPlayAnimation,
+                int evaluationPriority
         ) {
-            return new ItemUpdateAnimationRule(identifier, montageProvider, shouldPlayAnimation);
+            return new ItemUpdateAnimationRule(montageProvider, shouldPlayAnimation, evaluationPriority);
         }
     }
 
@@ -101,7 +101,7 @@ public class FirstPersonItemUpdateAnimations {
         }
     }
 
-    public static void testForAndPlayItemUpdateAnimations(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
+    public static void testForAndPlayItemUpdateAnimations(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand hand) {
         if (driverContainer.getDriverValue(FirstPersonDrivers.HAS_DROPPED_ITEM)) {
             return;
         }
@@ -113,24 +113,37 @@ public class FirstPersonItemUpdateAnimations {
             return;
         }
 
-        ItemStack currentItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getCurrentValue();
-        ItemStack previousItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getPreviousValue();
-        ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
+        ItemStack actualItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(hand)).getCurrentValue();
+        ItemStack previousItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(hand)).getPreviousValue();
+        ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
         ItemUpdateAnimationConditionContext context = new ItemUpdateAnimationConditionContext(
-                currentItem,
+                actualItem,
                 previousItem
         );
 
-        for (ItemUpdateAnimationRule rule : ITEM_UPDATE_ANIMATION_RULES) {
+        Map<Identifier, ItemUpdateAnimationRule> sortedItemUpdateAnimationRules = ITEM_UPDATE_ANIMATION_RULES_BY_IDENTIFIER.entrySet()
+                .stream()
+                .sorted(Comparator.comparingInt(entry -> -entry.getValue().evaluationPriority()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue,
+                        LinkedHashMap::new
+                ));
+
+        for (Identifier ruleIdentifier : sortedItemUpdateAnimationRules.keySet()) {
+            ItemUpdateAnimationRule rule = sortedItemUpdateAnimationRules.get(ruleIdentifier);
             if (rule.shouldPlayAnimation.test(context)) {
-                LocomotionMain.DEBUG_LOGGER.info("Playing item update animation \"{}\"", rule.identifier);
-                MontageConfiguration montage = rule.montageProvider.apply(interactionHand);
+                LocomotionMain.DEBUG_LOGGER.info("Playing item update animation \"{}\"", ruleIdentifier);
+                MontageConfiguration montage = rule.montageProvider.apply(hand);
                 for (String slot : montage.slots()) {
                     montageManager.interruptMontagesInSlot(slot, Transition.builder(TimeSpan.ofSeconds(0.2f)).build());
                 }
-                montageManager.playMontage(rule.montageProvider.apply(interactionHand));
-                if (FirstPersonHandPose.fromItemStack(renderedItem) == FirstPersonHandPose.fromItemStack(currentItem)) {
-                    FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
+                montageManager.playMontage(rule.montageProvider.apply(hand));
+                Identifier renderedItemHandPose = FirstPersonHandPoses.testForNextHandPose(renderedItem, hand);
+                Identifier currentItemHandPose = FirstPersonHandPoses.testForNextHandPose(actualItem, hand);
+                if (currentItemHandPose == renderedItemHandPose) {
+                    FirstPersonDrivers.updateRenderedItem(driverContainer, hand);
                 }
                 return;
             }

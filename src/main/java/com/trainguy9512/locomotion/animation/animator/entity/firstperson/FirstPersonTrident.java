@@ -28,13 +28,13 @@ public class FirstPersonTrident {
         return TRIDENT_IDLE_STATE;
     }
 
-    public static PoseFunction<LocalSpacePose> handTridentPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        DriverKey<VariableDriver<Boolean>> usingItemDriverKey = FirstPersonDrivers.getUsingItemDriver(interactionHand);
+    public static PoseFunction<LocalSpacePose> handTridentPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
+        DriverKey<VariableDriver<Boolean>> usingItemDriverKey = FirstPersonDrivers.getUsingItemDriver(hand);
 
         PoseFunction<LocalSpacePose> tridentStateMachine;
         tridentStateMachine = StateMachineFunction.builder(FirstPersonTrident::getTridentEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(TRIDENT_IDLE_STATE, FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand))
+                .defineState(StateDefinition.builder(TRIDENT_IDLE_STATE, FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand))
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .defineState(StateDefinition.builder(TRIDENT_CHARGE_THROW_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_CHARGE_THROW).build())
@@ -75,7 +75,7 @@ public class FirstPersonTrident {
                                 TRIDENT_RIPTIDE_END_STATE
                         ))
                         .addOutboundTransition(StateTransition.builder(TRIDENT_RIPTIDE_STATE)
-                                .isTakenIfTrue(context -> shouldPlayRiptideAnimation(context, interactionHand))
+                                .isTakenIfTrue(context -> shouldPlayRiptideAnimation(context, hand))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(60)
                                 .build())
@@ -85,9 +85,9 @@ public class FirstPersonTrident {
         return tridentStateMachine;
     }
 
-    private static boolean shouldPlayRiptideAnimation(StateTransition.TransitionContext context, InteractionHand interactionHand) {
+    private static boolean shouldPlayRiptideAnimation(StateTransition.TransitionContext context, InteractionHand hand) {
         boolean isInRiptide = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_IN_RIPTIDE);
         InteractionHand lastUsedHand = context.driverContainer().getDriverValue(FirstPersonDrivers.LAST_USED_HAND);
-        return isInRiptide && lastUsedHand == interactionHand;
+        return isInRiptide && lastUsedHand == hand;
     }
 }

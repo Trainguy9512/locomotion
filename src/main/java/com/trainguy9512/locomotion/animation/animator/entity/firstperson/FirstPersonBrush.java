@@ -14,8 +14,8 @@ import net.minecraft.world.InteractionHand;
 
 public class FirstPersonBrush {
 
-    private static boolean isUsingItem(StateTransition.TransitionContext context, InteractionHand interactionHand) {
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(interactionHand));
+    private static boolean isUsingItem(StateTransition.TransitionContext context, InteractionHand hand) {
+        return context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
     }
 
     public static final String BRUSH_IDLE_STATE = "idle";
@@ -23,9 +23,9 @@ public class FirstPersonBrush {
 
     public static PoseFunction<LocalSpacePose> handBrushPoseFunction(
             CachedPoseContainer cachedPoseContainer,
-            InteractionHand interactionHand
+            InteractionHand hand
     ) {
-        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand);
+        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> siftingPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_BRUSH_SIFT_LOOP)
                 .setPlayRate(1)
                 .setLooping(true)
@@ -34,7 +34,7 @@ public class FirstPersonBrush {
         return StateMachineFunction.builder(functionEvaluationState -> BRUSH_IDLE_STATE)
                 .defineState(StateDefinition.builder(BRUSH_IDLE_STATE, idlePoseFunction)
                         .addOutboundTransition(StateTransition.builder(BRUSH_SIFTING_STATE)
-                                .isTakenIfTrue(context -> isUsingItem(context, interactionHand))
+                                .isTakenIfTrue(context -> isUsingItem(context, hand))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(8))
                                         .setEasement(Easing.CUBIC_IN_OUT)
                                         .build())
@@ -44,7 +44,7 @@ public class FirstPersonBrush {
                         .build())
                 .defineState(StateDefinition.builder(BRUSH_SIFTING_STATE, siftingPoseFunction)
                         .addOutboundTransition(StateTransition.builder(BRUSH_IDLE_STATE)
-                                .isTakenIfTrue(context -> !isUsingItem(context, interactionHand))
+                                .isTakenIfTrue(context -> !isUsingItem(context, hand))
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
                                         .setEasement(Easing.EXPONENTIAL_OUT)
                                         .build())

@@ -178,10 +178,10 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         this.minecraft.renderBuffers().bufferSource().endBatch();
     }
 
-    private static ItemStack getItemStackInHandToRender(AnimationDataContainer dataContainer, LocalPlayer localPlayer, InteractionHand interactionHand) {
-        ItemStack driverItem = dataContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
-        ItemStack driverRenderedItem = dataContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
-        ItemStack playerItem = localPlayer.getItemInHand(interactionHand);
+    private static ItemStack getItemStackInHandToRender(AnimationDataContainer dataContainer, LocalPlayer localPlayer, InteractionHand hand) {
+        ItemStack driverItem = dataContainer.getDriverValue(FirstPersonDrivers.getItemDriver(hand));
+        ItemStack driverRenderedItem = dataContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
+        ItemStack playerItem = localPlayer.getItemInHand(hand);
 
         if (!ItemStack.isSameItem(playerItem, driverRenderedItem)) {
             return driverRenderedItem;
@@ -252,12 +252,12 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             SubmitNodeCollector nodeCollector,
             int combinedLight,
             HumanoidArm side,
-            InteractionHand interactionHand,
+            InteractionHand hand,
             ItemRenderType renderType
     ) {
         if (!itemStack.isEmpty()) {
             IS_RENDERING_LOCOMOTION_FIRST_PERSON = true;
-            CURRENT_ITEM_INTERACTION_HAND = interactionHand;
+            CURRENT_ITEM_INTERACTION_HAND = hand;
 
             poseStack.pushPose();
             jointChannel.transformPoseStack(poseStack, 16f);

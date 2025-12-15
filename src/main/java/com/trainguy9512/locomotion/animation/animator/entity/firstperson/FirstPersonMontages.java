@@ -29,6 +29,9 @@ public class FirstPersonMontages {
         return FirstPersonHandPoses.getOrThrowFromIdentifier(handPose).basePoseSequence();
     }
 
+
+
+
     public static final MontageConfiguration HAND_TOOL_ATTACK_PICKAXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_pickaxe", FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
@@ -42,20 +45,28 @@ public class FirstPersonMontages {
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(15)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
-
     public static final MontageConfiguration HAND_MACE_ATTACK_MONTAGE = MontageConfiguration.builder("hand_mace_attack", FirstPersonAnimationSequences.HAND_MACE_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
-
     public static final MontageConfiguration HAND_TRIDENT_JAB_MONTAGE = MontageConfiguration.builder("hand_trident_jab", FirstPersonAnimationSequences.HAND_TRIDENT_JAB)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
             .build();
+    public static final MontageConfiguration HAND_SPEAR_JAB_MONTAGE = MontageConfiguration.builder("hand_spear_jab", FirstPersonAnimationSequences.HAND_SPEAR_JAB)
+            .playsInSlot(MAIN_HAND_ATTACK_SLOT)
+            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.SINE_IN_OUT).build())
+            .build();
+
+
+
+
 
     public static final MontageConfiguration USE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("hand_use_main_hand", FirstPersonAnimationSequences.HAND_TOOL_USE)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
@@ -117,6 +128,10 @@ public class FirstPersonMontages {
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
             .build();
 
+
+
+
+
     public static final MontageConfiguration BUCKET_COLLECT_MAIN_HAND_MONTAGE = MontageConfiguration.builder("bucket_collect_main_hand", FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BUCKET_COLLECT)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
@@ -147,57 +162,61 @@ public class FirstPersonMontages {
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
             .build();
 
-    public static MontageConfiguration getCrossbowFireMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+
+
+
+
+    public static MontageConfiguration getCrossbowFireMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> CROSSBOW_FIRE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> CROSSBOW_FIRE_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getUseAnimationMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getUseAnimationMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> USE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> USE_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getAxeScrapeMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getAxeScrapeMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> AXE_SCRAPE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> AXE_SCRAPE_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getHoeTillMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getHoeTillMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> HOE_TILL_MAIN_HAND_MONTAGE;
             case OFF_HAND -> HOE_TILL_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getShovelFlattenMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getShovelFlattenMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> SHOVEL_FLATTEN_MAIN_HAND_MONTAGE;
             case OFF_HAND -> SHOVEL_FLATTEN_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getShearsUseMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getShearsUseMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> SHEARS_USE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> SHEARS_USE_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getBucketCollectMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getBucketCollectMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> BUCKET_COLLECT_MAIN_HAND_MONTAGE;
             case OFF_HAND -> BUCKET_COLLECT_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getBucketEmptyMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getBucketEmptyMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> BUCKET_EMPTY_MAIN_HAND_MONTAGE;
             case OFF_HAND -> BUCKET_EMPTY_OFF_HAND_MONTAGE;
         };

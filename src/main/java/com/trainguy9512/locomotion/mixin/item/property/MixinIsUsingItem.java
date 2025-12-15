@@ -27,9 +27,9 @@ public class MixinIsUsingItem {
         if (FirstPersonPlayerRenderer.IS_RENDERING_LOCOMOTION_FIRST_PERSON) {
             JointAnimatorDispatcher.getInstance().getInterpolatedFirstPersonPlayerPose().ifPresent(pose -> {
                 JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(driverContainer -> {
-                    InteractionHand interactionHand = FirstPersonPlayerRenderer.CURRENT_ITEM_INTERACTION_HAND;
+                    InteractionHand hand = FirstPersonPlayerRenderer.CURRENT_ITEM_INTERACTION_HAND;
                     InteractionHand currentUsingInteractionHand = driverContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).getCurrentValue();
-                    cir.setReturnValue(interactionHand == currentUsingInteractionHand && pose.getCustomAttributeValueAsBoolean("is_using_property"));
+                    cir.setReturnValue(hand == currentUsingInteractionHand && pose.getCustomAttributeValueAsBoolean("is_using_property"));
                 });
             });
         }
