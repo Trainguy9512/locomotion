@@ -31,9 +31,9 @@ public class FirstPersonSword {
         return SWORD_IDLE_STATE;
     }
 
-    public static PoseFunction<LocalSpacePose> handSwordPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        PoseFunction<LocalSpacePose> miningPoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand);
-        return switch (interactionHand) {
+    public static PoseFunction<LocalSpacePose> handSwordPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
+        PoseFunction<LocalSpacePose> miningPoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
+        return switch (hand) {
             case MAIN_HAND -> StateMachineFunction.builder(FirstPersonSword::getSwordEntryState)
                     .resetsUponRelevant(true)
                     .defineState(StateDefinition.builder(SWORD_IDLE_STATE, miningPoseFunction)

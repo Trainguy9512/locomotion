@@ -795,12 +795,12 @@ public class PlayerPartAnimatorOld extends LivingEntityPartAnimator<Player, Play
         }
     }
 
-    private static HumanoidModel.ArmPose getArmPose(LivingEntity livingEntity, InteractionHand interactionHand) {
-        ItemStack itemStack = livingEntity.getItemInHand(interactionHand);
+    private static HumanoidModel.ArmPose getArmPose(LivingEntity livingEntity, InteractionHand hand) {
+        ItemStack itemStack = livingEntity.getItemInHand(hand);
         if (itemStack.isEmpty()) {
             return HumanoidModel.ArmPose.EMPTY;
         }
-        if (livingEntity.getUsedItemHand() == interactionHand && livingEntity.getUseItemRemainingTicks() > 0) {
+        if (livingEntity.getUsedItemHand() == hand && livingEntity.getUseItemRemainingTicks() > 0) {
             UseAnim useAnim = itemStack.getUseAnimation();
             if (useAnim == UseAnim.BLOCK) {
                 return HumanoidModel.ArmPose.BLOCK;
@@ -811,7 +811,7 @@ public class PlayerPartAnimatorOld extends LivingEntityPartAnimator<Player, Play
             if (useAnim == UseAnim.SPEAR) {
                 return HumanoidModel.ArmPose.THROW_SPEAR;
             }
-            if (useAnim == UseAnim.CROSSBOW && interactionHand == livingEntity.getUsedItemHand()) {
+            if (useAnim == UseAnim.CROSSBOW && hand == livingEntity.getUsedItemHand()) {
                 return HumanoidModel.ArmPose.CROSSBOW_CHARGE;
             }
             if (useAnim == UseAnim.SPYGLASS) {

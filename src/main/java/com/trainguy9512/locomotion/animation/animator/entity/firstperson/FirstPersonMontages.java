@@ -147,57 +147,57 @@ public class FirstPersonMontages {
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
             .build();
 
-    public static MontageConfiguration getCrossbowFireMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getCrossbowFireMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> CROSSBOW_FIRE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> CROSSBOW_FIRE_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getUseAnimationMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getUseAnimationMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> USE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> USE_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getAxeScrapeMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getAxeScrapeMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> AXE_SCRAPE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> AXE_SCRAPE_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getHoeTillMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getHoeTillMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> HOE_TILL_MAIN_HAND_MONTAGE;
             case OFF_HAND -> HOE_TILL_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getShovelFlattenMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getShovelFlattenMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> SHOVEL_FLATTEN_MAIN_HAND_MONTAGE;
             case OFF_HAND -> SHOVEL_FLATTEN_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getShearsUseMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getShearsUseMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> SHEARS_USE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> SHEARS_USE_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getBucketCollectMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getBucketCollectMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> BUCKET_COLLECT_MAIN_HAND_MONTAGE;
             case OFF_HAND -> BUCKET_COLLECT_OFF_HAND_MONTAGE;
         };
     }
 
-    public static MontageConfiguration getBucketEmptyMontage(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static MontageConfiguration getBucketEmptyMontage(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> BUCKET_EMPTY_MAIN_HAND_MONTAGE;
             case OFF_HAND -> BUCKET_EMPTY_OFF_HAND_MONTAGE;
         };

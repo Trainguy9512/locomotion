@@ -27,15 +27,15 @@ public class FirstPersonSpyglass {
         return SPYGLASS_IDLE_STATE;
     }
 
-    private static boolean isUsingItem(StateTransition.TransitionContext context, InteractionHand interactionHand) {
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(interactionHand));
+    private static boolean isUsingItem(StateTransition.TransitionContext context, InteractionHand hand) {
+        return context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
     }
 
     public static PoseFunction<LocalSpacePose> handSpyglassPoseFunction(
             CachedPoseContainer cachedPoseContainer,
-            InteractionHand interactionHand
+            InteractionHand hand
     ) {
-        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand);
+        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> lookingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT).build();
         PoseFunction<LocalSpacePose> lookingExitPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT)
                 .setPlayRate(1)
@@ -46,14 +46,14 @@ public class FirstPersonSpyglass {
                 .defineState(StateDefinition.builder(SPYGLASS_IDLE_STATE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_STATE)
-                                .isTakenIfTrue(context -> isUsingItem(context, interactionHand))
+                                .isTakenIfTrue(context -> isUsingItem(context, hand))
                                 .setTiming(Transition.INSTANT)
                                 .build())
                         .build())
                 .defineState(StateDefinition.builder(SPYGLASS_LOOKING_STATE, lookingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_EXIT_STATE)
-                                .isTakenIfTrue(context -> !isUsingItem(context, interactionHand))
+                                .isTakenIfTrue(context -> !isUsingItem(context, hand))
                                 .setTiming(Transition.INSTANT)
                                 .build())
                         .build())
@@ -66,7 +66,7 @@ public class FirstPersonSpyglass {
                                         .build())
                                 .build())
                         .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_STATE)
-                                .isTakenIfTrue(context -> isUsingItem(context, interactionHand))
+                                .isTakenIfTrue(context -> isUsingItem(context, hand))
                                 .setTiming(Transition.INSTANT)
                                 .build())
                         .build())
@@ -77,18 +77,18 @@ public class FirstPersonSpyglass {
      * If the item the player is currently using is a spyglass, return a vector with 0. Otherwise return 1.
      */
     private static Vector3f getHiddenScale(PoseFunction.FunctionInterpolationContext context) {
-        for (InteractionHand interactionHand : InteractionHand.values()) {
+        for (InteractionHand hand : InteractionHand.values()) {
             if (context
                     .driverContainer()
                     .getInterpolatedDriverValue(
-                            FirstPersonDrivers.getUsingItemDriver(interactionHand),
+                            FirstPersonDrivers.getUsingItemDriver(hand),
                             context.partialTicks()
                     )
             ) {
                 ItemUseAnimation itemUseAnimation = context
                         .driverContainer()
                         .getInterpolatedDriverValue(
-                                FirstPersonDrivers.getItemDriver(interactionHand),
+                                FirstPersonDrivers.getItemDriver(hand),
                                 context.partialTicks()
                         ).getUseAnimation();
                 if (itemUseAnimation == ItemUseAnimation.SPYGLASS) {

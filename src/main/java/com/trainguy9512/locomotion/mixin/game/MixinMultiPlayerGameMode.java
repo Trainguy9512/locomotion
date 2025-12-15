@@ -49,10 +49,10 @@ public class MixinMultiPlayerGameMode {
 //            method = "method_41929(Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/entity/player/Player;Lorg/apache/commons/lang3/mutable/MutableObject;I)Lnet/minecraft/network/protocol/Packet;",
 //            at = @At("TAIL")
 //    )
-//    public void triggerHasInteractedWithDriver(InteractionHand interactionHand, Player player, MutableObject mutableObject, int i, CallbackInfoReturnable<Packet> cir) {
+//    public void triggerHasInteractedWithDriver(InteractionHand hand, Player player, MutableObject mutableObject, int i, CallbackInfoReturnable<Packet> cir) {
 //        if (mutableObject.getValue() instanceof InteractionResult.Success) {
 //            JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-//                dataContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(interactionHand)).trigger();
+//                dataContainer.getDriver(FirstPersonDrivers.getHasInteractedWithDriver(hand)).trigger();
 //            });
 //        }
 //    }

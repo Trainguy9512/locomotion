@@ -85,63 +85,63 @@ public class FirstPersonDrivers {
         }
     }
 
-    public static void updateRenderedItemIfNoTwoHandOverrides(OnTickDriverContainer driverContainer, InteractionHand interactionHand) {
+    public static void updateRenderedItemIfNoTwoHandOverrides(OnTickDriverContainer driverContainer, InteractionHand hand) {
         if (Objects.equals(driverContainer.getDriverValue(CURRENT_TWO_HANDED_OVERRIDE_STATE), FirstPersonTwoHandedActions.TWO_HANDED_ACTION_NORMAL_STATE)) {
-            updateRenderedItem(driverContainer, interactionHand);
+            updateRenderedItem(driverContainer, hand);
         }
     }
 
-    public static DriverKey<VariableDriver<Identifier>> getHandPoseDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static DriverKey<VariableDriver<Identifier>> getHandPoseDriver(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> MAIN_HAND_POSE;
             case OFF_HAND -> OFF_HAND_POSE;
         };
     }
 
-    public static DriverKey<VariableDriver<Identifier>> getGenericItemPoseDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static DriverKey<VariableDriver<Identifier>> getGenericItemPoseDriver(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> MAIN_HAND_GENERIC_ITEM_POSE;
             case OFF_HAND -> OFF_HAND_GENERIC_ITEM_POSE;
         };
     }
 
-    public static DriverKey<VariableDriver<Boolean>> getItemOnCooldownDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static DriverKey<VariableDriver<Boolean>> getItemOnCooldownDriver(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> IS_MAIN_HAND_ON_COOLDOWN;
             case OFF_HAND -> IS_OFF_HAND_ON_COOLDOWN;
         };
     }
 
-    public static DriverKey<VariableDriver<ItemStack>> getItemDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static DriverKey<VariableDriver<ItemStack>> getItemDriver(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> MAIN_HAND_ITEM;
             case OFF_HAND -> OFF_HAND_ITEM;
         };
     }
 
-    public static DriverKey<VariableDriver<ItemStack>> getItemCopyReferenceDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static DriverKey<VariableDriver<ItemStack>> getItemCopyReferenceDriver(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> MAIN_HAND_ITEM_COPY_REFERENCE;
             case OFF_HAND -> OFF_HAND_ITEM_COPY_REFERENCE;
         };
     }
 
-    public static DriverKey<VariableDriver<ItemStack>> getRenderedItemDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static DriverKey<VariableDriver<ItemStack>> getRenderedItemDriver(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> RENDERED_MAIN_HAND_ITEM;
             case OFF_HAND -> RENDERED_OFF_HAND_ITEM;
         };
     }
 
-    public static DriverKey<VariableDriver<Boolean>> getUsingItemDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static DriverKey<VariableDriver<Boolean>> getUsingItemDriver(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> IS_USING_MAIN_HAND_ITEM;
             case OFF_HAND -> IS_USING_OFF_HAND_ITEM;
         };
     }
 
-    public static DriverKey<TriggerDriver> getHasUsedItemDriver(InteractionHand interactionHand) {
-        return switch (interactionHand) {
+    public static DriverKey<TriggerDriver> getHasUsedItemDriver(InteractionHand hand) {
+        return switch (hand) {
             case MAIN_HAND -> HAS_USED_MAIN_HAND_ITEM;
             case OFF_HAND -> HAS_USED_OFF_HAND_ITEM;
         };

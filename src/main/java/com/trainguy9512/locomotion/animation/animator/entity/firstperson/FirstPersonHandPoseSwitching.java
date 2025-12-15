@@ -215,8 +215,8 @@ public class FirstPersonHandPoseSwitching {
                         .build());
     }
 
-    private static void clearMontagesInAttackSlot(PoseFunction.FunctionEvaluationState evaluationState, InteractionHand interactionHand) {
-        evaluationState.montageManager().interruptMontagesInSlot(FirstPersonMontages.getAttackSlot(interactionHand), Transition.INSTANT);
+    private static void clearMontagesInAttackSlot(PoseFunction.FunctionEvaluationState evaluationState, InteractionHand hand) {
+        evaluationState.montageManager().interruptMontagesInSlot(FirstPersonMontages.getAttackSlot(hand), Transition.INSTANT);
     }
 
 

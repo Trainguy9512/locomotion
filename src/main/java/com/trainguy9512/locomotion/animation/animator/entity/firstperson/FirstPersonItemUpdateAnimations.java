@@ -101,7 +101,7 @@ public class FirstPersonItemUpdateAnimations {
         }
     }
 
-    public static void testForAndPlayItemUpdateAnimations(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
+    public static void testForAndPlayItemUpdateAnimations(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand hand) {
         if (driverContainer.getDriverValue(FirstPersonDrivers.HAS_DROPPED_ITEM)) {
             return;
         }
@@ -113,9 +113,9 @@ public class FirstPersonItemUpdateAnimations {
             return;
         }
 
-        ItemStack actualItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getCurrentValue();
-        ItemStack previousItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getPreviousValue();
-        ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
+        ItemStack actualItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(hand)).getCurrentValue();
+        ItemStack previousItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(hand)).getPreviousValue();
+        ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
         ItemUpdateAnimationConditionContext context = new ItemUpdateAnimationConditionContext(
                 actualItem,
                 previousItem
@@ -135,15 +135,15 @@ public class FirstPersonItemUpdateAnimations {
             ItemUpdateAnimationRule rule = sortedItemUpdateAnimationRules.get(ruleIdentifier);
             if (rule.shouldPlayAnimation.test(context)) {
                 LocomotionMain.DEBUG_LOGGER.info("Playing item update animation \"{}\"", ruleIdentifier);
-                MontageConfiguration montage = rule.montageProvider.apply(interactionHand);
+                MontageConfiguration montage = rule.montageProvider.apply(hand);
                 for (String slot : montage.slots()) {
                     montageManager.interruptMontagesInSlot(slot, Transition.builder(TimeSpan.ofSeconds(0.2f)).build());
                 }
-                montageManager.playMontage(rule.montageProvider.apply(interactionHand));
-                Identifier renderedItemHandPose = FirstPersonHandPoses.testForNextHandPose(renderedItem, interactionHand);
-                Identifier currentItemHandPose = FirstPersonHandPoses.testForNextHandPose(actualItem, interactionHand);
+                montageManager.playMontage(rule.montageProvider.apply(hand));
+                Identifier renderedItemHandPose = FirstPersonHandPoses.testForNextHandPose(renderedItem, hand);
+                Identifier currentItemHandPose = FirstPersonHandPoses.testForNextHandPose(actualItem, hand);
                 if (currentItemHandPose == renderedItemHandPose) {
-                    FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
+                    FirstPersonDrivers.updateRenderedItem(driverContainer, hand);
                 }
                 return;
             }

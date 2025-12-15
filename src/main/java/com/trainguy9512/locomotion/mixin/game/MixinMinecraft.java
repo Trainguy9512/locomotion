@@ -83,9 +83,9 @@ public abstract class MixinMinecraft {
 //            method = "startUseItem",
 //            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V")
 //    )
-//    public void injectOnSwingPlayerHandWhenBeginningUse(CallbackInfo ci, @Local InteractionHand interactionHand) {
+//    public void injectOnSwingPlayerHandWhenBeginningUse(CallbackInfo ci, @Local InteractionHand hand) {
 //        JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-//            switch (interactionHand) {
+//            switch (hand) {
 //                case MAIN_HAND -> dataContainer.getDriver(FirstPersonDrivers.HAS_USED_MAIN_HAND_ITEM).trigger();
 //                case OFF_HAND -> dataContainer.getDriver(FirstPersonDrivers.HAS_USED_OFF_HAND_ITEM).trigger();
 //            }

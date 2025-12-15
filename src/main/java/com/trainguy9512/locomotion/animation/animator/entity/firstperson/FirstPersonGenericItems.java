@@ -215,20 +215,20 @@ public class FirstPersonGenericItems {
         return getFallback();
     }
 
-//    public static Identifier getGenericItemPoseSequence(PoseFunction.FunctionInterpolationContext context, InteractionHand interactionHand) {
-//        DriverKey<VariableDriver<Identifier>> driver = FirstPersonDrivers.getGenericItemPoseDriver(interactionHand);
+//    public static Identifier getGenericItemPoseSequence(PoseFunction.FunctionInterpolationContext context, InteractionHand hand) {
+//        DriverKey<VariableDriver<Identifier>> driver = FirstPersonDrivers.getGenericItemPoseDriver(hand);
 //        Identifier genericItemPoseIdentifier = context.driverContainer().getInterpolatedDriverValue(driver, context.partialTicks());
 //        GenericItemPoseDefinition definition = getOrThrowFromIdentifier(genericItemPoseIdentifier);
 //        return definition.basePoseSequence;
 //    }
 
-    public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
-        PoseFunction<LocalSpacePose> pose = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand);
+    public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
+        PoseFunction<LocalSpacePose> pose = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
 
         PoseFunction<LocalSpacePose> consumablePose;
         consumablePose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build();
-        consumablePose = FirstPersonEating.constructWithEatingStateMachine(cachedPoseContainer, interactionHand, consumablePose);
-        consumablePose = FirstPersonDrinking.constructWithDrinkingStateMachine(cachedPoseContainer, interactionHand, consumablePose);
+        consumablePose = FirstPersonEating.constructWithEatingStateMachine(cachedPoseContainer, hand, consumablePose);
+        consumablePose = FirstPersonDrinking.constructWithDrinkingStateMachine(cachedPoseContainer, hand, consumablePose);
 
         pose = ApplyAdditiveFunction.of(
                 pose,

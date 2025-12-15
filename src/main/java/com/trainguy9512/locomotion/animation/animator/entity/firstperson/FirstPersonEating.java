@@ -25,7 +25,7 @@ public class FirstPersonEating {
     public static final String EATING_BEGIN_STATE = "eating_begin";
     public static final String EATING_LOOP_STATE = "eating_loop";
 
-    public static PoseFunction<LocalSpacePose> constructWithEatingStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand, PoseFunction<LocalSpacePose> idlePoseFunction) {
+    public static PoseFunction<LocalSpacePose> constructWithEatingStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand hand, PoseFunction<LocalSpacePose> idlePoseFunction) {
         PoseFunction<LocalSpacePose> drinkingLoopPoseFunction = ApplyAdditiveFunction.of(
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_PROGRESS)
                         .setPlayRate(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED))
@@ -49,7 +49,7 @@ public class FirstPersonEating {
                 .defineState(StateDefinition.builder(EATING_IDLE_STATE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(EATING_BEGIN_STATE)
-                                .isTakenIfTrue(context -> isEating(context, interactionHand))
+                                .isTakenIfTrue(context -> isEating(context, hand))
                                 .build())
                         .build())
                 .defineState(StateDefinition.builder(EATING_BEGIN_STATE, eatingBeginPoseFunction)
@@ -68,7 +68,7 @@ public class FirstPersonEating {
                                         EATING_LOOP_STATE
                                 ))
                         .addOutboundTransition(StateTransition.builder(EATING_IDLE_STATE)
-                                .isTakenIfTrue(context -> !isEating(context, interactionHand))
+                                .isTakenIfTrue(context -> !isEating(context, hand))
                                 .setCanInterruptOtherTransitions(false)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.8f))
                                         .setEasement(Easing.Elastic.of(4, true))
@@ -78,11 +78,11 @@ public class FirstPersonEating {
                 .build();
     }
 
-    private static boolean isEating(StateTransition.TransitionContext context, InteractionHand interactionHand) {
+    private static boolean isEating(StateTransition.TransitionContext context, InteractionHand hand) {
         OnTickDriverContainer driverContainer = context.driverContainer();
-        if (!driverContainer.getDriverValue(FirstPersonDrivers.getUsingItemDriver(interactionHand))) {
+        if (!driverContainer.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand))) {
             return false;
         }
-        return driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand)).getUseAnimation() == ItemUseAnimation.EAT;
+        return driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand)).getUseAnimation() == ItemUseAnimation.EAT;
     }
 }

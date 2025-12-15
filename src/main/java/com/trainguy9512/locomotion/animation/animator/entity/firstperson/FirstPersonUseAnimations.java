@@ -175,16 +175,16 @@ public class FirstPersonUseAnimations {
         }
     }
 
-    public static void playUseAnimationIfTriggered(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand interactionHand) {
+    public static void playUseAnimationIfTriggered(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand hand) {
         // Scheduling the next use animation if triggered by the multiplayer game mode.
-        TriggerDriver hasUsedItemDriver = driverContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(interactionHand));
+        TriggerDriver hasUsedItemDriver = driverContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand));
         TriggerDriver hasAttackedDriver = driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED);
 
         int swingTime = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_SWING_TIME);
         InteractionHand lastUsedHand = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_HAND);
         boolean swingTimeIsOne = swingTime == 1;
 
-        if (lastUsedHand != interactionHand) {
+        if (lastUsedHand != hand) {
             return;
         }
         boolean shouldPlayUseAnimationThisTick = hasUsedItemDriver.hasBeenTriggeredAndNotConsumed();
@@ -193,8 +193,8 @@ public class FirstPersonUseAnimations {
         }
         hasUsedItemDriver.consume();
 
-        ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
-        ItemStack actualItem = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(interactionHand));
+        ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
+        ItemStack actualItem = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(hand));
         UseAnimationType useAnimationType = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USE_TYPE);
         BlockState lastTargetedBlock = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_BLOCK_STATE);
         EntityType<?> lastTargetedEntity = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_TARGET_ENTITY);
@@ -224,11 +224,11 @@ public class FirstPersonUseAnimations {
             UseAnimationRule rule = sortedUseAnimationRules.get(ruleIdentifier);
             if (rule.shouldChooseUseAnimation.test(context)) {
                 LocomotionMain.DEBUG_LOGGER.info("Playing use animation \"{}\"", ruleIdentifier);
-                montageManager.playMontage(rule.montageProvider.apply(interactionHand));
-                Identifier renderedItemHandPose = FirstPersonHandPoses.testForNextHandPose(renderedItem, interactionHand);
-                Identifier currentItemHandPose = FirstPersonHandPoses.testForNextHandPose(actualItem, interactionHand);
+                montageManager.playMontage(rule.montageProvider.apply(hand));
+                Identifier renderedItemHandPose = FirstPersonHandPoses.testForNextHandPose(renderedItem, hand);
+                Identifier currentItemHandPose = FirstPersonHandPoses.testForNextHandPose(actualItem, hand);
                 if (currentItemHandPose == renderedItemHandPose) {
-                    FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
+                    FirstPersonDrivers.updateRenderedItem(driverContainer, hand);
                 }
                 return;
             }
