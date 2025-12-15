@@ -99,6 +99,15 @@ public class FirstPersonAnimationSequences {
     public static final Identifier GROUND_MOVEMENT_SWIMMING_IDLE = makeIdentifier("ground_movement/swimming_idle");
     public static final Identifier GROUND_MOVEMENT_MOUNT_ENTER = makeIdentifier("ground_movement/mount_enter");
 
+    public static final Identifier HAND_SPEAR_POSE = makeIdentifier("hand/spear/pose");
+    public static final Identifier HAND_SPEAR_JAB = makeIdentifier("hand/spear/jab");
+    public static final Identifier HAND_SPEAR_RAISE = makeIdentifier("hand/spear/raise");
+    public static final Identifier HAND_SPEAR_LOWER = makeIdentifier("hand/spear/lower");
+    public static final Identifier HAND_SPEAR_CHARGE_ENTER = makeIdentifier("hand/spear/charge_enter");
+    public static final Identifier HAND_SPEAR_CHARGE_EXIT = makeIdentifier("hand/spear/charge_exit");
+    public static final Identifier HAND_SPEAR_CHARGE_WEAKEN = makeIdentifier("hand/spear/charge_weaken");
+    public static final Identifier HAND_SPEAR_CHARGE_IMPACT = makeIdentifier("hand/spear/charge_impact");
+
     public static final Identifier OVERRIDING_MOVEMENT_SWIMMING = makeIdentifier("overriding_movement/swimming");
 
     private static Identifier makeIdentifier(String path) {

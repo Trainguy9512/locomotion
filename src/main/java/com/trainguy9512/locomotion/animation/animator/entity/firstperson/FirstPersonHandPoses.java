@@ -6,6 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
 import com.trainguy9512.locomotion.util.Easing;
+import com.trainguy9512.locomotion.util.MultiVersionUtils;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.core.component.DataComponents;
@@ -132,10 +133,10 @@ public class FirstPersonHandPoses {
             "trident",
             FirstPersonTrident::handTridentPoseFunction,
             FirstPersonAnimationSequences.HAND_TRIDENT_POSE,
-            itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.TRIDENT,
+            itemStack -> itemStack.getUseAnimation() == MultiVersionUtils.getTridentUseAnimation(),
             100)
-            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
-            .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_SPEAR_RAISE)
+            .setLowerSequence(FirstPersonAnimationSequences.HAND_SPEAR_LOWER)
             .build());
     public static final Identifier BRUSH = register(LocomotionMain.makeIdentifier("brush"), HandPoseDefinition.builder(
             "brush",
@@ -174,6 +175,17 @@ public class FirstPersonHandPoses {
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
             .setItemRenderType(ItemRenderType.MAP)
             .build());
+    //? if >= 1.21.11 {
+    public static final Identifier SPEAR = register(LocomotionMain.makeIdentifier("spear"), HandPoseDefinition.builder(
+            "spear",
+            FirstPersonSpear::constructSpearPoseFunction,
+            FirstPersonAnimationSequences.HAND_SPEAR_POSE,
+            itemStack -> itemStack.getUseAnimation() == MultiVersionUtils.getSpearUseAnimation(),
+            100)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_SPEAR_RAISE)
+            .setLowerSequence(FirstPersonAnimationSequences.HAND_SPEAR_LOWER)
+            .build());
+    //? }
 
     public static Identifier getFallback() {
         return GENERIC_ITEM;

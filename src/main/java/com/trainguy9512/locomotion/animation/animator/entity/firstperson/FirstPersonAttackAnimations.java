@@ -43,6 +43,18 @@ public class FirstPersonAttackAnimations {
             context -> context.currentMainHandPose() == FirstPersonHandPoses.AXE,
             30
     ));
+    public static final Identifier MACE_SLAM = register(LocomotionMain.makeIdentifier("mace_slam"), AttackAnimationRule.of(
+            FirstPersonMontages.HAND_MACE_ATTACK_MONTAGE,
+            context -> context.currentMainHandPose() == FirstPersonHandPoses.MACE,
+            30
+    ));
+    //? if >= 1.21.11 {
+    public static final Identifier SPEAR_JAB = register(LocomotionMain.makeIdentifier("spear_jab"), AttackAnimationRule.of(
+            FirstPersonMontages.HAND_SPEAR_JAB_MONTAGE,
+            context -> context.currentMainHandPose() == FirstPersonHandPoses.SPEAR,
+            30
+    ));
+    //? }
 
     public record AttackAnimationRule(
             MontageConfiguration montageToPlay,
