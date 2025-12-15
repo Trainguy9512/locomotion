@@ -30,12 +30,24 @@ public class FirstPersonHandPoses {
         return identifier;
     }
 
-    public static final Identifier EMPTY = register(LocomotionMain.makeIdentifier("empty"), HandPoseDefinition.builder(
-            "empty",
+    public static final Identifier EMPTY_MAIN_HAND = register(LocomotionMain.makeIdentifier("empty_main_hand"), HandPoseDefinition.builder(
+            "empty_main_hand",
             FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_EMPTY_POSE,
             ItemStack::isEmpty,
             10)
+            .setHandsToUsePoseIn(InteractionHand.MAIN_HAND)
+            .build());
+
+    public static final Identifier EMPTY_OFF_HAND = register(LocomotionMain.makeIdentifier("empty_off_hand"), HandPoseDefinition.builder(
+            "empty_off_hand",
+            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonAnimationSequences.HAND_EMPTY_LOWERED,
+            ItemStack::isEmpty,
+            10)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_EMPTY_LOWERED)
+            .setLowerSequence(FirstPersonAnimationSequences.HAND_EMPTY_LOWERED)
+            .setHandsToUsePoseIn(InteractionHand.OFF_HAND)
             .build());
     public static final Identifier GENERIC_ITEM = register(LocomotionMain.makeIdentifier("generic_item"), HandPoseDefinition.builder(
             "generic_item",
@@ -163,6 +175,16 @@ public class FirstPersonHandPoses {
             .setItemRenderType(ItemRenderType.MAP)
             .build());
 
+    public static Identifier getFallback() {
+        return GENERIC_ITEM;
+    }
+
+    public static Identifier getEmptyHandPose(InteractionHand hand) {
+        return switch (hand) {
+            case MAIN_HAND -> EMPTY_MAIN_HAND;
+            case OFF_HAND -> EMPTY_OFF_HAND;
+        };
+    }
 
     public record HandPoseDefinition(
             String stateIdentifier,
@@ -174,7 +196,8 @@ public class FirstPersonHandPoses {
             Identifier lowerSequence,
             Transition raiseToPoseTransition,
             Transition poseToLowerTransition,
-            ItemRenderType itemRenderType
+            ItemRenderType itemRenderType,
+            InteractionHand[] handsToUsePoseIn
     ) {
 
         public String getRaiseStateIdentifier() {
@@ -206,6 +229,7 @@ public class FirstPersonHandPoses {
             private Transition raiseToPoseTransition;
             private Transition poseToLowerTransition;
             private ItemRenderType itemRenderType;
+            private InteractionHand[] handsToUsePoseIn;
 
             private Builder(
                     String stateIdentifier,
@@ -225,6 +249,7 @@ public class FirstPersonHandPoses {
                 this.raiseToPoseTransition = Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build();
                 this.poseToLowerTransition = Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build();
                 this.itemRenderType = ItemRenderType.THIRD_PERSON_ITEM;
+                this.handsToUsePoseIn = InteractionHand.values();
             }
 
             public Builder setRaiseSequence(Identifier sequence) {
@@ -252,25 +277,27 @@ public class FirstPersonHandPoses {
                 return this;
             }
 
+            public Builder setHandsToUsePoseIn(InteractionHand... hands) {
+                this.handsToUsePoseIn = hands;
+                return this;
+            }
+
             public HandPoseDefinition build() {
                 return new HandPoseDefinition(
-                        stateIdentifier,
-                        choosePoseIfTrue,
-                        evaluationPriority,
-                        poseFunctionProvider,
-                        basePoseSequence,
-                        raiseSequence,
-                        lowerSequence,
-                        raiseToPoseTransition,
-                        poseToLowerTransition,
-                        itemRenderType
+                        this.stateIdentifier,
+                        this.choosePoseIfTrue,
+                        this.evaluationPriority,
+                        this.poseFunctionProvider,
+                        this.basePoseSequence,
+                        this.raiseSequence,
+                        this.lowerSequence,
+                        this.raiseToPoseTransition,
+                        this.poseToLowerTransition,
+                        this.itemRenderType,
+                        this.handsToUsePoseIn
                 );
             }
         }
-    }
-
-    public static Identifier getFallback() {
-        return GENERIC_ITEM;
     }
 
     public static HandPoseDefinition getOrThrowFromIdentifier(Identifier identifier) {
@@ -285,7 +312,7 @@ public class FirstPersonHandPoses {
         return HAND_POSES_BY_IDENTIFIER.keySet();
     }
 
-    public static Identifier getConfigurationFromItem(ItemStack itemStack) {
+    public static Identifier testForNextHandPose(ItemStack itemStack, InteractionHand hand) {
 
         Map<Identifier, HandPoseDefinition> handPosesSortedByPriority = HAND_POSES_BY_IDENTIFIER.entrySet()
                 .stream()
@@ -296,9 +323,12 @@ public class FirstPersonHandPoses {
                         (oldValue, newValue) -> oldValue,
                         LinkedHashMap::new
                 ));
+
         for (Identifier key : handPosesSortedByPriority.keySet()) {
             HandPoseDefinition definition = HAND_POSES_BY_IDENTIFIER.get(key);
-            if (definition.choosePoseIfTrue().test(itemStack)) {
+            boolean poseHasBeenChosen = definition.choosePoseIfTrue().test(itemStack);
+            boolean poseCanPlayInCurrentHand = Arrays.asList(definition.handsToUsePoseIn()).contains(hand);
+            if (poseHasBeenChosen && poseCanPlayInCurrentHand) {
                 return key;
             }
         }
