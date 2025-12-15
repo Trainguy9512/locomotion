@@ -17,7 +17,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -224,7 +223,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE);
         });
         driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).runAndConsumeIfTriggered(() -> {
-            FirstPersonMontages.playAttackMontage(driverContainer, montageManager);
+            FirstPersonAttackAnimations.playAttackAnimation(driverContainer, montageManager);
         });
         if (driverContainer.getDriver(FirstPersonDrivers.IS_MINING).getCurrentValue()) {
             montageManager.interruptMontagesInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT, Transition.builder(TimeSpan.ofTicks(2)).build());

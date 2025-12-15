@@ -53,18 +53,18 @@ public abstract class MixinMinecraft {
         });
     }
 
-    @Inject(
-            method = "startAttack",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V"))
-    public void injectStartAttackHitEntity(CallbackInfoReturnable<Boolean> cir) {
-        JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-            dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger();
-        });
-    }
+//    @Inject(
+//            method = "startAttack",
+//            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V"))
+//    public void injectStartAttackHitEntity(CallbackInfoReturnable<Boolean> cir) {
+//        JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
+//            dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger();
+//        });
+//    }
 
     @Inject(
             method = "startAttack",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
     public void injectStartAttackMiss(CallbackInfoReturnable<Boolean> cir) {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
             dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger();
