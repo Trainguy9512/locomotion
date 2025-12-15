@@ -225,7 +225,9 @@ public class FirstPersonUseAnimations {
             if (rule.shouldChooseUseAnimation.test(context)) {
                 LocomotionMain.DEBUG_LOGGER.info("Playing use animation \"{}\"", ruleIdentifier);
                 montageManager.playMontage(rule.montageProvider.apply(interactionHand));
-                if (FirstPersonHandPose.fromItemStack(renderedItem) == FirstPersonHandPose.fromItemStack(actualItem)) {
+                Identifier renderedItemHandPose = FirstPersonHandPoses.testForNextHandPose(renderedItem, interactionHand);
+                Identifier currentItemHandPose = FirstPersonHandPoses.testForNextHandPose(actualItem, interactionHand);
+                if (currentItemHandPose == renderedItemHandPose) {
                     FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
                 }
                 return;

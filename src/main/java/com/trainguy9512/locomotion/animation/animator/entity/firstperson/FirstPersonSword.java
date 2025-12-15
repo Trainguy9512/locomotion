@@ -32,10 +32,11 @@ public class FirstPersonSword {
     }
 
     public static PoseFunction<LocalSpacePose> handSwordPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand interactionHand) {
+        PoseFunction<LocalSpacePose> miningPoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand);
         return switch (interactionHand) {
             case MAIN_HAND -> StateMachineFunction.builder(FirstPersonSword::getSwordEntryState)
                     .resetsUponRelevant(true)
-                    .defineState(StateDefinition.builder(SWORD_IDLE_STATE, FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, interactionHand))
+                    .defineState(StateDefinition.builder(SWORD_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SWORD_SWING_DOWN_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.HAS_ATTACKED))
@@ -110,7 +111,7 @@ public class FirstPersonSword {
                                     .build())
                             .build())
                     .build();
-            case OFF_HAND -> FirstPersonHandPose.SWORD.getMiningStateMachine(cachedPoseContainer, interactionHand);
+            case OFF_HAND -> miningPoseFunction;
         };
     }
 }

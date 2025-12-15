@@ -113,11 +113,11 @@ public class FirstPersonItemUpdateAnimations {
             return;
         }
 
-        ItemStack currentItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getCurrentValue();
+        ItemStack actualItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getCurrentValue();
         ItemStack previousItem = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(interactionHand)).getPreviousValue();
         ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(interactionHand));
         ItemUpdateAnimationConditionContext context = new ItemUpdateAnimationConditionContext(
-                currentItem,
+                actualItem,
                 previousItem
         );
 
@@ -140,7 +140,9 @@ public class FirstPersonItemUpdateAnimations {
                     montageManager.interruptMontagesInSlot(slot, Transition.builder(TimeSpan.ofSeconds(0.2f)).build());
                 }
                 montageManager.playMontage(rule.montageProvider.apply(interactionHand));
-                if (FirstPersonHandPose.fromItemStack(renderedItem) == FirstPersonHandPose.fromItemStack(currentItem)) {
+                Identifier renderedItemHandPose = FirstPersonHandPoses.testForNextHandPose(renderedItem, interactionHand);
+                Identifier currentItemHandPose = FirstPersonHandPoses.testForNextHandPose(actualItem, interactionHand);
+                if (currentItemHandPose == renderedItemHandPose) {
                     FirstPersonDrivers.updateRenderedItem(driverContainer, interactionHand);
                 }
                 return;
