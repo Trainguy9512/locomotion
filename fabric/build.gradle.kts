@@ -107,7 +107,7 @@ dependencies {
     modImplementation("dev.isxander:yet-another-config-lib:${versionProp("yacl_version")}-fabric")
     modImplementation("com.terraformersmc:modmenu:${versionProp("modmenu_version")}")
     modImplementation("maven.modrinth:sodium:${versionProp("sodium_version")}")
-    modImplementation("maven.modrinth:iris:${versionProp("iris_version")}")
+//    modImplementation("maven.modrinth:iris:${versionProp("iris_version")}")
 
     // Iris dependencies
     runtimeOnly("org.antlr:antlr4-runtime:4.13.1")
