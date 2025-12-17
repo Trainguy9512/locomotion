@@ -19,12 +19,12 @@ Locomotion is a Minecraft: Java mod centered around giving the game's entities a
 | Pose Function System            | 🟩     | Implementation of state machines, blend spaces, and montage tracks.                                                                                                                           |
 | PyQT Maya Exporter              | 🟩     | Tool for exporting animations out of Maya with new format with scale support.                                                                                                                 |
 | First Person Player Animations  | 🟨     | The first proper stress-test of the system.                                                                                                                                                   |
-| In-game configuration           | 🟨     | Settings for tweaking individual aspects of different joint animators.                                                                                                                        |
+| In-game configuration           | 🟩     | Settings for tweaking individual aspects of different joint animators.                                                                                                                        |
 | Block / Block Entity Animations | 🟥     | Would like to re-add support for block animations, similar to the earlier implementation with Pollen, after first person animations are far enough along.                                     |
 | Third Person Player Animations  | 🟥     | Whether or not this will be included with the release version or not is TBD.                                                                                                                  |
 | Back-porting                    | 🟥     | Depends on the demand, given that this mod is intended to be used on vanilla-ish versions of the game and usually people playing vanilla don't often play older versions.                     |
 | Synchronised Sound              | ❌      | I don't know how the sound system works currently, or what it would take to make sounds trigger with animations without breaking other sound mods, but it's something I'm keeping in mind.    |
-| Open API for Modding            | 🟥      | I would like to lock down the design of the animation systems further before considering making this an open API                                                                              |
+| Open API for Modding            | 🟥     | I would like to lock down the design of the animation systems further before considering making this an open API                                                                              |
 | Entity Animations               | ❌      | Too high-scope to do on my own at this juncture, requires a large amount of animations/character rigs. Functionality will support it if I were to find somebody to help out on this.          |
 | Data-Driven Joint Animators     | ❌      | Design would need to be locked down enough prior to considering this.                                                                                                                         |
 
@@ -61,16 +61,18 @@ Locomotion is a Minecraft: Java mod centered around giving the game's entities a
 
 ## 🔍 FAQ
 
+- How can I download the mod?
+> Currently, the mod is not available on Modrinth or Curseforge as I'm still working towards making the project feature complete for first person animations. However, if you'd like to try playing with a pre-release playtest version, you can find the latest verions [here](https://github.com/Trainguy9512/locomotion/releases)
 - What versions of the game will this mod support?
 > For right now, the mod is being worked on in the latest release version of Minecraft: Java Edition. Minecraft: Bedrock Edition will not be supported. 
 > 
-> Currently backports to versions such as 1.20 and 1.21.1 are not planned due to the wide changes to the game's rendering system throughout the 1.21.x drops.
+> Currently backports to versions such as 1.20 and 1.21.1 are not planned due to the wide changes to the game's rendering system throughout the 1.21.x drops. I'm going to look into ways I can make it happen without too much work, but I can't make any guarantees.
 - What mod loaders will this mod be compatible with?
 > Right now both Fabric and NeoForge are supported.
 - What will the mod require as a dependency?
 > For the fabric version, just Fabric API. Mod Loader and YACL are optional dependencies for both Fabric and NeoForge for the configuration interface.
 - What is this mod compatible with?
-> Currently there is no list of what will or will not work, but generally most cosmetic vanilla-friendly mods like Essential, 3D Skin Layers, and other cosmetic mods should work perfectly fine.
+> Currently there is no list of what will or will not work, but generally most cosmetic vanilla-friendly mods like Essential, 3D Skin Layers, and other cosmetic mods should work perfectly fine, along with other performance mods such as Sodium or shader mods such as Iris.
 >
 > Additionally, right now there are no plans to implement compatibility with heavier content mods which would have their own player interaction animations (depends on the implementation).
 > 
