@@ -105,7 +105,11 @@ public class FirstPersonAnimationSequences {
     public static final Identifier HAND_SPEAR_LOWER = makeIdentifier("hand/spear/lower");
     public static final Identifier HAND_SPEAR_CHARGE_ENTER = makeIdentifier("hand/spear/charge_enter");
     public static final Identifier HAND_SPEAR_CHARGE_EXIT = makeIdentifier("hand/spear/charge_exit");
-    public static final Identifier HAND_SPEAR_CHARGE_WEAKEN = makeIdentifier("hand/spear/charge_weaken");
+    public static final Identifier HAND_SPEAR_CHARGE_POSE_1 = makeIdentifier("hand/spear/charge_pose_1");
+    public static final Identifier HAND_SPEAR_CHARGE_POSE_2 = makeIdentifier("hand/spear/charge_pose_2");
+    public static final Identifier HAND_SPEAR_CHARGE_POSE_3 = makeIdentifier("hand/spear/charge_pose_3");
+    public static final Identifier HAND_SPEAR_CHARGE_WEAKEN_1 = makeIdentifier("hand/spear/charge_weaken_1");
+    public static final Identifier HAND_SPEAR_CHARGE_WEAKEN_2 = makeIdentifier("hand/spear/charge_weaken_2");
     public static final Identifier HAND_SPEAR_CHARGE_IMPACT = makeIdentifier("hand/spear/charge_impact");
 
     public static final Identifier OVERRIDING_MOVEMENT_SWIMMING = makeIdentifier("overriding_movement/swimming");
