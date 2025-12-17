@@ -181,6 +181,10 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         /*driverContainer.getDriver(HOTBAR_SLOT).setValue(dataReference.getInventory().selected);*/
         //?}
 
+        //? if >= 1.21.11 {
+        FirstPersonSpear.extractSpearData(player, driverContainer, montageManager);
+        //? }
+
         this.handleMontagesFromTriggerDrivers(player, driverContainer, montageManager);
         this.extractInteractionHandData(player, driverContainer, montageManager);
         this.extractDampedCameraData(player, driverContainer, montageManager);

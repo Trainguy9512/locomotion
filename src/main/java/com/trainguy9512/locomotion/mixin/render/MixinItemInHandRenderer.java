@@ -4,9 +4,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.access.FirstPersonPlayerRendererGetter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,14 +24,25 @@ public class MixinItemInHandRenderer {
 
     @Inject(
             method = "renderHandsWithItems",
-            at = @At("HEAD"),
-            cancellable = true
+            at = @At("HEAD")
     )
-    public void overrideFirstPersonRendering(
+    public void locomotion$overrideFirstPersonRendering(
             float partialTicks, PoseStack poseStack, SubmitNodeCollector nodeCollector, LocalPlayer player, int packedLight, CallbackInfo ci
     ) {
         if (LocomotionMain.CONFIG.data().firstPersonPlayer.enableRenderer) {
             ((FirstPersonPlayerRendererGetter) this.minecraft.getEntityRenderDispatcher()).locomotion$getFirstPersonPlayerRenderer().ifPresent(firstPersonPlayerRenderer -> firstPersonPlayerRenderer.render(partialTicks, poseStack, nodeCollector, player, packedLight));
+        }
+    }
+
+    @Inject(
+            method = "renderArmWithItem",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    public void locomotion$cancelVanillaFirstPersonRendering(
+            AbstractClientPlayer player, float partialTick, float pitch, InteractionHand hand, float swingProgress, ItemStack item, float equippedProgress, PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLight, CallbackInfo ci
+    ) {
+        if (LocomotionMain.CONFIG.data().firstPersonPlayer.enableRenderer) {
             ci.cancel();
         }
     }
