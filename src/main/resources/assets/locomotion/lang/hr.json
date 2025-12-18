@@ -1,0 +1,42 @@
+{
+  "locomotion.config.yacl_not_found.header": "API za postavke nije instaliran",
+  "locomotion.config.yacl_not_found.description": "Locomotion koristi konfiguracijsku datoteku \"YetAnotherConfigLib\" da stvori zaslon za postavke unutar igrice. To nije nužna datoteka, ali mora biti instalirana ako želite imati zaslon za postavke unutar igre. Inače morate postaviti postavke sami u .minecraft/config/locomotion.json",
+  "locomotion.config.yacl_not_found.close": "Zatvori",
+
+  "locomotion.config.title": "Postavke Locomotiona",
+  "locomotion.config.category.general.name": "Opće postavke",
+  "locomotion.config.category.general.tooltip": "Opće postavke za sve animacije",
+  "locomotion.config.category.first_person_player.name": "Igrač iz Prvog Lica",
+  "locomotion.config.category.first_person_player.tooltip": "Postavke animacija igrača iz prvog lica",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "Animacije Prvog Lica",
+  "locomotion.config.option.enable_first_person_renderer.description": "Određuje hoće li se koristiti Locomotion animacije igrača prvog lica. Za razliku od većine ostalih animacija, ove imaju svoj vlastiti renderer koji potpuno zamjenjuje Vanilla renderer prvog lica. Isključite ovu opciju da biste koristili Vanilla renderer prvog lica, ili radi kompatibilnosti s modovima koji koriste Vanilla renderer.",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "Uključeno",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "Isključeno",
+
+  "locomotion.config.group.first_person_camera_shake.name": "Drhtanje Kamere",
+  "locomotion.config.group.first_person_camera_shake.description": "Postavke za podešavanje jačine drhtanja kamere.",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "Jačina",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "Podešava jačinu drhtanja kamere za sve animacije",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "Jačina Kretanja",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "Podešava jačinu drhtanja kamere za animacije pokreta, uključujući 'Realistično kretanje'.",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "Jačina Interakcija Stvari",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "Podešava jačinu drhtanja kamere za animacije interakcija sa stvarima, uključujući rudarenje i udaranje.",
+
+  "locomotion.config.group.first_person_arm_camera_damping.name": "Ublaživanje Micanja Kamere Ruke",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "Postavke za podešavanje micanja ruke tijekom micanja kamere.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Uključeno",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Određuje hoće li ulbaživanje ruke prvog lica biti uključeno ili isključeno. Ruke se neće uopće micati, micanj kamere.",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Jačina Ublažavanja",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Podešava koliko tromost animacije. Što je veća jačina ublaženja to manje odskaću.",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Jačina Tromosti",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "Podešava brzinu micanja ruku da se prilagode mičenju kamere.",
+
+  "locomotion.config.option.first_person_mining_speed.name": "Povečanje Brzine Animacije Kopanja",
+  "locomotion.config.option.first_person_mining_speed.description": "Podešava brzinu animacija kopanja i rudarenja. 1 je normalna brzina, 0.5 is pola normalne brzine i 2 je duplo brže.",
+
+  "locomotion.config.group.first_person_map.name": "Stvari Karte",
+  "locomotion.config.group.first_person_map.description": "Postavke prikazivanja i animacija karte.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Jačina Animacije Micanja Karte",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Podešava jačinu animacija micanja dok držite kartu. Manja kačina pomaže sa čitanjem karte."
+}
