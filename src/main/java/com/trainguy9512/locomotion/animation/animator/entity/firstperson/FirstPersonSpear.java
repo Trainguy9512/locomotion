@@ -51,7 +51,7 @@ public class FirstPersonSpear {
 
     private static PoseFunction<LocalSpacePose> constructChargePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
 
-        PoseFunction<LocalSpacePose> chargeIdlePose = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
+        PoseFunction<LocalSpacePose> chargeIdlePose = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> chargeEnterPose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_ENTER).build();
         PoseFunction<LocalSpacePose> chargeExitPose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_EXIT).build();
         PoseFunction<LocalSpacePose> chargeStage1Pose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_POSE_1).build();

@@ -26,6 +26,7 @@ public class FirstPersonTwoHandedActions {
 
     public static PoseFunction<LocalSpacePose> constructPoseFunction(PoseFunction<LocalSpacePose> normalPoseFunction, CachedPoseContainer cachedPoseContainer) {
         StateMachineFunction.Builder builder = StateMachineFunction.builder(FirstPersonTwoHandedActions::getTwoHandedEntryState)
+                .resetsUponRelevant(true)
                 .bindDriverToCurrentActiveState(FirstPersonDrivers.CURRENT_TWO_HANDED_OVERRIDE_STATE)
                 .defineState(StateDefinition.builder(TWO_HANDED_ACTION_NORMAL_STATE, normalPoseFunction)
                         .resetsPoseFunctionUponEntry(true)

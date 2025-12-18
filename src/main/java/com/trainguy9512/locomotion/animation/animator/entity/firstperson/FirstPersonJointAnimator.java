@@ -128,6 +128,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         // Offsetting the hands based on the shield state machine.
         pose = FirstPersonShield.constructWithHandsOffsetByShield(cachedPoseContainer, pose);
 
+        // Punch mining animation
+        pose = FirstPersonMining.constructWithPunchMiningPoseFunction(pose);
+
         // Adding in the movement animations.
         pose = FirstPersonMovement.constructWithMovementAnimations(pose, cachedPoseContainer);
 

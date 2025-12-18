@@ -95,7 +95,6 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
         super.tick(evaluationState);
 
         this.takeInitialStateIfResetting(evaluationState);
-        this.lastUpdateTick = evaluationState.currentTick();
 
         Optional<StateTransition> potentialStateTransition = this.testForOutboundTransition(evaluationState);
 
@@ -134,6 +133,7 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
                 throw new IllegalStateException("Initial state " + initialStateIdentifier + " not found to be present in the state machine");
             }
         }
+        this.lastUpdateTick = evaluationState.currentTick();
     }
 
     private Optional<StateTransition> testForOutboundTransition(FunctionEvaluationState evaluationState) {

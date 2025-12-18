@@ -33,17 +33,18 @@ public class FirstPersonHandPoses {
 
     public static final Identifier EMPTY_MAIN_HAND = register(LocomotionMain.makeIdentifier("empty_main_hand"), HandPoseDefinition.builder(
             "empty_main_hand",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandEmptyHandMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_EMPTY_POSE,
             ItemStack::isEmpty,
             10)
             .setHandsToUsePoseIn(InteractionHand.MAIN_HAND)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_EMPTY_RAISE)
+            .setLowerSequence(FirstPersonAnimationSequences.HAND_EMPTY_LOWER)
             .build());
 
     public static final Identifier EMPTY_OFF_HAND = register(LocomotionMain.makeIdentifier("empty_off_hand"), HandPoseDefinition.builder(
             "empty_off_hand",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_EMPTY_LOWERED,
             ItemStack::isEmpty,
             10)
@@ -60,7 +61,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier PICKAXE = register(LocomotionMain.makeIdentifier("pickaxe"), HandPoseDefinition.builder(
             "pickaxe",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.PICKAXES),
             60)
@@ -69,7 +70,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier AXE = register(LocomotionMain.makeIdentifier("axe"), HandPoseDefinition.builder(
             "axe",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.AXES),
             50)
@@ -78,7 +79,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier SHOVEL = register(LocomotionMain.makeIdentifier("shovel"), HandPoseDefinition.builder(
             "shovel",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.SHOVELS),
             40)
@@ -87,7 +88,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier HOE = register(LocomotionMain.makeIdentifier("hoe"), HandPoseDefinition.builder(
             "hoe",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.HOES),
             40)
@@ -114,7 +115,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier BOW = register(LocomotionMain.makeIdentifier("bow"), HandPoseDefinition.builder(
             "bow",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_BOW_POSE,
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.BOW,
             100)
@@ -123,7 +124,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier CROSSBOW = register(LocomotionMain.makeIdentifier("crossbow"), HandPoseDefinition.builder(
             "crossbow",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_CROSSBOW_POSE,
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.CROSSBOW,
             100)
@@ -168,7 +169,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier MAP = register(LocomotionMain.makeIdentifier("map"), HandPoseDefinition.builder(
             "map",
-            FirstPersonMining::makeMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_MAP_SINGLE_HAND_POSE,
             itemStack -> itemStack.has(DataComponents.MAP_ID),
             100)

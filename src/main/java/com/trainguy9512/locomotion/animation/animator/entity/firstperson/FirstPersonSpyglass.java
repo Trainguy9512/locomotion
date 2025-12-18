@@ -35,7 +35,7 @@ public class FirstPersonSpyglass {
             CachedPoseContainer cachedPoseContainer,
             InteractionHand hand
     ) {
-        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
+        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> lookingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT).build();
         PoseFunction<LocalSpacePose> lookingExitPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT)
                 .setPlayRate(1)
