@@ -38,6 +38,7 @@ public class FirstPersonHandPoses {
             ItemStack::isEmpty,
             10)
             .setHandsToUsePoseIn(InteractionHand.MAIN_HAND)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_EMPTY_RAISE)
             .build());
 
     public static final Identifier EMPTY_OFF_HAND = register(LocomotionMain.makeIdentifier("empty_off_hand"), HandPoseDefinition.builder(
