@@ -28,6 +28,11 @@ public class FirstPersonAttackAnimations {
             context -> true,
             0
     ));
+    public static final Identifier EMPTY_HAND_PUNCH = register(LocomotionMain.makeIdentifier("empty_hand_punch"), AttackAnimationRule.of(
+            FirstPersonMontages.HAND_EMPTY_ATTACK_MONTAGE,
+            context -> context.item().isEmpty(),
+            20
+    ));
     public static final Identifier TRIDENT = register(LocomotionMain.makeIdentifier("trident_jab"), AttackAnimationRule.of(
             FirstPersonMontages.HAND_TRIDENT_JAB_MONTAGE,
             context -> context.currentMainHandPose() == FirstPersonHandPoses.TRIDENT,

@@ -9,6 +9,7 @@ public class FirstPersonAnimationSequences {
     public static final Identifier HAND_EMPTY_POSE = makeIdentifier("hand/empty/pose");
     public static final Identifier HAND_EMPTY_LOWER = makeIdentifier("hand/empty/lower");
     public static final Identifier HAND_EMPTY_RAISE = makeIdentifier("hand/empty/raise");
+    public static final Identifier HAND_EMPTY_ATTACK = makeIdentifier("hand/empty/attack");
     public static final Identifier HAND_EMPTY_MINE_SWING = makeIdentifier("hand/empty/mine_swing");
     public static final Identifier HAND_EMPTY_MINE_FINISH = makeIdentifier("hand/empty/mine_finish");
 

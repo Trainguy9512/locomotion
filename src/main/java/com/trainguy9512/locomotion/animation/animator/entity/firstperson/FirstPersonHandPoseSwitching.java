@@ -25,6 +25,10 @@ import java.util.Set;
 public class FirstPersonHandPoseSwitching {
 
     public static String getEntryHandPoseState(PoseFunction.FunctionEvaluationState evaluationState, InteractionHand hand) {
+//        if (hand == InteractionHand.OFF_HAND) {
+//            return FirstPersonHandPoses.getOrThrowFromIdentifier(FirstPersonHandPoses.EMPTY_OFF_HAND).getLowerStateIdentifier();
+//        }
+
         Identifier handPoseIdentifier = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
         FirstPersonHandPoses.HandPoseDefinition definition = FirstPersonHandPoses.getOrThrowFromIdentifier(handPoseIdentifier);
         return definition.stateIdentifier();

@@ -25,7 +25,7 @@ public class FirstPersonBrush {
             CachedPoseContainer cachedPoseContainer,
             InteractionHand hand
     ) {
-        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.makeMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
+        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> siftingPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_BRUSH_SIFT_LOOP)
                 .setPlayRate(1)
                 .setLooping(true)

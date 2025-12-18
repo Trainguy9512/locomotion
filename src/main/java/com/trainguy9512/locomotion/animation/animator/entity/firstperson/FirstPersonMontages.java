@@ -32,7 +32,13 @@ public class FirstPersonMontages {
 
 
 
-
+    public static final MontageConfiguration HAND_EMPTY_ATTACK_MONTAGE = MontageConfiguration.builder("hand_empty_attack", FirstPersonAnimationSequences.HAND_EMPTY_ATTACK)
+            .playsInSlot(MAIN_HAND_ATTACK_SLOT)
+            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
+//            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
+            .build();
     public static final MontageConfiguration HAND_TOOL_ATTACK_PICKAXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_pickaxe", FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
