@@ -1,5 +1,5 @@
 {
-  "locomotion.config.yacl_not_found.header": "Configuration API не установлен",
+  "locomotion.config.yacl_not_found.header": "API конфигурации не установлен",
   "locomotion.config.yacl_not_found.description": "Locomotion использует библиотеку конфигурации \"YetAnotherConfigLib\" для создания меню настройки внутри игры. Это не обязательная зависимость, но она должна быть установлена, если вы хотите изменять настройки во время игры. В противном случае вы можете изменить конфигурацию вручную в файле .minecraft/config/locomotion.json",
   "locomotion.config.yacl_not_found.close": "Закрыть",
 
