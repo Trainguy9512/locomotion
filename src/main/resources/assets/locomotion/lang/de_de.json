@@ -1,0 +1,42 @@
+{
+  "locomotion.config.yacl_not_found.header": "Konfigurations API nicht installiert",
+  "locomotion.config.yacl_not_found.description": "Locomotion nutzt die Konfigurationsbibliothek \"YetAnotherConfigLib\" um den Ingame-Konfigurations-Bildschirm zu generieren. Dies ist keine benötigte Abhängigkeit, muss jedoch installiert sein um die Konfiguration im Spiel anzupassen. Ansonsten muss die Konfiguration manuell in .minecraft/config/locomotion.json angepasst werden",
+  "locomotion.config.yacl_not_found.close": "Schließen",
+
+  "locomotion.config.title": "Locomotion Konfiguration",
+  "locomotion.config.category.general.name": "Allgemein",
+  "locomotion.config.category.general.tooltip": "Allgemeine Einstellungen für alle Animationen",
+  "locomotion.config.category.first_person_player.name": "Ego-Perspektive Spieler",
+  "locomotion.config.category.first_person_player.tooltip": "Einstellungen für die Spieler Animationen in der Ego-Perspektive",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "Ego-Perspektive Animationen",
+  "locomotion.config.option.enable_first_person_renderer.description": "Ob Locomotions Ego-Perspektive Animationen genutzt werden sollen. Im Gegensatz zu den meisten anderen Animationen, wird hier der Vanilla Ego-Perspektive-Renderer überschrieben. Deaktiviere dies um den Vanilla Ego-Perspektive-Renderer zu nutzen oder um Kompatibilität mit Mods herzustellen die den Vanilla Ego-Perspektive-Renderer integrieren.",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "Aktiviert",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "Deaktiviert",
+
+  "locomotion.config.group.first_person_camera_shake.name": "Kamera-Wackeln",
+  "locomotion.config.group.first_person_camera_shake.description": "Einstellungen zum Anpassen der Intensität des Kamera-Wackeln.",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "Basis Intensität",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "Steuert die Intensität des Kamera-Wackeln aller Animationen.",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "Bewegungsintensität",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "Steuert die Intensität des Kamera-Wackeln durch Bewegungsanimationen, einschließlich Geh-Bewegung.",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "Item-Interaktion Itensität",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "Steuert die Intensität des Kamera-Wackeln bei Animationen durch Interaktion mit Items, einschließlich Angriffe und Abbauen.",
+
+  "locomotion.config.group.first_person_arm_camera_damping.name": "Kamera Arm-Rotierung Dämpfung",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "Einstellungen zum Anpassen wie die Arme rotieren wenn die Kamera bewegt wird.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Aktiviert",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Ob die Ego-Perspektive Arm Dämpfung aktiviert ist. Durch Deaktivieren dieser Option bewegen sich die Arme beim Bewegen der Kamera überhaupt nicht mehr.",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Dämpfungsfaktor",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Steuert, wie viel Reibung die Federanimation hat. Je höher die Dämpfung, desto weniger springt sie hin und her",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Steifungsfaktor Factor",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "Steuert, wie schnell sich die Arme rotieren, um sich der Drehung der Kamera anzupassen",
+
+  "locomotion.config.option.first_person_mining_speed.name": "Abbau-Animation Geschwindigkeits-Multiplikator",
+  "locomotion.config.option.first_person_mining_speed.description": "Passt die Geschwindigkeit der Abbau-Animationen an. 1 ist normale Geschwindigkeit, 0,5 ist halb so schnell und 2 ist doppelt so schnell",
+
+  "locomotion.config.group.first_person_map.name": "Karten-Items",
+  "locomotion.config.group.first_person_map.description": "Einstellungen für die Anzeige und Animation von Karten-Items.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Animationsintensität der Kartenbewegung",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Steuert die Intensität der Bewegungsanimationen beim Halten einer Karte. Eine geringere Intensität verbessert die Lesbarkeit der Karte."
+}
