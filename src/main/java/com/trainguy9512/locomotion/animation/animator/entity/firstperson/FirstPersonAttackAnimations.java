@@ -3,9 +3,14 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
+import com.trainguy9512.locomotion.util.Easing;
+import com.trainguy9512.locomotion.util.TimeSpan;
+import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Comparator;
@@ -38,11 +43,6 @@ public class FirstPersonAttackAnimations {
             context -> context.currentMainHandPose() == FirstPersonHandPoses.TRIDENT,
             30
     ));
-    public static final Identifier SWORD_NULL = register(LocomotionMain.makeIdentifier("sword_null"), AttackAnimationRule.of(
-            null,
-            context -> context.currentMainHandPose() == FirstPersonHandPoses.SWORD,
-            30
-    ));
     public static final Identifier AXE_ACROSS = register(LocomotionMain.makeIdentifier("axe_across"), AttackAnimationRule.of(
             FirstPersonMontages.HAND_TOOL_ATTACK_AXE_MONTAGE,
             context -> context.currentMainHandPose() == FirstPersonHandPoses.AXE,
@@ -52,6 +52,16 @@ public class FirstPersonAttackAnimations {
             FirstPersonMontages.HAND_MACE_ATTACK_MONTAGE,
             context -> context.currentMainHandPose() == FirstPersonHandPoses.MACE,
             30
+    ));
+    public static final Identifier SWORD_MAIN = register(LocomotionMain.makeIdentifier("sword_main"), AttackAnimationRule.of(
+            MontageConfiguration.builder("hand_tool_sword_attack", FirstPersonAnimationSequences.HAND_TOOL_SWORD_ATTACK)
+                    .playsInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT)
+                    .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+                    .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+                    .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
+                    .build(),
+            context -> context.item().is(ItemTags.SWORDS),
+            60
     ));
     //? if >= 1.21.11 {
     public static final Identifier SPEAR_JAB = register(LocomotionMain.makeIdentifier("spear_jab"), AttackAnimationRule.of(
