@@ -101,7 +101,7 @@ public class FirstPersonHandPoses {
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.SWORDS),
             100)
-            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_SWORD_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
             .build());
     public static final Identifier SHIELD = register(LocomotionMain.makeIdentifier("shield"), HandPoseDefinition.builder(
