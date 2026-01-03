@@ -1,0 +1,42 @@
+{
+  "locomotion.config.yacl_not_found.header": "구성 API가 설치되지 않음",
+  "locomotion.config.yacl_not_found.description": "Locomotion은 게임 내 설정 화면 생성을 위해 \"YetAnotherConfigLib\" 설정 라이브러리를 사용합니다. 필수 의존성은 아니지만, 게임 내에서 설정을 바꾸려면 설치해야 합니다. 설치하지 않을 경우 .minecraft/config/locomotion.json 파일을 직접 수정해 설정을 변경할 수 있습니다.",
+  "locomotion.config.yacl_not_found.close": "닫기",
+
+  "locomotion.config.title": "Locomotion 설정",
+  "locomotion.config.category.general.name": "일반",
+  "locomotion.config.category.general.tooltip": "모든 애니메이션에 대한 일반 설정",
+  "locomotion.config.category.first_person_player.name": "1인칭 플레이어",
+  "locomotion.config.category.first_person_player.tooltip": "1인칭 플레이어 애니메이션 관련 설정",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "1인칭 애니메이션",
+  "locomotion.config.option.enable_first_person_renderer.description": "Locomotion의 1인칭 플레이어 애니메이션을 사용할지 여부입니다. 다른 대부분의 애니메이션과 달리, 이는 독립적인 렌더러를 사용하여 바닐라의 1인칭 렌더러를 완전히 대체합니다. 이 기능을 끄면 바닐라 1인칭 렌더러가 표시되며, 바닐라 렌더러와 통합되는 모드와의 호환성을 위해 끌 수도 있습니다.",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "사용",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "사용 안 함",
+
+  "locomotion.config.group.first_person_camera_shake.name": "카메라 흔들림",
+  "locomotion.config.group.first_person_camera_shake.description": "카메라 흔들림 애니메이션의 강도를 조절하는 설정입니다.",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "전체 강도",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "모든 카메라 흔들림 애니메이션의 강도를 조절합니다.",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "이동 흔들림 강도",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "이동 애니메이션(화면 흔들림 포함)으로 인해 발생하는 카메라 흔들림의 강도를 조절합니다.",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "아이템 상호작용 흔들림 강도",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "공격, 채광 등 아이템 상호작용 애니메이션으로 인한 카메라 흔들림의 강도를 조절합니다.",
+
+  "locomotion.config.group.first_person_arm_camera_damping.name": "카메라 회전에 따른 팔 감쇠",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "카메라를 움직일 때 팔이 어떻게 회전하는지를 조절하는 설정입니다.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "사용",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "1인칭 팔 감쇠 기능의 활성화 여부입니다. 비활성화하면 카메라를 움직여도 팔이 전혀 움직이지 않습니다.",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "감쇠 계수",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "스프링 애니메이션의 마찰력을 조절합니다. 값이 높을수록 흔들림이 빠르게 줄어듭니다.",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "강성 계수",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "팔이 카메라 회전에 얼마나 빠르게 따라가는지를 조절합니다.",
+
+  "locomotion.config.option.first_person_mining_speed.name": "채광 애니메이션 속도 배율",
+  "locomotion.config.option.first_person_mining_speed.description": "채광 애니메이션이 재생되는 속도를 조절합니다. 1은 기본 속도, 0.5는 절반 속도, 2는 두 배 속도입니다.",
+
+  "locomotion.config.group.first_person_map.name": "지도 아이템",
+  "locomotion.config.group.first_person_map.description": "지도 아이템의 표시 방식 및 애니메이션 관련 설정입니다.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "지도 이동 애니메이션 강도",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "지도 아이템을 들고 있을 때 적용되는 이동 애니메이션의 강도를 조절합니다. 강도를 낮추면 지도의 가독성이 향상됩니다."
+}
