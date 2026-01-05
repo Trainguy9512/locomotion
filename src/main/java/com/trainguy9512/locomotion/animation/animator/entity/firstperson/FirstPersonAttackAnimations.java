@@ -3,10 +3,10 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
-import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.util.Easing;
+import com.trainguy9512.locomotion.util.LocomotionMultiVersionWrappers;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.resources.Identifier;
@@ -40,17 +40,17 @@ public class FirstPersonAttackAnimations {
     ));
     public static final Identifier TRIDENT = register(LocomotionMain.makeIdentifier("trident_jab"), AttackAnimationRule.of(
             FirstPersonMontages.HAND_TRIDENT_JAB_MONTAGE,
-            context -> context.currentMainHandPose() == FirstPersonHandPoses.TRIDENT,
+            context -> context.item().getUseAnimation() == LocomotionMultiVersionWrappers.getTridentUseAnimation(),
             30
     ));
     public static final Identifier AXE_ACROSS = register(LocomotionMain.makeIdentifier("axe_across"), AttackAnimationRule.of(
             FirstPersonMontages.HAND_TOOL_ATTACK_AXE_MONTAGE,
-            context -> context.currentMainHandPose() == FirstPersonHandPoses.AXE,
+            context -> context.item().is(ItemTags.AXES),
             30
     ));
     public static final Identifier MACE_SLAM = register(LocomotionMain.makeIdentifier("mace_slam"), AttackAnimationRule.of(
             FirstPersonMontages.HAND_MACE_ATTACK_MONTAGE,
-            context -> context.currentMainHandPose() == FirstPersonHandPoses.MACE,
+            context -> context.item().is(ItemTags.MACE_ENCHANTABLE),
             30
     ));
     public static final Identifier SWORD_MAIN = register(LocomotionMain.makeIdentifier("sword_main"), AttackAnimationRule.of(
@@ -66,7 +66,7 @@ public class FirstPersonAttackAnimations {
     //? if >= 1.21.11 {
     public static final Identifier SPEAR_JAB = register(LocomotionMain.makeIdentifier("spear_jab"), AttackAnimationRule.of(
             FirstPersonMontages.HAND_SPEAR_JAB_MONTAGE,
-            context -> context.currentMainHandPose() == FirstPersonHandPoses.SPEAR,
+            context -> context.item().getUseAnimation() == LocomotionMultiVersionWrappers.getSpearUseAnimation(),
             30
     ));
     //? }
@@ -86,8 +86,7 @@ public class FirstPersonAttackAnimations {
     }
 
     public record AttackAnimationConditionContext(
-            ItemStack item,
-            Identifier currentMainHandPose
+            ItemStack item
     ) {
 
     }
@@ -95,8 +94,7 @@ public class FirstPersonAttackAnimations {
     public static void playAttackAnimation(OnTickDriverContainer driverContainer, MontageManager montageManager) {
 
         AttackAnimationConditionContext context = new AttackAnimationConditionContext(
-                driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM),
-                driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE)
+                driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM)
         );
 
         Map<Identifier, AttackAnimationRule> sortedAttackAnimationRules = ATTACK_ANIMATION_RULES_BY_IDENTIFIER.entrySet()

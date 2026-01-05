@@ -81,7 +81,9 @@ public class FirstPersonHandPoseSwitching {
         }
     }
 
-    private static boolean shouldTransitionToThisRaiseState(
+
+
+    private static boolean shouldChooseThisHandPose(
             StateTransition.TransitionContext context,
             Identifier handPoseIdentifier,
             InteractionHand hand
@@ -89,6 +91,31 @@ public class FirstPersonHandPoseSwitching {
         ItemStack currentItemStack = context.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(hand));
         Identifier handPoseFromCurrentItemStack = FirstPersonHandPoses.testForNextHandPose(currentItemStack, hand);
         return handPoseIdentifier == handPoseFromCurrentItemStack;
+    }
+
+    private static boolean shouldTransitionToThisRaiseState(
+            StateTransition.TransitionContext context,
+            Identifier handPoseIdentifier,
+            InteractionHand hand
+    ) {
+        if (!StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING.test(context)) {
+            return false;
+        }
+        return shouldChooseThisHandPose(context, handPoseIdentifier, hand);
+    }
+
+    private static boolean shouldSkipStraightToPoseStateForAttack(
+            StateTransition.TransitionContext context,
+            Identifier handPoseIdentifier,
+            InteractionHand hand
+    ) {
+        if (hand == InteractionHand.OFF_HAND) {
+            return false;
+        }
+        if (!context.driverContainer().getDriverValue(FirstPersonDrivers.HAS_ATTACKED)) {
+            return false;
+        }
+        return shouldChooseThisHandPose(context, handPoseIdentifier, hand);
     }
 
     public static void defineStatesForHandPose(
@@ -170,12 +197,15 @@ public class FirstPersonHandPoseSwitching {
                 .addOriginatingState(lowerState)
                 .addOutboundTransition(StateTransition.builder(raiseState)
                         .setTiming(Transition.INSTANT)
-                        .isTakenIfTrue(StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING
-                                .and(context -> shouldTransitionToThisRaiseState(context, handPoseIdentifier, hand))
-                        )
+                        .isTakenIfTrue(context -> shouldTransitionToThisRaiseState(context, handPoseIdentifier, hand))
                         .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), hand))
                         .bindToOnTransitionTaken(evaluationState -> clearMontagesInAttackSlot(evaluationState, hand))
-                        .build());
+                        .build())
+                .addOutboundTransition(StateTransition.builder(poseState)
+                        .setTiming(Transition.INSTANT)
+                        .isTakenIfTrue(context -> shouldSkipStraightToPoseStateForAttack(context, handPoseIdentifier, hand))
+                        .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItemIfNoTwoHandOverrides(evaluationState.driverContainer(), hand))
+                        .build());;
     }
 
     public static void defineExtraStates(StateMachineFunction.Builder stateMachineBuilder, InteractionHand hand) {
