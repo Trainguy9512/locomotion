@@ -74,6 +74,18 @@ public class FirstPersonAttackAnimations {
     )
             .setDoesAnimationOffsetOffHand(true)
             .build());
+    public static final Identifier SWORD_CRITICAL = register(LocomotionMain.makeIdentifier("sword_critical"), AttackAnimationRule.builder(
+                    MontageConfiguration.builder("hand_tool_sword_attack_critical", FirstPersonAnimationSequences.HAND_TOOL_SWORD_ATTACK_CRITICAL)
+                            .playsInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT)
+                            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+                            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+                            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
+                            .build(),
+                    context -> context.item().is(ItemTags.SWORDS) && context.isCriticalAttack(),
+                    70
+            )
+            .setDoesAnimationOffsetOffHand(true)
+            .build());
     //? if >= 1.21.11 {
     public static final Identifier SPEAR_JAB = register(LocomotionMain.makeIdentifier("spear_jab"), AttackAnimationRule.builder(
             FirstPersonMontages.HAND_SPEAR_JAB_MONTAGE,
@@ -132,7 +144,8 @@ public class FirstPersonAttackAnimations {
     }
 
     public record AttackAnimationConditionContext(
-            ItemStack item
+            ItemStack item,
+            boolean isCriticalAttack
     ) {
 
     }
@@ -140,7 +153,8 @@ public class FirstPersonAttackAnimations {
     public static void tryPlayingAttackAnimation(OnTickDriverContainer driverContainer, MontageManager montageManager) {
 
         AttackAnimationConditionContext context = new AttackAnimationConditionContext(
-                driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM)
+                driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM),
+                driverContainer.getDriverValue(FirstPersonDrivers.MEETS_CRITICAL_ATTACK_CONDITIONS)
         );
 
         Map<Identifier, AttackAnimationRule> sortedAttackAnimationRules = ATTACK_ANIMATION_RULES_BY_IDENTIFIER.entrySet()
