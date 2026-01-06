@@ -15,6 +15,7 @@ public class FirstPersonMontages {
 
     public static final String MAIN_HAND_ATTACK_SLOT = "main_hand_attack";
     public static final String OFF_HAND_ATTACK_SLOT = "off_hand_attack";
+
     public static final String SHIELD_BLOCK_SLOT = "shield_block";
     public static final String SPEAR_CHARGE_SLOT = "spear_charge";
 
