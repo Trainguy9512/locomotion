@@ -6,7 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
 import com.trainguy9512.locomotion.util.Easing;
-import com.trainguy9512.locomotion.util.MultiVersionUtils;
+import com.trainguy9512.locomotion.util.LocomotionMultiVersionWrappers;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.core.component.DataComponents;
@@ -135,7 +135,7 @@ public class FirstPersonHandPoses {
             "trident",
             FirstPersonTrident::handTridentPoseFunction,
             FirstPersonAnimationSequences.HAND_TRIDENT_POSE,
-            itemStack -> itemStack.getUseAnimation() == MultiVersionUtils.getTridentUseAnimation(),
+            itemStack -> itemStack.getUseAnimation() == LocomotionMultiVersionWrappers.getTridentUseAnimation(),
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_SPEAR_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_SPEAR_LOWER)
@@ -182,7 +182,7 @@ public class FirstPersonHandPoses {
             "spear",
             FirstPersonSpear::constructSpearPoseFunction,
             FirstPersonAnimationSequences.HAND_SPEAR_POSE,
-            itemStack -> itemStack.getUseAnimation() == MultiVersionUtils.getSpearUseAnimation(),
+            itemStack -> itemStack.getUseAnimation() == LocomotionMultiVersionWrappers.getSpearUseAnimation(),
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_SPEAR_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_SPEAR_LOWER)

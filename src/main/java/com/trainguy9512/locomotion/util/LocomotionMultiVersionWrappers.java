@@ -2,7 +2,7 @@ package com.trainguy9512.locomotion.util;
 
 import net.minecraft.world.item.ItemUseAnimation;
 
-public class MultiVersionUtils {
+public class LocomotionMultiVersionWrappers {
 
     public static ItemUseAnimation getTridentUseAnimation() {
         //? if >= 1.21.11 {

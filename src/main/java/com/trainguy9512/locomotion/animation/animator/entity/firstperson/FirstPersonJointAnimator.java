@@ -125,8 +125,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         pose = FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer);
 
-        // Offsetting the hands based on the shield state machine.
+        // Offsetting the hands based on the shield state machine. Also offsetting the hands for attack animaitons.
         pose = FirstPersonShield.constructWithHandsOffsetByShield(cachedPoseContainer, pose);
+        pose = FirstPersonAttackAnimations.constructWithOffsetOffHandAttack(pose);
 
         // Punch mining animation
         pose = FirstPersonMining.constructWithPunchMiningPoseFunction(pose);
@@ -230,7 +231,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE);
         });
         driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).runAndConsumeIfTriggered(() -> {
-            FirstPersonAttackAnimations.playAttackAnimation(driverContainer, montageManager);
+            FirstPersonAttackAnimations.tryPlayingAttackAnimation(driverContainer, montageManager);
         });
         if (driverContainer.getDriver(FirstPersonDrivers.IS_MINING).getCurrentValue()) {
             montageManager.interruptMontagesInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT, Transition.builder(TimeSpan.ofTicks(2)).build());

@@ -30,8 +30,8 @@ public record StateTransition(
 
     public static final Predicate<TransitionContext> ALWAYS_TRUE = transitionContext -> true;
     public static final Predicate<TransitionContext> CURRENT_TRANSITION_FINISHED = transitionContext -> transitionContext.currentStateWeight() == 1 && transitionContext.previousStateWeight() == 1;
-    public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING = makeMostRelevantAnimationPlayerFinishedCondition(1f);
-    public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED = makeMostRelevantAnimationPlayerFinishedCondition(0f);
+    public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING = context -> hasMostRelevantAnimationPlayerFinished(context, 1f);
+    public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED = context -> hasMostRelevantAnimationPlayerFinished(context, 0f);
 
     public static <D extends Driver<Boolean>> Predicate<TransitionContext> takeIfBooleanDriverTrue(DriverKey<D> booleanDriverKey) {
         return transitionContext -> transitionContext.driverContainer.getDriverValue(booleanDriverKey);
@@ -45,24 +45,22 @@ public record StateTransition(
         return context -> context.timeElapsedInCurrentState().inTicks() > time.inTicks();
     }
 
-    public static Predicate<TransitionContext> makeMostRelevantAnimationPlayerFinishedCondition(float crossFadeWeight) {
-        return transitionContext -> {
-            var potentialPlayer = transitionContext.findMostRelevantAnimationPlayer();
-            if (potentialPlayer.isPresent()) {
-                AnimationPlayer player = potentialPlayer.get();
-                float transitionTimeTicks = transitionContext.transitionDuration().inTicks() * crossFadeWeight;
-                Tuple<TimeSpan, TimeSpan> remainingTime = player.getRemainingTime();
+    public static boolean hasMostRelevantAnimationPlayerFinished(TransitionContext context, float crossFadeWeight) {
+        var potentialPlayer = context.findMostRelevantAnimationPlayer();
+        if (potentialPlayer.isPresent()) {
+            AnimationPlayer player = potentialPlayer.get();
+            float transitionTimeTicks = context.transitionDuration().inTicks() * crossFadeWeight;
+            Tuple<TimeSpan, TimeSpan> remainingTime = player.getRemainingTime();
 
-                // Mid-animation
-                if (remainingTime.getA().inTicks() > remainingTime.getB().inTicks()) {
-                    return transitionTimeTicks < remainingTime.getA().inTicks() && transitionTimeTicks >= remainingTime.getB().inTicks();
-                    // Looping (remaining time wrapping around 0), but NOT stopped.
-                } else if (remainingTime.getA().inTicks() < remainingTime.getB().inTicks()) {
-                    return transitionTimeTicks < remainingTime.getA().inTicks();
-                }
+            // Mid-animation
+            if (remainingTime.getA().inTicks() > remainingTime.getB().inTicks()) {
+                return transitionTimeTicks < remainingTime.getA().inTicks() && transitionTimeTicks >= remainingTime.getB().inTicks();
+                // Looping (remaining time wrapping around 0), but NOT stopped.
+            } else if (remainingTime.getA().inTicks() < remainingTime.getB().inTicks()) {
+                return transitionTimeTicks < remainingTime.getA().inTicks();
             }
-            return false;
-        };
+        }
+        return false;
     }
 
     /**
@@ -184,7 +182,7 @@ public record StateTransition(
                 this.conditionPredicate = this.conditionPredicate.and(StateTransition.CURRENT_TRANSITION_FINISHED);
             }
             if (this.automaticTransition) {
-                this.conditionPredicate = this.conditionPredicate.or(makeMostRelevantAnimationPlayerFinishedCondition(this.automaticTransitionCrossfadeWeight));
+                this.conditionPredicate = this.conditionPredicate.or(context -> hasMostRelevantAnimationPlayerFinished(context, this.automaticTransitionCrossfadeWeight));
             }
             return new StateTransition(this.target, this.conditionPredicate, this.transition, this.priority, this.onTransitionTakenListener, this.automaticTransition);
         }
