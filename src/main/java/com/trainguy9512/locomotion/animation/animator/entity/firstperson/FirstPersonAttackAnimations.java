@@ -34,33 +34,28 @@ public class FirstPersonAttackAnimations {
     public static final Identifier DEFAULT = register(LocomotionMain.makeIdentifier("default"), AttackAnimationRule.builder(
             FirstPersonMontages.HAND_TOOL_ATTACK_PICKAXE_MONTAGE,
             context -> true,
-            0
-    )
+            0)
             .build());
     public static final Identifier EMPTY_HAND_PUNCH = register(LocomotionMain.makeIdentifier("empty_hand_punch"), AttackAnimationRule.builder(
             FirstPersonMontages.HAND_EMPTY_ATTACK_MONTAGE,
             context -> context.item().isEmpty(),
-            20
-    )
+            20)
             .build());
     public static final Identifier TRIDENT = register(LocomotionMain.makeIdentifier("trident_jab"), AttackAnimationRule.builder(
             FirstPersonMontages.HAND_TRIDENT_JAB_MONTAGE,
             context -> context.item().getUseAnimation() == LocomotionMultiVersionWrappers.getTridentUseAnimation(),
-            30
-    )
+            30)
             .build());
     public static final Identifier AXE_ACROSS = register(LocomotionMain.makeIdentifier("axe_across"), AttackAnimationRule.builder(
             FirstPersonMontages.HAND_TOOL_ATTACK_AXE_MONTAGE,
             context -> context.item().is(ItemTags.AXES),
-            30
-    )
+            30)
             .setDoesAnimationOffsetOffHand(true)
             .build());
     public static final Identifier MACE_SLAM = register(LocomotionMain.makeIdentifier("mace_slam"), AttackAnimationRule.builder(
             FirstPersonMontages.HAND_MACE_ATTACK_MONTAGE,
             context -> context.item().is(ItemTags.MACE_ENCHANTABLE),
-            30
-    )
+            30)
             .build());
     public static final Identifier SWORD_MAIN = register(LocomotionMain.makeIdentifier("sword_main"), AttackAnimationRule.builder(
             MontageConfiguration.builder("hand_tool_sword_attack", FirstPersonAnimationSequences.HAND_TOOL_SWORD_ATTACK)
@@ -70,8 +65,18 @@ public class FirstPersonAttackAnimations {
                     .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
                     .build(),
             context -> context.item().is(ItemTags.SWORDS),
-            60
-    )
+            60)
+            .setDoesAnimationOffsetOffHand(true)
+            .build());
+    public static final Identifier SWORD_SPRINT = register(LocomotionMain.makeIdentifier("sword_sprint"), AttackAnimationRule.builder(
+                    MontageConfiguration.builder("hand_tool_sword_attack_sprint", FirstPersonAnimationSequences.HAND_TOOL_SWORD_ATTACK_SPRINT)
+                            .playsInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT)
+                            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+                            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+                            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
+                            .build(),
+                    context -> context.item().is(ItemTags.SWORDS) && context.isSprintAttack(),
+                    70)
             .setDoesAnimationOffsetOffHand(true)
             .build());
     public static final Identifier SWORD_CRITICAL = register(LocomotionMain.makeIdentifier("sword_critical"), AttackAnimationRule.builder(
@@ -81,9 +86,8 @@ public class FirstPersonAttackAnimations {
                             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
                             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
                             .build(),
-                    context -> context.item().is(ItemTags.SWORDS) && context.isCriticalAttack(),
-                    70
-            )
+                    context -> (context.item().is(ItemTags.SWORDS) || context.item().is(ItemTags.AXES)) && context.isCriticalAttack(),
+                    70)
             .setDoesAnimationOffsetOffHand(true)
             .build());
     //? if >= 1.21.11 {
@@ -145,7 +149,8 @@ public class FirstPersonAttackAnimations {
 
     public record AttackAnimationConditionContext(
             ItemStack item,
-            boolean isCriticalAttack
+            boolean isCriticalAttack,
+            boolean isSprintAttack
     ) {
 
     }
@@ -154,7 +159,8 @@ public class FirstPersonAttackAnimations {
 
         AttackAnimationConditionContext context = new AttackAnimationConditionContext(
                 driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM),
-                driverContainer.getDriverValue(FirstPersonDrivers.MEETS_CRITICAL_ATTACK_CONDITIONS)
+                driverContainer.getDriverValue(FirstPersonDrivers.MEETS_CRITICAL_ATTACK_CONDITIONS),
+                driverContainer.getDriverValue(FirstPersonDrivers.MEETS_SPRINT_ATTACK_CONDITIONS)
         );
 
         Map<Identifier, AttackAnimationRule> sortedAttackAnimationRules = ATTACK_ANIMATION_RULES_BY_IDENTIFIER.entrySet()

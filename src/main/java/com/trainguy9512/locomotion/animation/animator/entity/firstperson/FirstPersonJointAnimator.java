@@ -203,6 +203,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         driverContainer.getDriver(FirstPersonDrivers.IS_IN_RIPTIDE).setValue(player.isAutoSpinAttack());
         driverContainer.getDriver(FirstPersonDrivers.IS_MOVING).setValue(player.input.keyPresses.forward() || player.input.keyPresses.backward() || player.input.keyPresses.left() || player.input.keyPresses.right());
+        driverContainer.getDriver(FirstPersonDrivers.IS_SPRINTING).setValue(player.isSprinting());
         driverContainer.getDriver(FirstPersonDrivers.IS_ON_GROUND).setValue(player.onGround());
         driverContainer.getDriver(FirstPersonDrivers.IS_JUMPING).setValue(player.input.keyPresses.jump());
         driverContainer.getDriver(FirstPersonDrivers.IS_CROUCHING).setValue(player.isCrouching());
@@ -257,7 +258,12 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 && !player.isPassenger()
                 && !player.isSprinting();
 
+        boolean meetsSprintAttackConditions = driverContainer.getDriver(FirstPersonDrivers.IS_SPRINTING).getPreviousValue();
+        if (meetsCriticalAttackConditions) {
+            meetsSprintAttackConditions = false;
+        }
         driverContainer.getDriver(FirstPersonDrivers.MEETS_CRITICAL_ATTACK_CONDITIONS).setValue(meetsCriticalAttackConditions);
+        driverContainer.getDriver(FirstPersonDrivers.MEETS_SPRINT_ATTACK_CONDITIONS).setValue(meetsSprintAttackConditions);
     }
 
     public void extractInteractionHandData(LocalPlayer dataReference, OnTickDriverContainer driverContainer, MontageManager montageManager) {
