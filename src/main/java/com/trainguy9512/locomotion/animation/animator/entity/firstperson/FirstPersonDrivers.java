@@ -39,6 +39,7 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Float>> VERTICAL_MOVEMENT_SPEED = DriverKey.of("vertical_movement_speed", () -> VariableDriver.ofFloat(() -> 0f));
     public static final DriverKey<VariableDriver<Float>> MODIFIED_WALK_SPEED = DriverKey.of("modified_walk_speed", () -> VariableDriver.ofFloat(() -> 0f));
     public static final DriverKey<VariableDriver<Boolean>> IS_MOVING = DriverKey.of("is_moving", () -> VariableDriver.ofBoolean(() -> false));
+    public static final DriverKey<VariableDriver<Boolean>> IS_SPRINTING = DriverKey.of("is_sprinting", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_ON_GROUND = DriverKey.of("is_grounded", () -> VariableDriver.ofBoolean(() -> true));
     public static final DriverKey<VariableDriver<Boolean>> IS_JUMPING = DriverKey.of("is_jumping", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_CROUCHING = DriverKey.of("is_crouching", () -> VariableDriver.ofBoolean(() -> false));
@@ -53,6 +54,7 @@ public class FirstPersonDrivers {
     public static final DriverKey<TriggerDriver> HAS_DROPPED_ITEM = DriverKey.of("has_dropped_item", TriggerDriver::of);
     public static final DriverKey<TriggerDriver> HAS_SWAPPED_ITEMS = DriverKey.of("has_swapped_items", () -> TriggerDriver.of(3));
     public static final DriverKey<VariableDriver<Boolean>> MEETS_CRITICAL_ATTACK_CONDITIONS = DriverKey.of("meets_critical_attack_conditions", () -> VariableDriver.ofBoolean(() -> false));
+    public static final DriverKey<VariableDriver<Boolean>> MEETS_SPRINT_ATTACK_CONDITIONS = DriverKey.of("meets_sprint_attack_conditions", () -> VariableDriver.ofBoolean(() -> false));
 
     public static final DriverKey<TriggerDriver> HAS_USED_MAIN_HAND_ITEM = DriverKey.of("has_used_main_hand_item", () -> TriggerDriver.of(2));
     public static final DriverKey<TriggerDriver> HAS_USED_OFF_HAND_ITEM = DriverKey.of("has_used_off_hand_item", () -> TriggerDriver.of(2));
