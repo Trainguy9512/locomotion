@@ -1,0 +1,42 @@
+{
+  "locomotion.config.yacl_not_found.header": "未安装配置 API",
+  "locomotion.config.yacl_not_found.description": "Locomotion 使用配置库 \"YetAnotherConfigLib\" 来生成游戏内配置界面。它不是必需的依赖项，但如果您想在游戏中调整配置，则必须安装它。否则，您可以在 .minecraft/config/locomotion.json 中手动修改配置",
+  "locomotion.config.yacl_not_found.close": "关闭",
+
+  "locomotion.config.title": "Locomotion 配置",
+  "locomotion.config.category.general.name": "常规",
+  "locomotion.config.category.general.tooltip": "所有动画的常规设置",
+  "locomotion.config.category.first_person_player.name": "第一人称玩家",
+  "locomotion.config.category.first_person_player.tooltip": "第一人称玩家动画设置",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "第一人称动画",
+  "locomotion.config.option.enable_first_person_renderer.description": "是否使用 Locomotion 的第一人称玩家动画。与提供的大多数其他动画不同，此动画有自己独立的渲染器，完全覆盖原版的第一人称渲染器。禁用此选项以显示原版的第一人称玩家渲染器，或与集成到原版第一人称渲染器的模组兼容。",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "启用",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "禁用",
+
+  "locomotion.config.group.first_person_camera_shake.name": "镜头晃动",
+  "locomotion.config.group.first_person_camera_shake.description": "调整镜头晃动动画强度的设置。",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "主强度",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "控制所有镜头晃动动画的强度。",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "移动强度",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "控制移动动画的镜头晃动强度，包括视角摆动。",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "物品交互强度",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "控制物品交互动画的镜头晃动强度，包括攻击和挖掘。",
+
+  "locomotion.config.group.first_person_arm_camera_damping.name": "手臂视角跟随",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "设置转动视角时手臂的跟随与惯性效果。",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "启用",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "是否开启手臂跟随惯性。关闭后，手臂将死死锁定在屏幕上，转动视角时不会有任何晃动。",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "摆动阻尼",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "控制手臂摆动的阻力。数值越大，手臂晃动越少，停得越快（不那么“弹”）。",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "跟随力度",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "控制手臂追随视角的力度。数值越大，手臂跟得越紧，滞后越少。",
+
+  "locomotion.config.option.first_person_mining_speed.name": "挖掘动画速度倍率",
+  "locomotion.config.option.first_person_mining_speed.description": "调整挖掘动画的播放速度。1 为正常速度，0.5 为一半速度，2 为两倍速度",
+
+  "locomotion.config.group.first_person_map.name": "地图物品",
+  "locomotion.config.group.first_person_map.description": "地图物品的显示和动画设置。",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "地图移动动画强度",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "控制手持地图物品时的移动动画强度。较低的强度有助于提高地图可读性。"
+}
