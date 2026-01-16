@@ -20,7 +20,7 @@
     "sources": "https://github.com/Trainguy9512/locomotion/"
   },
 
-  "license": "LGPLv3",
+  "license": "ARR",
   "icon": "assets/locomotion/icon.png",
 
   "environment": "client",
