@@ -62,23 +62,23 @@ public class FirstPersonAttackAnimations {
                     .playsInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT)
                     .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
                     .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
-                    .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
+                    .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(1)).setEasement(Easing.SINE_IN_OUT).build())
                     .build(),
             context -> context.item().is(ItemTags.SWORDS),
             60)
             .setDoesAnimationOffsetOffHand(true)
             .build());
-    public static final Identifier SWORD_SPRINT = register(LocomotionMain.makeIdentifier("sword_sprint"), AttackAnimationRule.builder(
-                    MontageConfiguration.builder("hand_tool_sword_attack_sprint", FirstPersonAnimationSequences.HAND_TOOL_SWORD_ATTACK_SPRINT)
-                            .playsInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT)
-                            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
-                            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
-                            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
-                            .build(),
-                    context -> context.item().is(ItemTags.SWORDS) && context.isSprintAttack(),
-                    70)
-            .setDoesAnimationOffsetOffHand(true)
-            .build());
+//    public static final Identifier SWORD_SPRINT = register(LocomotionMain.makeIdentifier("sword_sprint"), AttackAnimationRule.builder(
+//                    MontageConfiguration.builder("hand_tool_sword_attack_sprint", FirstPersonAnimationSequences.HAND_TOOL_SWORD_ATTACK_SPRINT)
+//                            .playsInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT)
+//                            .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
+//                            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
+//                            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(30)).setEasement(Easing.SINE_IN_OUT).build())
+//                            .build(),
+//                    context -> context.item().is(ItemTags.SWORDS) && context.isSprintAttack(),
+//                    70)
+//            .setDoesAnimationOffsetOffHand(true)
+//            .build());
     public static final Identifier SWORD_CRITICAL = register(LocomotionMain.makeIdentifier("sword_critical"), AttackAnimationRule.builder(
                     MontageConfiguration.builder("hand_tool_sword_attack_critical", FirstPersonAnimationSequences.HAND_TOOL_SWORD_ATTACK_CRITICAL)
                             .playsInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT)
