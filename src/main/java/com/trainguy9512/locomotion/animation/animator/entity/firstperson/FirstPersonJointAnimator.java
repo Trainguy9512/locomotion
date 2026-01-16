@@ -124,9 +124,16 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 .addBlendInput(composedCameraPoseFunction, evaluationState -> 1f, CAMERA_MASK)
                 .build();
 
+        // Offsetting the hands from the config on the X axis prior to the two handed animations.
+        pose = FirstPersonArmOffset.constructWithArmXOffset(pose);
+
+        // Blending in the two handed animations.
         pose = FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer);
 
-        // Offsetting the hands based on the shield state machine. Also offsetting the hands for attack animaitons.
+        // Offsetting the hands from the config on the Y and Z axis after to the two handed animations.
+        pose = FirstPersonArmOffset.constructWithArmYZOffset(pose);
+
+        // Offsetting the hands based on the shield state machine. Also offsetting the hands for attack animations.
         pose = FirstPersonShield.constructWithHandsOffsetByShield(cachedPoseContainer, pose);
         pose = FirstPersonAttackAnimations.constructWithOffsetOffHandAttack(pose);
 

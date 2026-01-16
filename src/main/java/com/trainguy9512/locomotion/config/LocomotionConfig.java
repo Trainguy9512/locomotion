@@ -86,6 +86,10 @@ public class LocomotionConfig {
 
             public float miningAnimationSpeedMultiplier = 1f;
             public float mapMovementAnimationIntensity = 0.2f;
+
+            public float armOffsetX = 0f;
+            public float armOffsetY = 0f;
+            public float armOffsetZ = 0f;
         }
     }
 
