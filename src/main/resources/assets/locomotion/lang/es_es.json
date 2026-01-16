@@ -1,0 +1,42 @@
+{
+  "locomotion.config.yacl_not_found.header": "API de configuración no instalada",
+  "locomotion.config.yacl_not_found.description": "Locomotion utiliza la biblioteca de configuración \"YetAnotherConfigLib\" para generar la pantalla de configuración dentro del juego. No es una dependencia obligatoria, pero debe instalarse si deseas ajustar la configuración mientras juegas. De lo contrario, puedes modificar la configuración manualmente en .minecraft/config/locomotion.json",
+  "locomotion.config.yacl_not_found.close": "Cerrar",
+
+  "locomotion.config.title": "Configuración de Locomotion",
+  "locomotion.config.category.general.name": "General",
+  "locomotion.config.category.general.tooltip": "Configuración general para todas las animaciones",
+  "locomotion.config.category.first_person_player.name": "Jugador en primera persona",
+  "locomotion.config.category.first_person_player.tooltip": "Configuración de las animaciones del jugador en primera persona",
+
+  "locomotion.config.option.enable_first_person_renderer.name": "Animaciones en primera persona",
+  "locomotion.config.option.enable_first_person_renderer.description": "Define si deben usarse las animaciones del jugador en primera persona de Locomotion. A diferencia de la mayoría de las demás animaciones, esta cuenta con un renderizador independiente que sobrescribe por completo el renderizador Vanilla de primera persona. Desactiva esta opción para usar el renderizador Vanilla o para mantener la compatibilidad con mods que se integran en él",
+  "locomotion.config.option.enable_first_person_renderer.enabled": "Activado",
+  "locomotion.config.option.enable_first_person_renderer.disabled": "Desactivado",
+
+  "locomotion.config.group.first_person_camera_shake.name": "Sacudida de cámara",
+  "locomotion.config.group.first_person_camera_shake.description": "Configuración para ajustar la intensidad de las animaciones de sacudida de cámara.",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.name": "Intensidad general",
+  "locomotion.config.option.first_person_camera_shake_intensity_master.description": "Controla la intensidad de todas las animaciones de sacudida de cámara.",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.name": "Intensidad de movimiento",
+  "locomotion.config.option.first_person_camera_shake_intensity_movement.description": "Controla la intensidad de la sacudida de cámara producida por las animaciones de movimiento, incluido el balanceo de vista.",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.name": "Intensidad de interacción con objetos",
+  "locomotion.config.option.first_person_camera_shake_intensity_item_interactions.description": "Controla la intensidad de la sacudida de cámara producida por las animaciones de interacción con objetos, incluidos el ataque y la minería.",
+
+  "locomotion.config.group.first_person_arm_camera_damping.name": "Amortiguación de brazos según la rotación de la cámara",
+  "locomotion.config.group.first_person_arm_camera_damping.description": "Configuración para ajustar cómo rotan los brazos al mover la cámara.",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.name": "Activado",
+  "locomotion.config.option.enable_first_person_arm_camera_damping.description": "Define si la amortiguación de brazos en primera persona está activada. Al desactivarla, los brazos no se moverán al mover la cámara.",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.name": "Factor de amortiguación",
+  "locomotion.config.option.first_person_arm_camera_damping_factor.description": "Controla la fricción de la animación tipo resorte. Cuanto mayor sea la amortiguación, menor será el rebote.",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.name": "Factor de rigidez",
+  "locomotion.config.option.first_person_arm_camera_stiffness_factor.description": "Controla la rapidez con la que los brazos rotan para alinearse con la rotación de la cámara.",
+
+  "locomotion.config.option.first_person_mining_speed.name": "Multiplicador de velocidad de animación de minería",
+  "locomotion.config.option.first_person_mining_speed.description": "Ajusta la velocidad a la que se reproducen las animaciones de minería. 1 es la velocidad normal, 0.5 es la mitad de velocidad y 2 es el doble de velocidad.",
+
+  "locomotion.config.group.first_person_map.name": "Objetos de mapa",
+  "locomotion.config.group.first_person_map.description": "Configuración de cómo se muestran y animan los objetos de mapa.",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Intensidad de animación de movimiento del mapa",
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controla la intensidad de las animaciones de movimiento al sostener un objeto de mapa. Una menor intensidad ayuda a mejorar la legibilidad del mapa."
+}
