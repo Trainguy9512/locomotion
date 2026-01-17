@@ -28,10 +28,10 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<ItemStack>> OFF_HAND_ITEM_COPY_REFERENCE = DriverKey.of("off_hand_item_copy_reference", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_MAIN_HAND_ITEM = DriverKey.of("rendered_main_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
     public static final DriverKey<VariableDriver<ItemStack>> RENDERED_OFF_HAND_ITEM = DriverKey.of("rendered_off_hand_item", () -> VariableDriver.ofConstant(() -> ItemStack.EMPTY));
-    public static final DriverKey<VariableDriver<Identifier>> MAIN_HAND_POSE = DriverKey.of("main_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPoses.EMPTY_MAIN_HAND));
-    public static final DriverKey<VariableDriver<Identifier>> OFF_HAND_POSE = DriverKey.of("off_hand_pose", () -> VariableDriver.ofConstant(() -> FirstPersonHandPoses.EMPTY_OFF_HAND));
-    public static final DriverKey<VariableDriver<Identifier>> MAIN_HAND_GENERIC_ITEM_POSE = DriverKey.of("main_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItems.GENERIC_2D_ITEM));
-    public static final DriverKey<VariableDriver<Identifier>> OFF_HAND_GENERIC_ITEM_POSE = DriverKey.of("off_hand_generic_item_pose", () -> VariableDriver.ofConstant(() -> FirstPersonGenericItems.GENERIC_2D_ITEM));
+    public static final DriverKey<VariableDriver<Identifier>> MAIN_HAND_POSE = DriverKey.of("main_hand_pose", () -> VariableDriver.ofConstant(FirstPersonHandPoses::getEmptyMainHand));
+    public static final DriverKey<VariableDriver<Identifier>> OFF_HAND_POSE = DriverKey.of("off_hand_pose", () -> VariableDriver.ofConstant(FirstPersonHandPoses::getEmptyOffHand));
+    public static final DriverKey<VariableDriver<Identifier>> MAIN_HAND_GENERIC_ITEM_POSE = DriverKey.of("main_hand_generic_item_pose", () -> VariableDriver.ofConstant(FirstPersonGenericItems::getFallback));
+    public static final DriverKey<VariableDriver<Identifier>> OFF_HAND_GENERIC_ITEM_POSE = DriverKey.of("off_hand_generic_item_pose", () -> VariableDriver.ofConstant(FirstPersonGenericItems::getFallback));
 
     public static final DriverKey<VariableDriver<String>> CURRENT_TWO_HANDED_OVERRIDE_STATE = DriverKey.of("current_two_handed_override_state", () -> VariableDriver.ofConstant(() -> FirstPersonTwoHandedActions.TWO_HANDED_ACTION_NORMAL_STATE));
 

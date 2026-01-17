@@ -41,6 +41,7 @@ public class FirstPersonAnimationSequences {
     public static final Identifier HAND_GENERIC_ITEM_ARROW_POSE = makeIdentifier("hand/generic_item/arrow_pose");
     public static final Identifier HAND_GENERIC_ITEM_FISHING_ROD_POSE = makeIdentifier("hand/generic_item/fishing_rod_pose");
     public static final Identifier HAND_GENERIC_ITEM_SHEARS_POSE = makeIdentifier("hand/generic_item/shears_pose");
+    public static final Identifier HAND_GENERIC_ITEM_FIXED_ITEM_POSE = makeIdentifier("hand/generic_item/fixed_item_pose");
 
     public static final Identifier HAND_GENERIC_ITEM_RAISE = makeIdentifier("hand/generic_item/raise");
     public static final Identifier HAND_GENERIC_ITEM_LOWER = makeIdentifier("hand/generic_item/lower");

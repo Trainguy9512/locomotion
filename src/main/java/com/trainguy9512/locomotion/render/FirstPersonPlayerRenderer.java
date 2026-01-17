@@ -137,7 +137,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                             this.renderItem(
                                     player,
                                     rightHandItem,
-                                    ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
                                     poseStack,
                                     rightItemPose,
                                     nodeCollector,
@@ -149,7 +148,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                             this.renderItem(
                                     player,
                                     leftHandItem,
-                                    ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
                                     poseStack,
                                     leftItemPose,
                                     nodeCollector,
@@ -246,7 +244,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
     public void renderItem(
             LivingEntity entity,
             ItemStack itemStack,
-            ItemDisplayContext displayContext,
             PoseStack poseStack,
             JointChannel jointChannel,
             SubmitNodeCollector nodeCollector,
@@ -267,9 +264,10 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             }
             switch (renderType) {
                 case MAP -> this.renderMap(nodeCollector, poseStack, itemStack, combinedLight);
-                case THIRD_PERSON_ITEM, MIRRORED_THIRD_PERSON_ITEM -> {
+                case THIRD_PERSON_ITEM, MIRRORED_THIRD_PERSON_ITEM, FIXED -> {
                     //? if >= 1.21.9 {
 
+                    ItemDisplayContext displayContext = renderType.getItemDisplayContext(side);
                     ItemStackRenderState itemStackRenderState = new ItemStackRenderState();
                     this.itemModelResolver.updateForTopItem(itemStackRenderState, itemStack, displayContext, entity.level(), entity, entity.getId() + displayContext.ordinal());
                     itemStackRenderState.submit(poseStack, nodeCollector, combinedLight, OverlayTexture.NO_OVERLAY, 0);

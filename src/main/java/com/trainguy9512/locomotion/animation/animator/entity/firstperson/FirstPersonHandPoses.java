@@ -193,10 +193,18 @@ public class FirstPersonHandPoses {
         return GENERIC_ITEM;
     }
 
+    public static Identifier getEmptyMainHand() {
+        return EMPTY_MAIN_HAND;
+    }
+
+    public static Identifier getEmptyOffHand() {
+        return EMPTY_OFF_HAND;
+    }
+
     public static Identifier getEmptyHandPose(InteractionHand hand) {
         return switch (hand) {
-            case MAIN_HAND -> EMPTY_MAIN_HAND;
-            case OFF_HAND -> EMPTY_OFF_HAND;
+            case MAIN_HAND -> getEmptyMainHand();
+            case OFF_HAND -> getEmptyOffHand();
         };
     }
 
