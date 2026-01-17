@@ -42,10 +42,10 @@
   
   "locomotion.config.group.first_person_arm_offset.name": "Сдвиг положения руки",
   "locomotion.config.group.first_person_arm_offset.description": "Настройка для управления позицией руки от первого лица",
-  "locomotion.config.option.first_person_arm_offset_x.name": "Сдвиг руки по оси X",
-  "locomotion.config.option.first_person_arm_offset_x.description": "Сдвиг руки по оси X (по горизонтали)",
-  "locomotion.config.option.first_person_arm_offset_y.name": "Сдвиг руки по оси Y",
-  "locomotion.config.option.first_person_arm_offset_y.description": "Сдвиг руки по оси Y (по вертикали)",
-  "locomotion.config.option.first_person_arm_offset_z.name": "Сдвиг руки по оси Z",
-  "locomotion.config.option.first_person_arm_offset_z.description": "Сдвиг руки по оси Z (в грубину)"
+  "locomotion.config.option.first_person_arm_offset_x.name": "Сдвиг руки положения по оси X",
+  "locomotion.config.option.first_person_arm_offset_x.description": "Сдвиг положения руки по оси X (по горизонтали)",
+  "locomotion.config.option.first_person_arm_offset_y.name": "Сдвиг положения руки по оси Y",
+  "locomotion.config.option.first_person_arm_offset_y.description": "Сдвиг положения руки по оси Y (по вертикали)",
+  "locomotion.config.option.first_person_arm_offset_z.name": "Сдвиг положения руки по оси Z",
+  "locomotion.config.option.first_person_arm_offset_z.description": "Сдвиг положения руки по оси Z (в грубину)"
 }
