@@ -39,4 +39,13 @@
   "locomotion.config.group.first_person_map.description": "Настройки отображения и анимации карты от первого лица.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Интенсивность движения карты",
   "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Контролирует интенсивность движения карты при перемещении. Чем меньше значение, тем больше читабельность."
+  
+  "locomotion.config.group.first_person_arm_offset.name": "Сдвиг положения руки",
+  "locomotion.config.group.first_person_arm_offset.description": "Настройка для управления позицией руки от первого лица",
+  "locomotion.config.option.first_person_arm_offset_x.name": "Сдвиг руки по оси X",
+  "locomotion.config.option.first_person_arm_offset_x.description": "Сдвиг руки по оси X (по горизонтали)",
+  "locomotion.config.option.first_person_arm_offset_y.name": "Сдвиг руки по оси Y",
+  "locomotion.config.option.first_person_arm_offset_y.description": "Сдвиг руки по оси Y (по вертикали)",
+  "locomotion.config.option.first_person_arm_offset_z.name": "Сдвиг руки по оси Z",
+  "locomotion.config.option.first_person_arm_offset_z.description": "Сдвиг руки по оси Z (в грубину)"
 }
