@@ -38,5 +38,14 @@
   "locomotion.config.group.first_person_map.name": "지도 아이템",
   "locomotion.config.group.first_person_map.description": "지도 아이템의 표시 방식 및 애니메이션 관련 설정입니다.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "지도 이동 애니메이션 강도",
-  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "지도 아이템을 들고 있을 때 적용되는 이동 애니메이션의 강도를 조절합니다. 강도를 낮추면 지도의 가독성이 향상됩니다."
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "지도 아이템을 들고 있을 때 적용되는 이동 애니메이션의 강도를 조절합니다. 강도를 낮추면 지도의 가독성이 향상됩니다.",
+
+  "locomotion.config.group.first_person_arm_offset.name": "팔 위치 오프셋",
+  "locomotion.config.group.first_person_arm_offset.description": "1인칭 팔의 위치를 세부적으로 조정하기 위한 설정입니다.",
+  "locomotion.config.option.first_person_arm_offset_x.name": "팔 X 오프셋",
+  "locomotion.config.option.first_person_arm_offset_x.description": "팔의 X축(수평) 위치 오프셋을 조절합니다.",
+  "locomotion.config.option.first_person_arm_offset_y.name": "팔 Y 오프셋",
+  "locomotion.config.option.first_person_arm_offset_y.description": "팔의 Y축(수직) 위치 오프셋을 조절합니다.",
+  "locomotion.config.option.first_person_arm_offset_z.name": "팔 Z 오프셋",
+  "locomotion.config.option.first_person_arm_offset_z.description": "팔의 Z축(깊이) 위치 오프셋을 조절합니다."
 }
