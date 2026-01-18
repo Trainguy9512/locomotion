@@ -217,6 +217,7 @@ public class FirstPersonShield {
                         .addOutboundTransition(StateTransition.builder(SHIELD_BLOCKING_IN_STATE)
                                 .isTakenIfTrue(isUsingShieldPredicate
                                         .and(StateTransition.CURRENT_TRANSITION_FINISHED))
+                                .bindToOnTransitionTaken(FirstPersonAttackAnimations::cancelAttackOffHandOffset)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(13)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())
@@ -226,6 +227,7 @@ public class FirstPersonShield {
                                 ))
                         .addOutboundTransition(StateTransition.builder(SHIELD_BLOCKING_IN_STATE)
                                 .isTakenIfTrue(isUsingShieldPredicate)
+                                .bindToOnTransitionTaken(FirstPersonAttackAnimations::cancelAttackOffHandOffset)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(13)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())

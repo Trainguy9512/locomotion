@@ -20,6 +20,10 @@ public class FirstPersonAnimationSequences {
     public static final Identifier HAND_TOOL_PICKAXE_MINE_FINISH = makeIdentifier("hand/tool/pickaxe/mine_finish");
     public static final Identifier HAND_TOOL_PICKAXE_ATTACK = makeIdentifier("hand/tool/pickaxe/attack");
     public static final Identifier HAND_TOOL_USE = makeIdentifier("hand/tool/use");
+    public static final Identifier HAND_TOOL_SWORD_RAISE = makeIdentifier("hand/tool/sword/raise");
+    public static final Identifier HAND_TOOL_SWORD_ATTACK = makeIdentifier("hand/tool/sword/attack");
+    public static final Identifier HAND_TOOL_SWORD_ATTACK_CRITICAL = makeIdentifier("hand/tool/sword/attack_critical");
+    public static final Identifier HAND_TOOL_SWORD_ATTACK_SPRINT = makeIdentifier("hand/tool/sword/attack_sprint");
     public static final Identifier HAND_TOOL_SWORD_SWING_LEFT = makeIdentifier("hand/tool/sword/swing_left");
     public static final Identifier HAND_TOOL_SWORD_SWING_RIGHT = makeIdentifier("hand/tool/sword/swing_right");
     public static final Identifier HAND_TOOL_SWORD_SWING_DOWN = makeIdentifier("hand/tool/sword/swing_down");
@@ -37,6 +41,7 @@ public class FirstPersonAnimationSequences {
     public static final Identifier HAND_GENERIC_ITEM_ARROW_POSE = makeIdentifier("hand/generic_item/arrow_pose");
     public static final Identifier HAND_GENERIC_ITEM_FISHING_ROD_POSE = makeIdentifier("hand/generic_item/fishing_rod_pose");
     public static final Identifier HAND_GENERIC_ITEM_SHEARS_POSE = makeIdentifier("hand/generic_item/shears_pose");
+    public static final Identifier HAND_GENERIC_ITEM_FIXED_ITEM_POSE = makeIdentifier("hand/generic_item/fixed_item_pose");
 
     public static final Identifier HAND_GENERIC_ITEM_RAISE = makeIdentifier("hand/generic_item/raise");
     public static final Identifier HAND_GENERIC_ITEM_LOWER = makeIdentifier("hand/generic_item/lower");

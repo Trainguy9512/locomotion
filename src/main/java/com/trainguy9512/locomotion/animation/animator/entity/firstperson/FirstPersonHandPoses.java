@@ -6,7 +6,7 @@ import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
 import com.trainguy9512.locomotion.util.Easing;
-import com.trainguy9512.locomotion.util.MultiVersionUtils;
+import com.trainguy9512.locomotion.util.LocomotionMultiVersionWrappers;
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.core.component.DataComponents;
@@ -101,7 +101,7 @@ public class FirstPersonHandPoses {
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.SWORDS),
             100)
-            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
+            .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_SWORD_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
             .build());
     public static final Identifier SHIELD = register(LocomotionMain.makeIdentifier("shield"), HandPoseDefinition.builder(
@@ -135,7 +135,7 @@ public class FirstPersonHandPoses {
             "trident",
             FirstPersonTrident::handTridentPoseFunction,
             FirstPersonAnimationSequences.HAND_TRIDENT_POSE,
-            itemStack -> itemStack.getUseAnimation() == MultiVersionUtils.getTridentUseAnimation(),
+            itemStack -> itemStack.getUseAnimation() == LocomotionMultiVersionWrappers.getTridentUseAnimation(),
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_SPEAR_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_SPEAR_LOWER)
@@ -182,7 +182,7 @@ public class FirstPersonHandPoses {
             "spear",
             FirstPersonSpear::constructSpearPoseFunction,
             FirstPersonAnimationSequences.HAND_SPEAR_POSE,
-            itemStack -> itemStack.getUseAnimation() == MultiVersionUtils.getSpearUseAnimation(),
+            itemStack -> itemStack.getUseAnimation() == LocomotionMultiVersionWrappers.getSpearUseAnimation(),
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_SPEAR_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_SPEAR_LOWER)
@@ -193,10 +193,18 @@ public class FirstPersonHandPoses {
         return GENERIC_ITEM;
     }
 
+    public static Identifier getEmptyMainHand() {
+        return EMPTY_MAIN_HAND;
+    }
+
+    public static Identifier getEmptyOffHand() {
+        return EMPTY_OFF_HAND;
+    }
+
     public static Identifier getEmptyHandPose(InteractionHand hand) {
         return switch (hand) {
-            case MAIN_HAND -> EMPTY_MAIN_HAND;
-            case OFF_HAND -> EMPTY_OFF_HAND;
+            case MAIN_HAND -> getEmptyMainHand();
+            case OFF_HAND -> getEmptyOffHand();
         };
     }
 

@@ -21,6 +21,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
@@ -123,10 +124,18 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 .addBlendInput(composedCameraPoseFunction, evaluationState -> 1f, CAMERA_MASK)
                 .build();
 
+        // Offsetting the hands from the config on the X axis prior to the two handed animations.
+        pose = FirstPersonArmOffset.constructWithArmXOffset(pose);
+
+        // Blending in the two handed animations.
         pose = FirstPersonTwoHandedActions.constructPoseFunction(pose, cachedPoseContainer);
 
-        // Offsetting the hands based on the shield state machine.
+        // Offsetting the hands from the config on the Y and Z axis after to the two handed animations.
+        pose = FirstPersonArmOffset.constructWithArmYZOffset(pose);
+
+        // Offsetting the hands based on the shield state machine. Also offsetting the hands for attack animations.
         pose = FirstPersonShield.constructWithHandsOffsetByShield(cachedPoseContainer, pose);
+        pose = FirstPersonAttackAnimations.constructWithOffsetOffHandAttack(pose);
 
         // Punch mining animation
         pose = FirstPersonMining.constructWithPunchMiningPoseFunction(pose);
@@ -188,6 +197,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         FirstPersonSpear.extractSpearData(player, driverContainer, montageManager);
         //? }
 
+        this.extractAttackConditionData(player, driverContainer);
         this.handleMontagesFromTriggerDrivers(player, driverContainer, montageManager);
         this.extractInteractionHandData(player, driverContainer, montageManager);
         this.extractDampedCameraData(player, driverContainer, montageManager);
@@ -200,6 +210,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
         driverContainer.getDriver(FirstPersonDrivers.IS_IN_RIPTIDE).setValue(player.isAutoSpinAttack());
         driverContainer.getDriver(FirstPersonDrivers.IS_MOVING).setValue(player.input.keyPresses.forward() || player.input.keyPresses.backward() || player.input.keyPresses.left() || player.input.keyPresses.right());
+        driverContainer.getDriver(FirstPersonDrivers.IS_SPRINTING).setValue(player.isSprinting());
         driverContainer.getDriver(FirstPersonDrivers.IS_ON_GROUND).setValue(player.onGround());
         driverContainer.getDriver(FirstPersonDrivers.IS_JUMPING).setValue(player.input.keyPresses.jump());
         driverContainer.getDriver(FirstPersonDrivers.IS_CROUCHING).setValue(player.isCrouching());
@@ -230,7 +241,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE);
         });
         driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).runAndConsumeIfTriggered(() -> {
-            FirstPersonAttackAnimations.playAttackAnimation(driverContainer, montageManager);
+            FirstPersonAttackAnimations.tryPlayingAttackAnimation(driverContainer, montageManager);
         });
         if (driverContainer.getDriver(FirstPersonDrivers.IS_MINING).getCurrentValue()) {
             montageManager.interruptMontagesInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT, Transition.builder(TimeSpan.ofTicks(2)).build());
@@ -243,6 +254,23 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         driverContainer.getDriver(FirstPersonDrivers.HAS_SWAPPED_ITEMS).runAndConsumeIfTriggered(() -> {});
 
 
+    }
+
+    public void extractAttackConditionData(LocalPlayer player, OnTickDriverContainer driverContainer) {
+        boolean meetsCriticalAttackConditions = player.fallDistance > 0.0
+                && !player.onGround()
+                && !player.onClimbable()
+                && !player.isInWater()
+                && !player.isMobilityRestricted()
+                && !player.isPassenger()
+                && !player.isSprinting();
+
+        boolean meetsSprintAttackConditions = driverContainer.getDriver(FirstPersonDrivers.IS_SPRINTING).getPreviousValue();
+        if (meetsCriticalAttackConditions) {
+            meetsSprintAttackConditions = false;
+        }
+        driverContainer.getDriver(FirstPersonDrivers.MEETS_CRITICAL_ATTACK_CONDITIONS).setValue(meetsCriticalAttackConditions);
+        driverContainer.getDriver(FirstPersonDrivers.MEETS_SPRINT_ATTACK_CONDITIONS).setValue(meetsSprintAttackConditions);
     }
 
     public void extractInteractionHandData(LocalPlayer dataReference, OnTickDriverContainer driverContainer, MontageManager montageManager) {

@@ -26,10 +26,16 @@ public class FirstPersonGenericItems {
         return identifier;
     }
 
-    public static final Identifier GENERIC_2D_ITEM = register(LocomotionMain.makeIdentifier("generic_2d_item"), GenericItemPoseDefinition.builder(
-            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE,
-            itemStack -> true,
-            0)
+//    public static final Identifier GENERIC_2D_ITEM = register(LocomotionMain.makeIdentifier("generic_2d_item"), GenericItemPoseDefinition.builder(
+//            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE,
+//            itemStack -> true,
+//            0)
+//            .build());
+    public static final Identifier FIXED_ITEM = register(LocomotionMain.makeIdentifier("fixed_item"), GenericItemPoseDefinition.builder(
+                    FirstPersonAnimationSequences.HAND_GENERIC_ITEM_FIXED_ITEM_POSE,
+                    itemStack -> true,
+                    0)
+            .setItemRenderType(ItemRenderType.FIXED)
             .build());
     public static final Identifier ROD = register(LocomotionMain.makeIdentifier("rod"), GenericItemPoseDefinition.builder(
             FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE,
@@ -52,18 +58,18 @@ public class FirstPersonGenericItems {
             80)
             .setItemRenderType(ItemRenderType.MIRRORED_THIRD_PERSON_ITEM)
             .build());
-    public static final Identifier BLOCK = register(LocomotionMain.makeIdentifier("block"), GenericItemPoseDefinition.builder(
-                    FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE,
-                    FirstPersonGenericItems::isBlockItem,
-                    80)
-            .setItemRenderType(ItemRenderType.BLOCK_STATE)
-            .build());
-    public static final Identifier DOOR = register(LocomotionMain.makeIdentifier("door"), GenericItemPoseDefinition.builder(
-                    FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE,
-                    FirstPersonGenericItems::isDoorItem,
-                    90)
-            .setItemRenderType(ItemRenderType.BLOCK_STATE)
-            .build());
+//    public static final Identifier BLOCK = register(LocomotionMain.makeIdentifier("block"), GenericItemPoseDefinition.builder(
+//                    FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BLOCK_POSE,
+//                    FirstPersonGenericItems::isBlockItem,
+//                    80)
+//            .setItemRenderType(ItemRenderType.BLOCK_STATE)
+//            .build());
+//    public static final Identifier DOOR = register(LocomotionMain.makeIdentifier("door"), GenericItemPoseDefinition.builder(
+//                    FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DOOR_BLOCK_POSE,
+//                    FirstPersonGenericItems::isDoorItem,
+//                    90)
+//            .setItemRenderType(ItemRenderType.BLOCK_STATE)
+//            .build());
 
     public static final List<Item> ROD_ITEMS = List.of(
             Items.BONE,
@@ -184,7 +190,7 @@ public class FirstPersonGenericItems {
     }
 
     public static Identifier getFallback() {
-        return GENERIC_2D_ITEM;
+        return FIXED_ITEM;
     }
 
     public static GenericItemPoseDefinition getOrThrowFromIdentifier(Identifier identifier) {

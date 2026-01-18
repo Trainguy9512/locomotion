@@ -38,5 +38,14 @@
   "locomotion.config.group.first_person_map.name": "Map Items",
   "locomotion.config.group.first_person_map.description": "Settings for how map items are displayed and animated.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Map Movement Animation Intensity",
-  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controls the intensity of movement animations when holding a map item. A lower intensity helps with map readability."
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controls the intensity of movement animations when holding a map item. A lower intensity helps with map readability.",
+
+  "locomotion.config.group.first_person_arm_offset.name": "Arm Position Offset",
+  "locomotion.config.group.first_person_arm_offset.description": "Settings for adjusting the position of the first person arms",
+  "locomotion.config.option.first_person_arm_offset_x.name": "Arm X Offset",
+  "locomotion.config.option.first_person_arm_offset_x.description": "Arm offset on the X (horizontal) axis",
+  "locomotion.config.option.first_person_arm_offset_y.name": "Arm Y Offset",
+  "locomotion.config.option.first_person_arm_offset_y.description": "Arm offset on the Y (vertical) axis",
+  "locomotion.config.option.first_person_arm_offset_z.name": "Arm Z Offset",
+  "locomotion.config.option.first_person_arm_offset_z.description": "Arm offset on the Z (depth) axis"
 }

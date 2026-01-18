@@ -2,7 +2,7 @@
 
 (Formerly known as Trainguy's Animation Overhaul)
 
-Locomotion is a Minecraft: Java mod centered around giving the game's entities and blocks complex gameplay-driven animations through a real-time animation system inspired by Unreal Engine's Animation Blueprints. Currently included in the Moonflower suite of mods.
+Locomotion is a Minecraft: Java mod centered around giving the game's entities and blocks complex gameplay-driven animations through a real-time animation system inspired by Unreal Engine's Animation Blueprints.
 
 > **Warning!**
 > This project is still in heavy development! You are free to compile yourself and try it out, but keep in mind that there will be missing animations, placeholders, and debugging visuals that will not look correct in a normal gameplay context.
@@ -54,10 +54,11 @@ Locomotion is a Minecraft: Java mod centered around giving the game's entities a
 - Special thanks to members of the Moonflower team for supporting my development on this and helping answer my questions!
 
 ## 🧵 Usage and Contribution
-- Pull requests are welcome! I would love to make this mod a use-able API for other mod developers, so any input from others on the API design is very valuable to me!
-- You may not upload or publish compiled versions, forks, or ports of the mod to public sites like Curseforge or Modrinth **without explicit written permission**.
+- Pull requests for the API, bugs, and localization are welcome, but currently I'm not accepting outward contributions for animations themselves while I'm still working on the core of the mod. I would love to make this mod a use-able API for other mod developers, so any input from others on the API design is very valuable to me!
+- Do not redistribute or publish compiled versions, forks, or ports of the mod publicly to places such as Curseforge or Modrinth **without explicit written permission from me**.
+  - Inclusion of the mod in publicly distributed mod packs is only allowed with written permission from me as it for now requires including the play testing JAR with the mod pack.
 - You can read the license [here](https://github.com/Trainguy9512/trainguys-animation-overhaul/blob/master/LICENSE)
-  - Code portions of the project are under GNU General Public License v3, while all resources/non-code assets are under All Rights Reserved.
+  - The project is under an All Rights Reserved license for the time being until I begin publishing builds on Modrinth and CurseForge.
 
 ## 🔍 FAQ
 
@@ -66,7 +67,7 @@ Locomotion is a Minecraft: Java mod centered around giving the game's entities a
 - What versions of the game will this mod support?
 > For right now, the mod is being worked on in the latest release version of Minecraft: Java Edition. Minecraft: Bedrock Edition will not be supported. 
 > 
-> Currently backports to versions such as 1.20 and 1.21.1 are not planned due to the wide changes to the game's rendering system throughout the 1.21.x drops. I'm going to look into ways I can make it happen without too much work, but I can't make any guarantees.
+> Currently backports to versions such as 1.20 and 1.21.1 are not planned due to the wide changes to the game's rendering system throughout the 1.21.x drops. I'm going to look into ways I can make it happen without restructuring the mod, but I can't make any guarantees.
 - What mod loaders will this mod be compatible with?
 > Right now both Fabric and NeoForge are supported.
 - What will the mod require as a dependency?
@@ -78,4 +79,4 @@ Locomotion is a Minecraft: Java mod centered around giving the game's entities a
 > 
 > Resource packs that change animations like Fresh Animations should be compatible, but animations added for the same kind of thing by both this mod and a resource pack will not work together.
 
-If you feel this FAQ is missing anything or you have any additional questions, please let me know by sending me a message through my discord server.
+If you have any additional questions, please let me know by sending me a message through my discord server.
