@@ -38,5 +38,14 @@
   "locomotion.config.group.first_person_map.name": "Objetos de mapa",
   "locomotion.config.group.first_person_map.description": "Configuración de cómo se muestran y animan los objetos de mapa.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Intensidad de animación de movimiento del mapa",
-  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controla la intensidad de las animaciones de movimiento al sostener un objeto de mapa. Una menor intensidad ayuda a mejorar la legibilidad del mapa."
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controla la intensidad de las animaciones de movimiento al sostener un objeto de mapa. Una menor intensidad ayuda a mejorar la legibilidad del mapa.",
+
+  "locomotion.config.group.first_person_arm_offset.name": "Desplazamiento de posición de brazos",
+  "locomotion.config.group.first_person_arm_offset.description": "Configuración para ajustar la posición de los brazos en primera persona",
+  "locomotion.config.option.first_person_arm_offset_x.name": "Desplazamiento X de brazos",
+  "locomotion.config.option.first_person_arm_offset_x.description": "Desplazamiento de brazos en el eje X (horizontal)",
+  "locomotion.config.option.first_person_arm_offset_y.name": "Desplazamiento Y de brazos",
+  "locomotion.config.option.first_person_arm_offset_y.description": "Desplazamiento de brazos en el eje Y (vertical)",
+  "locomotion.config.option.first_person_arm_offset_z.name": "Desplazamiento Z de brazos",
+  "locomotion.config.option.first_person_arm_offset_z.description": "Desplazamiento de brazos en el eje Z (profundidad)"
 }
