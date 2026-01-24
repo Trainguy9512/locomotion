@@ -4,30 +4,24 @@ import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
 import com.trainguy9512.locomotion.animation.animator.block_entity.BlockEntityJointAnimator;
-import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator;
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
+import com.trainguy9512.locomotion.animation.driver.DriverKey;
+import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.Pose;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.ComponentSpacePose;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.profiling.Profiler;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.swing.text.html.Option;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.function.Function;
 
 public class JointAnimatorDispatcher {
@@ -37,6 +31,9 @@ public class JointAnimatorDispatcher {
     private final HashMap<Long, AnimationDataContainer> blockEntityAnimationDataContainerStorage;
     private AnimationDataContainer firstPersonPlayerDataContainer;
     private ComponentSpacePose interpolatedFirstPersonPlayerPose;
+
+    private static DriverKey<VariableDriver<Identifier>> BLOCK_ENTITY_TYPE_DRIVER = DriverKey.of("block_entity_type", () -> VariableDriver.ofConstant(() -> Identifier.withDefaultNamespace("none")));
+    private static DriverKey<VariableDriver<Identifier>> ENTITY_TYPE_DRIVER = DriverKey.of("entity_type", () -> VariableDriver.ofConstant(() -> Identifier.withDefaultNamespace("none")));
 
     public JointAnimatorDispatcher() {
         this.entityAnimationDataContainerStorage = new WeakHashMap<>();
@@ -85,7 +82,6 @@ public class JointAnimatorDispatcher {
             AnimationDataContainer dataContainer = potentialDataContainer.get();
             this.tickJointAnimator(jointAnimator, blockEntity, dataContainer);
         }
-        // TODO: Flush data containers that are out of range.
     }
 
     public void tickFirstPersonPlayerJointAnimator(){
@@ -124,14 +120,57 @@ public class JointAnimatorDispatcher {
         return Optional.ofNullable(this.entityAnimationDataContainerStorage.get(uuid));
     }
 
+    private static <T extends BlockEntity> Optional<AnimationDataContainer> tryConstructBlockEntityDataContainer(BlockEntityType<T> type) {
+        Optional<BlockEntityJointAnimator<T>> potentialJointAnimator = JointAnimatorRegistry.getBlockEntityJointAnimator(type);
+        if (potentialJointAnimator.isPresent()) {
+            BlockEntityJointAnimator<T> jointAnimator = potentialJointAnimator.get();
+            AnimationDataContainer dataContainer = AnimationDataContainer.of(jointAnimator);
+            dataContainer.getDriver(BLOCK_ENTITY_TYPE_DRIVER).setValue(BlockEntityType.getKey(type));
+            return Optional.of(dataContainer);
+        }
+        return Optional.empty();
+    }
+
+    private static boolean positionIsWithinCameraRadius(BlockPos blockPos, float radius) {
+        BlockPos cameraBlockPos = Objects.requireNonNull(Minecraft.getInstance().getCameraEntity()).blockPosition();
+        return cameraBlockPos.distChessboard(blockPos) < radius;
+    }
+
     public <T extends BlockEntity> Optional<AnimationDataContainer> getBlockEntityAnimationDataContainer(BlockPos blockPos, BlockEntityType<T> type){
         long packedBlockPos = blockPos.asLong();
-        if(!this.blockEntityAnimationDataContainerStorage.containsKey(packedBlockPos)){
-            JointAnimatorRegistry.getBlockEntityJointAnimator(type).ifPresent(jointAnimator ->
-                    this.blockEntityAnimationDataContainerStorage.put(packedBlockPos, this.createDataContainer(jointAnimator))
-            );
+
+        if (positionIsWithinCameraRadius(blockPos, 16)) {
+            // If this block position is within range, try and find a data container for it.
+
+            if (this.blockEntityAnimationDataContainerStorage.containsKey(packedBlockPos)) {
+
+                AnimationDataContainer dataContainer = this.blockEntityAnimationDataContainerStorage.get(packedBlockPos);
+                if (dataContainer.getDriverValue(BLOCK_ENTITY_TYPE_DRIVER) == BlockEntityType.getKey(type)) {
+                    // If the block is within range and its type matches the requested type, return it.
+                    return Optional.of(dataContainer);
+                } else {
+                    // Flush the current data container for the block if its type does not match anymore. Will continue to create a new data container
+                    this.blockEntityAnimationDataContainerStorage.remove(packedBlockPos);
+                }
+
+            }
+            if (!this.blockEntityAnimationDataContainerStorage.containsKey(packedBlockPos)) {
+
+                Optional<AnimationDataContainer> potentialDataContainer = tryConstructBlockEntityDataContainer(type);
+                if (potentialDataContainer.isPresent()) {
+                    // If no data container is found for this block, one is successfully created from the registry, and it is within range, put it in storage.
+                    AnimationDataContainer dataContainer = potentialDataContainer.get();
+                    this.blockEntityAnimationDataContainerStorage.put(packedBlockPos, dataContainer);
+                }
+            }
+            // If a data container is present in storage and it is within range, return it.
+            return Optional.ofNullable(this.blockEntityAnimationDataContainerStorage.getOrDefault(packedBlockPos, null));
+
+        } else {
+            // If this block position is not in range, flush it from storage and return nothing.
+            this.blockEntityAnimationDataContainerStorage.remove(packedBlockPos);
+            return Optional.empty();
         }
-        return Optional.ofNullable(this.blockEntityAnimationDataContainerStorage.get(packedBlockPos));
     }
 
     public Optional<AnimationDataContainer> getFirstPersonPlayerDataContainer(){

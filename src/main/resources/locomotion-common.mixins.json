@@ -23,7 +23,6 @@
     "render.MixinGameRenderer",
     "render.MixinItemInHandRenderer",
     "render.MixinLivingEntityRenderState",
-    "render.MixinModel",
     "render.MixinModelFeatureRenderer",
     "render.MixinModelPart"
   ],
