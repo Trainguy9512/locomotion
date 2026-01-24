@@ -4,6 +4,7 @@
   "package": "com.trainguy9512.locomotion.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "game.MixinLevelChunk"
   ],
   "client": [
     "debug.MixinDefaultPlayerSkin",
@@ -16,11 +17,14 @@
     "item.property.MixinUseCycle",
     "item.property.MixinUseDuration",
     "render.MixinBlockRenderDispatcher",
+    "render.MixinChestRenderer",
     "render.MixinEntityRenderDispatcher",
     "render.MixinFishingHookRenderer",
     "render.MixinGameRenderer",
     "render.MixinItemInHandRenderer",
     "render.MixinLivingEntityRenderState",
+    "render.MixinModel",
+    "render.MixinModelFeatureRenderer",
     "render.MixinModelPart"
   ],
   "injectors": {

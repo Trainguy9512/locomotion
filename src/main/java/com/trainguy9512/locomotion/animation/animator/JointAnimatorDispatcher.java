@@ -1,7 +1,9 @@
 package com.trainguy9512.locomotion.animation.animator;
 
+import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
+import com.trainguy9512.locomotion.animation.animator.block_entity.BlockEntityJointAnimator;
 import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator;
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.pose.Pose;
@@ -9,12 +11,20 @@ import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.ComponentSpacePose;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
+import javax.swing.text.html.Option;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -24,12 +34,13 @@ public class JointAnimatorDispatcher {
     private static final JointAnimatorDispatcher INSTANCE = new JointAnimatorDispatcher();
 
     private final WeakHashMap<UUID, AnimationDataContainer> entityAnimationDataContainerStorage;
-
+    private final HashMap<Long, AnimationDataContainer> blockEntityAnimationDataContainerStorage;
     private AnimationDataContainer firstPersonPlayerDataContainer;
     private ComponentSpacePose interpolatedFirstPersonPlayerPose;
 
     public JointAnimatorDispatcher() {
         this.entityAnimationDataContainerStorage = new WeakHashMap<>();
+        this.blockEntityAnimationDataContainerStorage = Maps.newHashMap();
     }
 
     public static JointAnimatorDispatcher getInstance() {
@@ -42,6 +53,13 @@ public class JointAnimatorDispatcher {
     public void reInitializeData() {
         this.firstPersonPlayerDataContainer = null;
         this.entityAnimationDataContainerStorage.clear();
+        this.blockEntityAnimationDataContainerStorage.clear();
+    }
+
+    public <T extends Entity, B extends BlockEntity> void tick(Iterable<T> entitiesForRendering) {
+
+        this.tickEntityJointAnimators(entitiesForRendering);
+        this.tickFirstPersonPlayerJointAnimator();
     }
 
     public <T extends Entity> void tickEntityJointAnimators(Iterable<T> entitiesForRendering) {
@@ -52,6 +70,22 @@ public class JointAnimatorDispatcher {
                         )
                 )
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends BlockEntity> void tickBlockEntityJointAnimator(Level level, BlockPos blockPos, BlockState blockState, T blockEntity) {
+        Optional<BlockEntityJointAnimator<T>> potentialJointAnimator;
+        potentialJointAnimator = JointAnimatorRegistry.getBlockEntityJointAnimator((BlockEntityType<T>) blockEntity.getType());
+        if (potentialJointAnimator.isPresent()) {
+            BlockEntityJointAnimator<T> jointAnimator = potentialJointAnimator.get();
+            Optional<AnimationDataContainer> potentialDataContainer = this.getBlockEntityAnimationDataContainer(blockPos, blockEntity.getType());
+            if (potentialDataContainer.isEmpty()) {
+                return;
+            }
+            AnimationDataContainer dataContainer = potentialDataContainer.get();
+            this.tickJointAnimator(jointAnimator, blockEntity, dataContainer);
+        }
+        // TODO: Flush data containers that are out of range.
     }
 
     public void tickFirstPersonPlayerJointAnimator(){
@@ -90,6 +124,16 @@ public class JointAnimatorDispatcher {
         return Optional.ofNullable(this.entityAnimationDataContainerStorage.get(uuid));
     }
 
+    public <T extends BlockEntity> Optional<AnimationDataContainer> getBlockEntityAnimationDataContainer(BlockPos blockPos, BlockEntityType<T> type){
+        long packedBlockPos = blockPos.asLong();
+        if(!this.blockEntityAnimationDataContainerStorage.containsKey(packedBlockPos)){
+            JointAnimatorRegistry.getBlockEntityJointAnimator(type).ifPresent(jointAnimator ->
+                    this.blockEntityAnimationDataContainerStorage.put(packedBlockPos, this.createDataContainer(jointAnimator))
+            );
+        }
+        return Optional.ofNullable(this.blockEntityAnimationDataContainerStorage.get(packedBlockPos));
+    }
+
     public Optional<AnimationDataContainer> getFirstPersonPlayerDataContainer(){
         if(this.firstPersonPlayerDataContainer == null){
             JointAnimatorRegistry.getFirstPersonPlayerJointAnimator().ifPresent(jointAnimator ->
@@ -118,20 +162,11 @@ public class JointAnimatorDispatcher {
         };
     }
 
-    public <S extends EntityRenderState> void setupAnimWithAnimationPose(EntityModel<S> entityModel, S entityRenderState, Pose pose, EntityJointAnimator<?, S> entityJointAnimator){
-        entityModel.resetPose();
+    public <S> void setupAnimWithAnimationPose(Model<S> model, Pose pose){
+        model.resetPose();
         JointSkeleton jointSkeleton = pose.getJointSkeleton();
-        //? if <= 1.21.5 {
-        /*jointSkeleton.getJoints()
-                .forEach(joint -> {
-                    if (jointSkeleton.getJointConfiguration(joint).modelPartIdentifier() != null) {
-                        entityModel.getAnyDescendantWithName(jointSkeleton.getJointConfiguration(joint).modelPartIdentifier()).ifPresent(
-                                modelPart -> ((MatrixModelPart)(Object) modelPart).locomotion$setMatrix(pose.getJointChannel(joint).getTransform())
-                        );
-                    }
-                });
-        *///?} else {
-        Function<String, ModelPart> partLookup = entityModel.root().createPartLookup();
+
+        Function<String, ModelPart> partLookup = model.root().createPartLookup();
         jointSkeleton.getJoints().forEach(joint -> {
             String modelPartIdentifier = jointSkeleton.getJointConfiguration(joint).modelPartIdentifier();
             if (modelPartIdentifier != null) {
@@ -141,7 +176,5 @@ public class JointAnimatorDispatcher {
                 }
             }
         });
-        entityJointAnimator.postProcessModelParts(entityModel, entityRenderState);
-        //?}
     }
 }

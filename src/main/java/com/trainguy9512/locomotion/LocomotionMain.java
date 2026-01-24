@@ -1,11 +1,11 @@
 package com.trainguy9512.locomotion;
 
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorRegistry;
+import com.trainguy9512.locomotion.animation.animator.block_entity.ChestJointAnimator;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
 import com.trainguy9512.locomotion.config.LocomotionConfig;
-import com.trainguy9512.locomotion.debug.DebugEntryFirstPersonDrivers;
-import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +18,8 @@ public class LocomotionMain {
 	public static void initialize() {
 		CONFIG.load();
 
-		registerEntityAnimators();
+		registerAnimators();
+
 	}
 
 	public static Identifier makeIdentifier(String location) {
@@ -38,8 +39,9 @@ public class LocomotionMain {
 	 */
 
 
-	private static void registerEntityAnimators() {
+	private static void registerAnimators() {
 		JointAnimatorRegistry.registerFirstPersonPlayerJointAnimator(new FirstPersonJointAnimator());
+		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.CHEST, new ChestJointAnimator());
 	}
 
 	/*
