@@ -131,6 +131,14 @@ public class JointAnimatorDispatcher {
         return Optional.empty();
     }
 
+    public Map<BlockPos, Identifier> getCurrentlyEvaluatingBlockEntityJointAnimators() {
+        Map<BlockPos, Identifier> map = Maps.newHashMap();
+        this.blockEntityAnimationDataContainerStorage.forEach((packedBlockPos, dataContainer) -> {
+            map.put(BlockPos.of(packedBlockPos), dataContainer.getDriverValue(BLOCK_ENTITY_TYPE_DRIVER));
+        });
+        return map;
+    }
+
     private static boolean positionIsWithinCameraRadius(BlockPos blockPos, float radius) {
         BlockPos cameraBlockPos = Objects.requireNonNull(Minecraft.getInstance().getCameraEntity()).blockPosition();
         return cameraBlockPos.distChessboard(blockPos) < radius;
