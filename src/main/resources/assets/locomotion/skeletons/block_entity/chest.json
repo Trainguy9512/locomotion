@@ -1,0 +1,171 @@
+{
+    "format_version": 5,
+    "root_joint": "root_jnt",
+    "custom_attributes": {},
+    "joints": {
+        "bottom_jnt": {
+            "children": [],
+            "mirror_joint": null,
+            "model_part_identifier": "bottom",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "lid_jnt": {
+            "children": [],
+            "mirror_joint": null,
+            "model_part_identifier": "lid",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    9.0,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "lock_jnt": {
+            "children": [],
+            "mirror_joint": null,
+            "model_part_identifier": "lock",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    9.0,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "root_jnt": {
+            "children": [
+                "bottom_jnt",
+                "lid_jnt",
+                "lock_jnt"
+            ],
+            "mirror_joint": null,
+            "model_part_identifier": "root",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -24.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        }
+    }
+}

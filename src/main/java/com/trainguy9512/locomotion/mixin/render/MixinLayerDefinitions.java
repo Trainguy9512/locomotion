@@ -37,7 +37,10 @@ public class MixinLayerDefinitions {
             LayerDefinition layerDefinition = models.get(location);
 
             try {
-                GsonConfiguration.getInstance().toJson(layerDefinition, new FileWriter(filePath + "/models/" + location.model().toDebugFileName() + "_" + location.layer() + ".json"));
+
+                FileWriter writer = new FileWriter(filePath + "/models/" + location.model().toDebugFileName() + "_" + location.layer() + ".json");
+                GsonConfiguration.getInstance().toJson(layerDefinition, writer);
+                writer.close();
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }
