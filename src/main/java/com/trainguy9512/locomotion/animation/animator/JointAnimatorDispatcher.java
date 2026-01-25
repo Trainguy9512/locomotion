@@ -144,17 +144,23 @@ public class JointAnimatorDispatcher {
         return map;
     }
 
-    private static boolean positionIsWithinCameraRadius(BlockPos blockPos, float radius) {
+    private static boolean positionIsWithinCameraRadius(BlockPos blockPos) {
         BlockPos cameraBlockPos = Objects.requireNonNull(Minecraft.getInstance().getCameraEntity()).blockPosition();
+        int radius = LocomotionMain.CONFIG.data().blockEntities.evaluationDistance;
         return cameraBlockPos.distChessboard(blockPos) < radius;
+    }
+
+    private static boolean blockEntityIsEnabledInConfig(BlockEntityType<?> type) {
+        Identifier typeIdentifier = BlockEntityType.getKey(type);
+        assert typeIdentifier != null;
+        return LocomotionMain.CONFIG.data().blockEntities.enabledBlockEntities.getOrDefault(typeIdentifier.toString(), true);
     }
 
     public void flushBlockEntityDataContainersOutsideRadius() {
         List<Long> dataContainerPositionsToRemove = new ArrayList<>();
         for (long packedBlockPos : this.blockEntityAnimationDataContainerStorage.keySet()) {
-            AnimationDataContainer dataContainer = this.blockEntityAnimationDataContainerStorage.get(packedBlockPos);
             BlockPos blockPos = BlockPos.of(packedBlockPos);
-            if (!positionIsWithinCameraRadius(blockPos, 16)) {
+            if (!positionIsWithinCameraRadius(blockPos)) {
                 dataContainerPositionsToRemove.add(packedBlockPos);
             }
         }
@@ -166,7 +172,7 @@ public class JointAnimatorDispatcher {
     public <T extends BlockEntity> Optional<AnimationDataContainer> getBlockEntityAnimationDataContainer(BlockPos blockPos, BlockEntityType<T> type){
         long packedBlockPos = blockPos.asLong();
 
-        if (positionIsWithinCameraRadius(blockPos, 16)) {
+        if (positionIsWithinCameraRadius(blockPos) && blockEntityIsEnabledInConfig(type)) {
             // If this block position is within range, try and find a data container for it.
 
             if (this.blockEntityAnimationDataContainerStorage.containsKey(packedBlockPos)) {

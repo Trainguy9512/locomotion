@@ -6,6 +6,7 @@ import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator
 import com.trainguy9512.locomotion.animation.animator.entity.LivingEntityJointAnimator;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Set;
 
 public class JointAnimatorRegistry {
 
@@ -60,5 +62,9 @@ public class JointAnimatorRegistry {
 
     public static Optional<LivingEntityJointAnimator<LocalPlayer, AvatarRenderState>> getFirstPersonPlayerJointAnimator(){
         return Optional.ofNullable(FIRST_PERSON_PLAYER_JOINT_ANIMATOR);
+    }
+
+    public static Set<BlockEntityType<?>> getRegisteredBlockEntities() {
+        return BLOCK_ENTITY_JOINT_ANIMATORS.keySet();
     }
 }

@@ -115,9 +115,4 @@ public class ChestJointAnimator<T extends BlockEntity & LidBlockEntity> implemen
 
         return chestOpenStateMachine;
     }
-
-    @Override
-    public PoseCalculationFrequency getPoseCalulationFrequency() {
-        return PoseCalculationFrequency.CALCULATE_EVERY_FRAME;
-    }
 }
