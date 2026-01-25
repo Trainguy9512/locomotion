@@ -225,9 +225,9 @@ public class LocomotionConfigScreen {
                 .build());
 
         OptionGroup.Builder blockTogglesBuilder = OptionGroup.createBuilder()
-                .name(Component.translatable("locomotion.config.group.block_entity_optimization.name"))
+                .name(Component.translatable("locomotion.config.group.individual_block_entity_toggles.name"))
                 .description(OptionDescription.createBuilder()
-                        .text(Component.translatable("locomotion.config.group.block_entity_optimization.description"))
+                        .text(Component.translatable("locomotion.config.group.individual_block_entity_toggles.description"))
                         .build());
 
         for (BlockEntityType<?> blockEntityType : JointAnimatorRegistry.getRegisteredBlockEntities()) {
