@@ -16,9 +16,11 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTra
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.LidBlockEntity;
 
-public class ChestJointAnimator implements BlockEntityJointAnimator<@org.jetbrains.annotations.NotNull ChestBlockEntity> {
+public class ChestJointAnimator<T extends LidBlockEntity> implements BlockEntityJointAnimator<T> {
 
     public static final Identifier CHEST_SKELETON = LocomotionMain.makeIdentifier("skeletons/block_entity/chest.json");
 

@@ -39,13 +39,13 @@ public abstract class MixinLivingEntityRenderer<S extends EntityRenderState, R e
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At("HEAD"))
     private <L extends Enum<L>> void extractAnimationPoseToRenderState(T livingEntity, R livingEntityRenderState, float partialTicks, CallbackInfo ci){
-        JointAnimatorDispatcher entityJointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
-        JointAnimatorRegistry.getThirdPersonJointAnimator(livingEntity).ifPresent(jointAnimator ->
-                entityJointAnimatorDispatcher.getEntityAnimationDataContainer(livingEntity).ifPresent(dataContainer -> {
-                    ((LivingEntityRenderStateAccess) livingEntityRenderState).animationOverhaul$setInterpolatedAnimationPose(entityJointAnimatorDispatcher.getInterpolatedAnimationPose(jointAnimator, dataContainer, partialTicks));
-                    ((LivingEntityRenderStateAccess) livingEntityRenderState).animationOverhaul$setEntityJointAnimator(jointAnimator);
-                })
-        );
+//        JointAnimatorDispatcher entityJointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
+//        JointAnimatorRegistry.getThirdPersonJointAnimator(livingEntity).ifPresent(jointAnimator ->
+//                entityJointAnimatorDispatcher.getEntityAnimationDataContainer(livingEntity).ifPresent(dataContainer -> {
+//                    ((LivingEntityRenderStateAccess) livingEntityRenderState).animationOverhaul$setInterpolatedAnimationPose(entityJointAnimatorDispatcher.getInterpolatedAnimationPose(jointAnimator, dataContainer, partialTicks));
+//                    ((LivingEntityRenderStateAccess) livingEntityRenderState).animationOverhaul$setEntityJointAnimator(jointAnimator);
+//                })
+//        );
     }
 
     /*

@@ -32,7 +32,7 @@ public class MixinModelFeatureRenderer<S> {
                 AnimationDataContainer dataContainer = potentialDataContainer.get();
                 float partialTicks = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
                 Pose pose = dataContainer.computePose(partialTicks);
-                JointAnimatorDispatcher.getInstance().setupAnimWithAnimationPose(instance, pose);
+                dataContainer.setupAnimWithAnimationPose(instance, partialTicks);
             }
         } else {
             original.call(instance, renderState);

@@ -42,6 +42,7 @@ public class LocomotionMain {
 	private static void registerAnimators() {
 		JointAnimatorRegistry.registerFirstPersonPlayerJointAnimator(new FirstPersonJointAnimator());
 		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.CHEST, new ChestJointAnimator());
+		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.ENDER_CHEST, new ChestJointAnimator());
 	}
 
 	/*
