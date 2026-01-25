@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 
-public class ChestJointAnimator<T extends LidBlockEntity> implements BlockEntityJointAnimator<T> {
+public class ChestJointAnimator<T extends BlockEntity & LidBlockEntity> implements BlockEntityJointAnimator<@org.jetbrains.annotations.NotNull T> {
 
     public static final Identifier CHEST_SKELETON = LocomotionMain.makeIdentifier("skeletons/block_entity/chest.json");
 
@@ -36,7 +36,7 @@ public class ChestJointAnimator<T extends LidBlockEntity> implements BlockEntity
     }
 
     @Override
-    public void extractAnimationData(ChestBlockEntity chest, OnTickDriverContainer dataContainer, MontageManager montageManager) {
+    public void extractAnimationData(T chest, OnTickDriverContainer dataContainer, MontageManager montageManager) {
         dataContainer.getDriver(CHEST_OPENNESS).setValue(chest.getOpenNess(1));
 
         float currentChestOpenness = dataContainer.getDriver(CHEST_OPENNESS).getCurrentValue();

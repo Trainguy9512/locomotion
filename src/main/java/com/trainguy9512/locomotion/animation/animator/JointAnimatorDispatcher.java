@@ -55,9 +55,9 @@ public class JointAnimatorDispatcher {
     }
 
     public <T extends Entity, B extends BlockEntity> void tick(Iterable<T> entitiesForRendering) {
-
 //        this.tickEntityJointAnimators(entitiesForRendering);
         this.tickFirstPersonPlayerJointAnimator();
+        this.flushBlockEntityDataContainersOutsideRadius();
     }
 
 //    public <T extends Entity> void tickEntityJointAnimators(Iterable<T> entitiesForRendering) {
@@ -147,6 +147,20 @@ public class JointAnimatorDispatcher {
     private static boolean positionIsWithinCameraRadius(BlockPos blockPos, float radius) {
         BlockPos cameraBlockPos = Objects.requireNonNull(Minecraft.getInstance().getCameraEntity()).blockPosition();
         return cameraBlockPos.distChessboard(blockPos) < radius;
+    }
+
+    public void flushBlockEntityDataContainersOutsideRadius() {
+        List<Long> dataContainerPositionsToRemove = new ArrayList<>();
+        for (long packedBlockPos : this.blockEntityAnimationDataContainerStorage.keySet()) {
+            AnimationDataContainer dataContainer = this.blockEntityAnimationDataContainerStorage.get(packedBlockPos);
+            BlockPos blockPos = BlockPos.of(packedBlockPos);
+            if (!positionIsWithinCameraRadius(blockPos, 16)) {
+                dataContainerPositionsToRemove.add(packedBlockPos);
+            }
+        }
+        for (long packedBlockPos : dataContainerPositionsToRemove) {
+            this.blockEntityAnimationDataContainerStorage.remove(packedBlockPos);
+        }
     }
 
     public <T extends BlockEntity> Optional<AnimationDataContainer> getBlockEntityAnimationDataContainer(BlockPos blockPos, BlockEntityType<T> type){
