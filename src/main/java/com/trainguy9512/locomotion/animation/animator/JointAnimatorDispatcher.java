@@ -7,6 +7,7 @@ import com.trainguy9512.locomotion.animation.animator.block_entity.BlockEntityJo
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
+import com.trainguy9512.locomotion.animation.pose.ModelPartSpacePose;
 import com.trainguy9512.locomotion.animation.pose.Pose;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.ComponentSpacePose;
@@ -30,7 +31,7 @@ public class JointAnimatorDispatcher {
     private final WeakHashMap<UUID, AnimationDataContainer> entityAnimationDataContainerStorage;
     private final HashMap<Long, AnimationDataContainer> blockEntityAnimationDataContainerStorage;
     private AnimationDataContainer firstPersonPlayerDataContainer;
-    private ComponentSpacePose interpolatedFirstPersonPlayerPose;
+    private ModelPartSpacePose interpolatedFirstPersonPlayerPose;
 
     private static DriverKey<VariableDriver<Identifier>> BLOCK_ENTITY_TYPE_DRIVER = DriverKey.of("block_entity_type", () -> VariableDriver.ofConstant(() -> Identifier.withDefaultNamespace("none")));
     private static DriverKey<VariableDriver<Identifier>> ENTITY_TYPE_DRIVER = DriverKey.of("entity_type", () -> VariableDriver.ofConstant(() -> Identifier.withDefaultNamespace("none")));
@@ -54,20 +55,20 @@ public class JointAnimatorDispatcher {
     }
 
     public <T extends Entity, B extends BlockEntity> void tick(Iterable<T> entitiesForRendering) {
-
-        this.tickEntityJointAnimators(entitiesForRendering);
+//        this.tickEntityJointAnimators(entitiesForRendering);
         this.tickFirstPersonPlayerJointAnimator();
+        this.flushBlockEntityDataContainersOutsideRadius();
     }
 
-    public <T extends Entity> void tickEntityJointAnimators(Iterable<T> entitiesForRendering) {
-        entitiesForRendering.forEach(entity ->
-                JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(
-                        jointAnimator -> this.getEntityAnimationDataContainer(entity).ifPresent(
-                                dataContainer -> this.tickJointAnimator(jointAnimator, entity, dataContainer)
-                        )
-                )
-        );
-    }
+//    public <T extends Entity> void tickEntityJointAnimators(Iterable<T> entitiesForRendering) {
+//        entitiesForRendering.forEach(entity ->
+//                JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(
+//                        jointAnimator -> this.getEntityAnimationDataContainer(entity).ifPresent(
+//                                dataContainer -> this.tickJointAnimator(jointAnimator, entity, dataContainer)
+//                        )
+//                )
+//        );
+//    }
 
     @SuppressWarnings("unchecked")
     public <T extends BlockEntity> void tickBlockEntityJointAnimator(Level level, BlockPos blockPos, BlockState blockState, T blockEntity) {
@@ -110,15 +111,19 @@ public class JointAnimatorDispatcher {
         dataContainer.postTick();
     }
 
-    public <T extends Entity> Optional<AnimationDataContainer> getEntityAnimationDataContainer(T entity){
-        UUID uuid = entity.getUUID();
-        if(!this.entityAnimationDataContainerStorage.containsKey(uuid)){
-            JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(jointAnimator ->
-                    this.entityAnimationDataContainerStorage.put(uuid, this.createDataContainer(jointAnimator))
-            );
-        }
-        return Optional.ofNullable(this.entityAnimationDataContainerStorage.get(uuid));
-    }
+//    public <T extends Entity> Optional<AnimationDataContainer> getEntityAnimationDataContainer(T entity){
+//        UUID uuid = entity.getUUID();
+//        if(!this.entityAnimationDataContainerStorage.containsKey(uuid)){
+//            JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(jointAnimator ->
+//                    this.entityAnimationDataContainerStorage.put(uuid, this.createDataContainer(jointAnimator))
+//            );
+//        }
+//        return Optional.ofNullable(this.entityAnimationDataContainerStorage.get(uuid));
+//    }
+
+
+
+
 
     private static <T extends BlockEntity> Optional<AnimationDataContainer> tryConstructBlockEntityDataContainer(BlockEntityType<T> type) {
         Optional<BlockEntityJointAnimator<T>> potentialJointAnimator = JointAnimatorRegistry.getBlockEntityJointAnimator(type);
@@ -131,15 +136,43 @@ public class JointAnimatorDispatcher {
         return Optional.empty();
     }
 
-    private static boolean positionIsWithinCameraRadius(BlockPos blockPos, float radius) {
+    public Map<BlockPos, Identifier> getCurrentlyEvaluatingBlockEntityJointAnimators() {
+        Map<BlockPos, Identifier> map = Maps.newHashMap();
+        this.blockEntityAnimationDataContainerStorage.forEach((packedBlockPos, dataContainer) -> {
+            map.put(BlockPos.of(packedBlockPos), dataContainer.getDriverValue(BLOCK_ENTITY_TYPE_DRIVER));
+        });
+        return map;
+    }
+
+    private static boolean positionIsWithinCameraRadius(BlockPos blockPos) {
         BlockPos cameraBlockPos = Objects.requireNonNull(Minecraft.getInstance().getCameraEntity()).blockPosition();
+        int radius = LocomotionMain.CONFIG.data().blockEntities.evaluationDistance;
         return cameraBlockPos.distChessboard(blockPos) < radius;
+    }
+
+    private static boolean blockEntityIsEnabledInConfig(BlockEntityType<?> type) {
+        Identifier typeIdentifier = BlockEntityType.getKey(type);
+        assert typeIdentifier != null;
+        return LocomotionMain.CONFIG.data().blockEntities.enabledBlockEntities.getOrDefault(typeIdentifier.toString(), true);
+    }
+
+    public void flushBlockEntityDataContainersOutsideRadius() {
+        List<Long> dataContainerPositionsToRemove = new ArrayList<>();
+        for (long packedBlockPos : this.blockEntityAnimationDataContainerStorage.keySet()) {
+            BlockPos blockPos = BlockPos.of(packedBlockPos);
+            if (!positionIsWithinCameraRadius(blockPos)) {
+                dataContainerPositionsToRemove.add(packedBlockPos);
+            }
+        }
+        for (long packedBlockPos : dataContainerPositionsToRemove) {
+            this.blockEntityAnimationDataContainerStorage.remove(packedBlockPos);
+        }
     }
 
     public <T extends BlockEntity> Optional<AnimationDataContainer> getBlockEntityAnimationDataContainer(BlockPos blockPos, BlockEntityType<T> type){
         long packedBlockPos = blockPos.asLong();
 
-        if (positionIsWithinCameraRadius(blockPos, 16)) {
+        if (positionIsWithinCameraRadius(blockPos) && blockEntityIsEnabledInConfig(type)) {
             // If this block position is within range, try and find a data container for it.
 
             if (this.blockEntityAnimationDataContainerStorage.containsKey(packedBlockPos)) {
@@ -173,47 +206,24 @@ public class JointAnimatorDispatcher {
         }
     }
 
+
+
+
+
     public Optional<AnimationDataContainer> getFirstPersonPlayerDataContainer(){
         if(this.firstPersonPlayerDataContainer == null){
             JointAnimatorRegistry.getFirstPersonPlayerJointAnimator().ifPresent(jointAnimator ->
-                this.firstPersonPlayerDataContainer = this.createDataContainer(jointAnimator)
+                this.firstPersonPlayerDataContainer = AnimationDataContainer.of(jointAnimator)
             );
         }
         return Optional.ofNullable(this.firstPersonPlayerDataContainer);
     }
 
-    public Optional<ComponentSpacePose> getInterpolatedFirstPersonPlayerPose(){
+    public Optional<ModelPartSpacePose> getInterpolatedFirstPersonPlayerPose(){
         return Optional.ofNullable(this.interpolatedFirstPersonPlayerPose);
     }
 
-    public void calculateInterpolatedFirstPersonPlayerPose(JointAnimator<?> jointAnimator, AnimationDataContainer dataContainer, float partialTicks){
-        this.interpolatedFirstPersonPlayerPose = this.getInterpolatedAnimationPose(jointAnimator, dataContainer, partialTicks);
-    }
-
-    private AnimationDataContainer createDataContainer(JointAnimator<?> jointAnimator){
-        return AnimationDataContainer.of(jointAnimator);
-    }
-
-    public ComponentSpacePose getInterpolatedAnimationPose(JointAnimator<?> jointAnimator, AnimationDataContainer dataContainer, float partialTicks){
-        return switch (jointAnimator.getPoseCalulationFrequency()) {
-            case CALCULATE_EVERY_FRAME -> dataContainer.computePose(partialTicks).convertedToComponentSpace();
-            case CALCULATE_ONCE_PER_TICK -> dataContainer.getInterpolatedDriverValue(dataContainer.getPerTickCalculatedPoseDriverKey(), partialTicks).convertedToComponentSpace();
-        };
-    }
-
-    public <S> void setupAnimWithAnimationPose(Model<S> model, Pose pose){
-        model.resetPose();
-        JointSkeleton jointSkeleton = pose.getJointSkeleton();
-
-        Function<String, ModelPart> partLookup = model.root().createPartLookup();
-        jointSkeleton.getJoints().forEach(joint -> {
-            String modelPartIdentifier = jointSkeleton.getJointConfiguration(joint).modelPartIdentifier();
-            if (modelPartIdentifier != null) {
-                ModelPart modelPart = partLookup.apply(modelPartIdentifier);
-                if (modelPart != null) {
-                    ((MatrixModelPart)(Object) modelPart).locomotion$setMatrix(pose.getJointChannel(joint).getTransform());
-                }
-            }
-        });
+    public void calculateInterpolatedFirstPersonPlayerPose(AnimationDataContainer dataContainer, float partialTicks){
+        this.interpolatedFirstPersonPlayerPose = dataContainer.getInterpolatedAnimationPose(partialTicks);
     }
 }

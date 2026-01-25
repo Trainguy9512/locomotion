@@ -16,9 +16,11 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTra
 import com.trainguy9512.locomotion.util.TimeSpan;
 import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.LidBlockEntity;
 
-public class ChestJointAnimator implements BlockEntityJointAnimator<@org.jetbrains.annotations.NotNull ChestBlockEntity> {
+public class ChestJointAnimator<T extends BlockEntity & LidBlockEntity> implements BlockEntityJointAnimator<@org.jetbrains.annotations.NotNull T> {
 
     public static final Identifier CHEST_SKELETON = LocomotionMain.makeIdentifier("skeletons/block_entity/chest.json");
 
@@ -34,7 +36,7 @@ public class ChestJointAnimator implements BlockEntityJointAnimator<@org.jetbrai
     }
 
     @Override
-    public void extractAnimationData(ChestBlockEntity chest, OnTickDriverContainer dataContainer, MontageManager montageManager) {
+    public void extractAnimationData(T chest, OnTickDriverContainer dataContainer, MontageManager montageManager) {
         dataContainer.getDriver(CHEST_OPENNESS).setValue(chest.getOpenNess(1));
 
         float currentChestOpenness = dataContainer.getDriver(CHEST_OPENNESS).getCurrentValue();
@@ -112,10 +114,5 @@ public class ChestJointAnimator implements BlockEntityJointAnimator<@org.jetbrai
                 .build();
 
         return chestOpenStateMachine;
-    }
-
-    @Override
-    public PoseCalculationFrequency getPoseCalulationFrequency() {
-        return PoseCalculationFrequency.CALCULATE_EVERY_FRAME;
     }
 }

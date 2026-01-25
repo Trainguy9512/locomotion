@@ -1,14 +1,17 @@
 package com.trainguy9512.locomotion.config;
 
+import com.google.common.collect.Maps;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.animator.JointAnimator;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.AlertScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -72,8 +76,10 @@ public class LocomotionConfig {
     public static class Data {
 
         public final FirstPersonPlayer firstPersonPlayer = new FirstPersonPlayer();
+        public final BlockEntities blockEntities = new BlockEntities();
 
         public static class FirstPersonPlayer {
+
             public boolean enableRenderer = true;
 
             public boolean enableCameraRotationDamping = true;
@@ -90,6 +96,15 @@ public class LocomotionConfig {
             public float armOffsetX = 0f;
             public float armOffsetY = 0f;
             public float armOffsetZ = 0f;
+
+        }
+
+        public static class BlockEntities {
+
+            public JointAnimator.PoseCalculationFrequency poseCalculationFrequency = JointAnimator.PoseCalculationFrequency.CALCULATE_EVERY_FRAME;
+            public int evaluationDistance = 32;
+            public Map<String, Boolean> enabledBlockEntities = Maps.newHashMap();
+
         }
     }
 

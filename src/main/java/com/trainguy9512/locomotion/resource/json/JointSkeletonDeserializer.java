@@ -30,6 +30,7 @@ public class JointSkeletonDeserializer implements JsonDeserializer<JointSkeleton
     private static final String MODEL_PART_IDENTIFIER_KEY = "model_part_identifier";
     private static final String REFERENCE_POSE_KEY = "reference_pose";
     private static final String MODEL_PART_OFFSET_KEY = "model_part_offset";
+    private static final String MODEL_PART_SPACE_PARENT_KEY = "model_part_space_parent";
 
     private static final List<String> REQUIRED_JOINT_KEYS = List.of(
             CHILDREN_KEY,
@@ -133,6 +134,16 @@ public class JointSkeletonDeserializer implements JsonDeserializer<JointSkeleton
                 PartPose.class,
                 PartPose.ZERO
         ));
+        String modelPartSpaceParent = GsonConfiguration.deserializeWithFallback(
+                context,
+                jointJsonObject,
+                MODEL_PART_SPACE_PARENT_KEY,
+                String.class,
+                null
+        );
+        if (jointsJsonMap.containsKey(modelPartSpaceParent)) {
+            jointConfigurationBuilder.setModelPartSpaceParent(modelPartSpaceParent);
+        }
         skeletonBuilder.defineJoint(joint, jointConfigurationBuilder.build());
     }
 }

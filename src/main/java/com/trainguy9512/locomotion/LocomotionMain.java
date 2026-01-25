@@ -6,6 +6,7 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPe
 import com.trainguy9512.locomotion.config.LocomotionConfig;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,7 +42,9 @@ public class LocomotionMain {
 
 	private static void registerAnimators() {
 		JointAnimatorRegistry.registerFirstPersonPlayerJointAnimator(new FirstPersonJointAnimator());
-		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.CHEST, new ChestJointAnimator());
+		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.CHEST, new ChestJointAnimator<>());
+		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.ENDER_CHEST, new ChestJointAnimator<>());
+		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.TRAPPED_CHEST, new ChestJointAnimator<>());
 	}
 
 	/*

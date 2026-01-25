@@ -146,7 +146,8 @@ public class JointSkeleton {
             JointChannel referencePose,
             String mirrorJoint,
             String modelPartIdentifier,
-            PartPose modelPartOffset
+            PartPose modelPartOffset,
+            String modelPartSpaceParent
     ) {
 
         public static Builder builder(){
@@ -160,6 +161,7 @@ public class JointSkeleton {
             private String mirrorJoint;
             private String modelPartIdentifier;
             private PartPose modelPartOffset;
+            private String modelPartSpaceParent;
 
             private Builder(){
                 this.parent = null;
@@ -167,6 +169,7 @@ public class JointSkeleton {
                 this.mirrorJoint = null;
                 this.modelPartIdentifier = null;
                 this.modelPartOffset = PartPose.ZERO;
+                this.modelPartSpaceParent = null;
             }
 
             public Builder addChild(String child){
@@ -199,8 +202,21 @@ public class JointSkeleton {
                 return this;
             }
 
+            public Builder setModelPartSpaceParent(String modelPartSpaceParent){
+                this.modelPartSpaceParent = modelPartSpaceParent;
+                return this;
+            }
+
             public JointConfiguration build(){
-                return new JointConfiguration(this.parent, this.children, this.referencePose, this.mirrorJoint, this.modelPartIdentifier, this.modelPartOffset);
+                return new JointConfiguration(
+                        this.parent,
+                        this.children,
+                        this.referencePose,
+                        this.mirrorJoint,
+                        this.modelPartIdentifier,
+                        this.modelPartOffset,
+                        this.modelPartSpaceParent
+                );
             }
         }
     }

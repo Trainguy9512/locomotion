@@ -26,7 +26,7 @@ public final class JointChannel {
     }
 
     public static JointChannel of(JointChannel jointChannel){
-        return JointChannel.of(jointChannel.transform, jointChannel.visibility);
+        return JointChannel.of(jointChannel.getTransform(), jointChannel.visibility);
     }
 
     public static JointChannel ofPartPose(PartPose partPose){
