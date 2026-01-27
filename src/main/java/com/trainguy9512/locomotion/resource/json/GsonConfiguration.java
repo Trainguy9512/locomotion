@@ -5,12 +5,11 @@ import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.resource.FormatVersion;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.util.Mth;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
-import java.lang.reflect.Type;
 
 public class GsonConfiguration {
 
@@ -19,6 +18,7 @@ public class GsonConfiguration {
     private static Gson createInternal() {
         return new GsonBuilder()
                 .setStrictness(Strictness.STRICT)
+                .setPrettyPrinting()
                 .registerTypeAdapter(Vector3f.class, vector3fDeserializer())
                 .registerTypeAdapter(Quaternionf.class, quaternionDeserializer())
                 .registerTypeAdapter(AnimationSequence.class, new AnimationSequenceDeserializer())
@@ -26,6 +26,7 @@ public class GsonConfiguration {
                 .registerTypeAdapter(FormatVersion.class, FormatVersion.getDeserializer())
                 .registerTypeAdapter(JointChannel.class, new JointChannelDeserializer())
                 .registerTypeAdapter(PartPose.class, new PartPoseDeserializer())
+                .registerTypeAdapter(ModelPart.class, new ModelPartSerializer())
                 .create();
     }
 

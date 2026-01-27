@@ -32,7 +32,7 @@ public abstract class MixinGameRenderer {
             JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
             jointAnimatorDispatcher.getFirstPersonPlayerDataContainer().ifPresent(dataContainer ->
                     JointAnimatorRegistry.getFirstPersonPlayerJointAnimator().ifPresent(
-                            jointAnimator -> jointAnimatorDispatcher.calculateInterpolatedFirstPersonPlayerPose(jointAnimator, dataContainer, deltaTracker.getGameTimeDeltaPartialTick(true))
+                            jointAnimator -> jointAnimatorDispatcher.calculateInterpolatedFirstPersonPlayerPose(dataContainer, deltaTracker.getGameTimeDeltaPartialTick(true))
 
                     ));
         }

@@ -10,6 +10,7 @@ public class LocomotionDebugScreenEntries {
 
     public static void register(BiConsumer<Identifier, DebugScreenEntry> registrar){
         registrar.accept(Identifier.fromNamespaceAndPath(LocomotionMain.MOD_ID, "first_person_drivers"), new DebugEntryFirstPersonDrivers());
+        registrar.accept(Identifier.fromNamespaceAndPath(LocomotionMain.MOD_ID, "currently_evaluating_block_entity_animators"), new DebugEntryBlockEntityAnimators());
     }
 
 }
