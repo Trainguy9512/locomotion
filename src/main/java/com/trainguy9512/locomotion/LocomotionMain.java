@@ -2,6 +2,7 @@ package com.trainguy9512.locomotion;
 
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorRegistry;
 import com.trainguy9512.locomotion.animation.animator.block_entity.ChestJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.block_entity.ShulkerBoxJointAnimator;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
 import com.trainguy9512.locomotion.config.LocomotionConfig;
 import net.minecraft.resources.Identifier;
@@ -42,9 +43,11 @@ public class LocomotionMain {
 
 	private static void registerAnimators() {
 		JointAnimatorRegistry.registerFirstPersonPlayerJointAnimator(new FirstPersonJointAnimator());
+
 		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.CHEST, new ChestJointAnimator<>());
 		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.ENDER_CHEST, new ChestJointAnimator<>());
 		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.TRAPPED_CHEST, new ChestJointAnimator<>());
+		JointAnimatorRegistry.registerBlockEntityJointAnimator(BlockEntityType.SHULKER_BOX, new ShulkerBoxJointAnimator());
 	}
 
 	/*

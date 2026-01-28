@@ -1,0 +1,133 @@
+{
+    "format_version": 6,
+    "root_joint": "root_jnt",
+    "custom_attributes": {},
+    "joints": {
+        "base_jnt": {
+            "children": [],
+            "mirror_joint": null,
+            "model_part_space_parent": "root_jnt",
+            "model_part_identifier": "base",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    24.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "lid_jnt": {
+            "children": [],
+            "mirror_joint": null,
+            "model_part_space_parent": "root_jnt",
+            "model_part_identifier": "lid",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    14.21,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -180.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "root_jnt": {
+            "children": [
+                "lid_jnt",
+                "base_jnt"
+            ],
+            "mirror_joint": null,
+            "model_part_space_parent": null,
+            "model_part_identifier": "root",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        }
+    }
+}
