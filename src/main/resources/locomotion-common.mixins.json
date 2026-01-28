@@ -4,10 +4,10 @@
   "package": "com.trainguy9512.locomotion.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "game.MixinLevelChunk"
   ],
   "client": [
     "debug.MixinDefaultPlayerSkin",
+    "game.MixinLevelChunk",
     "game.MixinMinecraft",
     "game.MixinMultiPlayerGameMode",
     "item.MixinBlocksAttacks",
@@ -17,14 +17,15 @@
     "item.property.MixinUseCycle",
     "item.property.MixinUseDuration",
     "render.MixinBlockRenderDispatcher",
-    "render.MixinChestRenderer",
     "render.MixinEntityRenderDispatcher",
     "render.MixinFishingHookRenderer",
     "render.MixinGameRenderer",
     "render.MixinItemInHandRenderer",
     "render.MixinLivingEntityRenderState",
     "render.MixinModelFeatureRenderer",
-    "render.MixinModelPart"
+    "render.MixinModelPart",
+    "render.block_entity.MixinChestRenderer",
+    "render.block_entity.MixinShulkerBoxRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

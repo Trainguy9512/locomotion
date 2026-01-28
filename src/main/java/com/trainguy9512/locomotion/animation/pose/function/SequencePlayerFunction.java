@@ -5,7 +5,7 @@ import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.resource.LocomotionResources;
-import com.trainguy9512.locomotion.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;

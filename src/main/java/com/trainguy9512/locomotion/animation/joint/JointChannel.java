@@ -1,12 +1,8 @@
 package com.trainguy9512.locomotion.animation.joint;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
-import com.trainguy9512.locomotion.resource.LocomotionResources;
-import com.trainguy9512.locomotion.util.Interpolator;
-import com.trainguy9512.locomotion.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.Interpolator;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.resources.Identifier;
 import org.joml.*;
 
 public final class JointChannel {

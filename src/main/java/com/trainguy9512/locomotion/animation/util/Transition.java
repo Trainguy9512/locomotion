@@ -1,4 +1,4 @@
-package com.trainguy9512.locomotion.util;
+package com.trainguy9512.locomotion.animation.util;
 
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendProfile;
 

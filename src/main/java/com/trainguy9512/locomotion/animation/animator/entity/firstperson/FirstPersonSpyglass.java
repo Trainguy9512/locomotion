@@ -10,9 +10,9 @@ import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseConta
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
-import com.trainguy9512.locomotion.util.Easing;
-import com.trainguy9512.locomotion.util.TimeSpan;
-import com.trainguy9512.locomotion.util.Transition;
+import com.trainguy9512.locomotion.animation.util.Easing;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemUseAnimation;
 import org.joml.Vector3f;
