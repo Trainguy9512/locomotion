@@ -30,6 +30,6 @@ public abstract class MixinDefaultPlayerSkin {
             cancellable = true
     )
     private static void makeSteveDefault(UUID uuid, CallbackInfoReturnable<PlayerSkin> cir) {
-        cir.setReturnValue(create("entity/player/wide/sunny", PlayerModelType.WIDE));
+        cir.setReturnValue(create("entity/player/wide/steve", PlayerModelType.WIDE));
     }
 }

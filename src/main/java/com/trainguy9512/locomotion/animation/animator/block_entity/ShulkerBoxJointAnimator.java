@@ -2,19 +2,29 @@ package com.trainguy9512.locomotion.animation.animator.block_entity;
 
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.driver.DriverKey;
+import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
+import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import org.jetbrains.annotations.NotNull;
 
-public class ShulkerBoxJointAnimator implements BlockEntityJointAnimator<@org.jetbrains.annotations.NotNull ShulkerBoxBlockEntity> {
+public class ShulkerBoxJointAnimator implements TwoStateContainerJointAnimator<@org.jetbrains.annotations.NotNull ShulkerBoxBlockEntity> {
 
     public static final Identifier SHULKER_BOX_SKELETON = LocomotionMain.makeIdentifier("skeletons/block_entity/shulker_box.json");
 
     public static final Identifier SHULKER_BOX_OPEN_SEQUENCE = LocomotionMain.makeIdentifier("sequences/block_entity/shulker_box/open.json");
+    public static final Identifier SHULKER_BOX_CLOSE_SEQUENCE = LocomotionMain.makeIdentifier("sequences/block_entity/shulker_box/close.json");
 
     @Override
     public Identifier getJointSkeleton() {
@@ -22,12 +32,17 @@ public class ShulkerBoxJointAnimator implements BlockEntityJointAnimator<@org.je
     }
 
     @Override
-    public void extractAnimationData(ShulkerBoxBlockEntity dataReference, OnTickDriverContainer dataContainer, MontageManager montageManager) {
-
+    public float getOpenProgress(@NotNull ShulkerBoxBlockEntity blockEntity) {
+        return blockEntity.getProgress(0);
     }
 
     @Override
-    public PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer) {
-        return SequencePlayerFunction.builder(SHULKER_BOX_OPEN_SEQUENCE).setLooping(true).build();
+    public Identifier getOpenAnimationSequence() {
+        return SHULKER_BOX_OPEN_SEQUENCE;
+    }
+
+    @Override
+    public Identifier getCloseAnimationSequence() {
+        return SHULKER_BOX_CLOSE_SEQUENCE;
     }
 }

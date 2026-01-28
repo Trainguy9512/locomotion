@@ -17,15 +17,15 @@
     "item.property.MixinUseCycle",
     "item.property.MixinUseDuration",
     "render.MixinBlockRenderDispatcher",
-    "render.block_entity.MixinChestRenderer",
     "render.MixinEntityRenderDispatcher",
     "render.MixinFishingHookRenderer",
     "render.MixinGameRenderer",
     "render.MixinItemInHandRenderer",
     "render.MixinLivingEntityRenderState",
     "render.MixinModelFeatureRenderer",
-    "render.block_entity.MixinShulkerBoxRenderer",
-    "render.MixinModelPart"
+    "render.MixinModelPart",
+    "render.block_entity.MixinChestRenderer",
+    "render.block_entity.MixinShulkerBoxRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -19,15 +19,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 
-public class ChestJointAnimator<T extends BlockEntity & LidBlockEntity> implements BlockEntityJointAnimator<@org.jetbrains.annotations.NotNull T> {
+public class ChestJointAnimator<B extends BlockEntity & LidBlockEntity> implements TwoStateContainerJointAnimator<B> {
 
     public static final Identifier CHEST_SKELETON = LocomotionMain.makeIdentifier("skeletons/block_entity/chest.json");
 
     public static final Identifier CHEST_OPEN_SEQUENCE = LocomotionMain.makeIdentifier("sequences/block_entity/chest/open.json");
     public static final Identifier CHEST_CLOSE_SEQUENCE = LocomotionMain.makeIdentifier("sequences/block_entity/chest/close.json");
-
-    public static final DriverKey<VariableDriver<Float>> CHEST_OPENNESS = DriverKey.of("chest_openness", () -> VariableDriver.ofFloat(() -> 0f));
-    public static final DriverKey<VariableDriver<Boolean>> CHEST_IS_OPEN = DriverKey.of("chest_is_open", () -> VariableDriver.ofBoolean(() -> false));
 
     @Override
     public Identifier getJointSkeleton() {
@@ -35,83 +32,17 @@ public class ChestJointAnimator<T extends BlockEntity & LidBlockEntity> implemen
     }
 
     @Override
-    public void extractAnimationData(T chest, OnTickDriverContainer dataContainer, MontageManager montageManager) {
-        dataContainer.getDriver(CHEST_OPENNESS).setValue(chest.getOpenNess(1));
-
-        float currentChestOpenness = dataContainer.getDriver(CHEST_OPENNESS).getCurrentValue();
-        float previousChestOpenness = dataContainer.getDriver(CHEST_OPENNESS).getPreviousValue();
-
-        boolean chestIsOpen = false;
-        if (currentChestOpenness >= 1f) {
-            chestIsOpen = true;
-        } else if (currentChestOpenness != previousChestOpenness) {
-            if (currentChestOpenness > previousChestOpenness) {
-                chestIsOpen = true;
-            }
-        }
-        dataContainer.getDriver(CHEST_IS_OPEN).setValue(chestIsOpen);
-    }
-
-    private static final String CHEST_CLOSED_STATE = "closed";
-    private static final String CHEST_OPENING_STATE = "opening";
-    private static final String CHEST_OPEN_STATE = "open";
-    private static final String CHEST_CLOSING_STATE = "closing";
-
-    private static String getInitialChestState(PoseFunction.FunctionEvaluationState evaluationState) {
-        return CHEST_CLOSED_STATE;
+    public float getOpenProgress(B blockEntity) {
+        return blockEntity.getOpenNess(0);
     }
 
     @Override
-    public PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer) {
+    public Identifier getOpenAnimationSequence() {
+        return CHEST_OPEN_SEQUENCE;
+    }
 
-        PoseFunction<LocalSpacePose> chestClosedPoseFunction = SequenceEvaluatorFunction.builder(CHEST_OPEN_SEQUENCE).build();
-        PoseFunction<LocalSpacePose> chestOpeningPoseFunction = SequencePlayerFunction.builder(CHEST_OPEN_SEQUENCE).build();
-        PoseFunction<LocalSpacePose> chestOpenPoseFunction = SequenceEvaluatorFunction.builder(CHEST_CLOSE_SEQUENCE).build();
-        PoseFunction<LocalSpacePose> chestClosingPoseFunction = SequencePlayerFunction.builder(CHEST_CLOSE_SEQUENCE).build();
-
-        PoseFunction<LocalSpacePose> chestOpenStateMachine;
-        chestOpenStateMachine = StateMachineFunction.builder(ChestJointAnimator::getInitialChestState)
-                .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(CHEST_CLOSED_STATE, chestClosedPoseFunction)
-                        .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(CHEST_OPENING_STATE)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(CHEST_IS_OPEN))
-                                .setTiming(Transition.SINGLE_TICK)
-                                .build())
-                        .build())
-                .defineState(StateDefinition.builder(CHEST_OPENING_STATE, chestOpeningPoseFunction)
-                        .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(CHEST_OPEN_STATE)
-                                .isTakenOnAnimationFinished(1f)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).build())
-                                .build())
-                        .addOutboundTransition(StateTransition.builder(CHEST_CLOSING_STATE)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(CHEST_IS_OPEN).negate())
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).build())
-                                .setCanInterruptOtherTransitions(false)
-                                .build())
-                        .build())
-                .defineState(StateDefinition.builder(CHEST_OPEN_STATE, chestOpenPoseFunction)
-                        .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(CHEST_CLOSING_STATE)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(CHEST_IS_OPEN).negate())
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).build())
-                                .build())
-                        .build())
-                .defineState(StateDefinition.builder(CHEST_CLOSING_STATE, chestClosingPoseFunction)
-                        .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(CHEST_CLOSED_STATE)
-                                .isTakenOnAnimationFinished(1f)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).build())
-                                .build())
-                        .addOutboundTransition(StateTransition.builder(CHEST_OPENING_STATE)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(CHEST_IS_OPEN))
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).build())
-                                .setCanInterruptOtherTransitions(false)
-                                .build())
-                        .build())
-                .build();
-
-        return chestOpenStateMachine;
+    @Override
+    public Identifier getCloseAnimationSequence() {
+        return CHEST_CLOSE_SEQUENCE;
     }
 }
