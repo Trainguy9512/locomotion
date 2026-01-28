@@ -4,7 +4,7 @@ import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
 import com.trainguy9512.locomotion.animation.data.PoseCalculationDataContainer;
 import com.trainguy9512.locomotion.animation.pose.Pose;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
-import com.trainguy9512.locomotion.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;

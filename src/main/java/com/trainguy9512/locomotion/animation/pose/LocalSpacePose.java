@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
-import com.trainguy9512.locomotion.util.Interpolator;
-import com.trainguy9512.locomotion.util.Transition;
+import com.trainguy9512.locomotion.animation.util.Interpolator;
+import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 

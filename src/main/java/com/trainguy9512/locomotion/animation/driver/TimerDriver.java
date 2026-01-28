@@ -1,8 +1,8 @@
 package com.trainguy9512.locomotion.animation.driver;
 
-import com.trainguy9512.locomotion.util.Easing;
-import com.trainguy9512.locomotion.util.Interpolator;
-import com.trainguy9512.locomotion.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.Easing;
+import com.trainguy9512.locomotion.animation.util.Interpolator;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
 
 import java.util.function.Supplier;
 

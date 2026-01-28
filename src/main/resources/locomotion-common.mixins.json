@@ -7,6 +7,7 @@
   ],
   "client": [
     "debug.MixinDefaultPlayerSkin",
+    "game.MixinLevelChunk",
     "game.MixinMinecraft",
     "game.MixinMultiPlayerGameMode",
     "item.MixinBlocksAttacks",
@@ -16,15 +17,15 @@
     "item.property.MixinUseCycle",
     "item.property.MixinUseDuration",
     "render.MixinBlockRenderDispatcher",
-    "render.MixinChestRenderer",
+    "render.block_entity.MixinChestRenderer",
     "render.MixinEntityRenderDispatcher",
     "render.MixinFishingHookRenderer",
     "render.MixinGameRenderer",
     "render.MixinItemInHandRenderer",
     "render.MixinLivingEntityRenderState",
     "render.MixinModelFeatureRenderer",
-    "render.MixinModelPart",
-    "game.MixinLevelChunk"
+    "render.block_entity.MixinShulkerBoxRenderer",
+    "render.MixinModelPart"
   ],
   "injectors": {
     "defaultRequire": 1

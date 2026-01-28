@@ -1,8 +1,5 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
-import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
-import com.trainguy9512.locomotion.util.TimeSpan;
-
 public enum SequenceReferencePoint {
     BEGINNING(0),
     END(1);

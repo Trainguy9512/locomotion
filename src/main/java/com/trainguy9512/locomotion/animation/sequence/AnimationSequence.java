@@ -2,14 +2,13 @@ package com.trainguy9512.locomotion.animation.sequence;
 
 import com.google.common.collect.Maps;
 import com.mojang.math.Axis;
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.resource.LocomotionResources;
-import com.trainguy9512.locomotion.util.Interpolator;
-import com.trainguy9512.locomotion.util.TimeSpan;
-import com.trainguy9512.locomotion.util.Timeline;
+import com.trainguy9512.locomotion.animation.util.Interpolator;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.Timeline;
 import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;

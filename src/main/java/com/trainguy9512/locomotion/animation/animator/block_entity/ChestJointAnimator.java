@@ -13,11 +13,10 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManage
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
-import com.trainguy9512.locomotion.util.TimeSpan;
-import com.trainguy9512.locomotion.util.Transition;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 
 public class ChestJointAnimator<T extends BlockEntity & LidBlockEntity> implements BlockEntityJointAnimator<@org.jetbrains.annotations.NotNull T> {
