@@ -70,7 +70,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier AXE = register(LocomotionMain.makeIdentifier("axe"), HandPoseDefinition.builder(
             "axe",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandAxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.AXES),
             50)
@@ -79,7 +79,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier SHOVEL = register(LocomotionMain.makeIdentifier("shovel"), HandPoseDefinition.builder(
             "shovel",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandShovelMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.SHOVELS),
             40)
