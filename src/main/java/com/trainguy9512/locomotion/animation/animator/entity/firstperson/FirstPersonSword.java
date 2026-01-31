@@ -2,18 +2,9 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
-import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
-import com.trainguy9512.locomotion.util.Easing;
-import com.trainguy9512.locomotion.util.TimeSpan;
-import com.trainguy9512.locomotion.util.Transition;
 import net.minecraft.world.InteractionHand;
-
-import java.util.Set;
 
 public class FirstPersonSword {
 

@@ -1,6 +1,5 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
@@ -10,9 +9,9 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDef
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
-import com.trainguy9512.locomotion.util.Easing;
-import com.trainguy9512.locomotion.util.TimeSpan;
-import com.trainguy9512.locomotion.util.Transition;
+import com.trainguy9512.locomotion.animation.util.Easing;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.world.InteractionHand;
 
 import java.util.Set;

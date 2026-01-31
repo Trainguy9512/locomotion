@@ -5,10 +5,10 @@ import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
-import com.trainguy9512.locomotion.util.Easing;
+import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.util.LocomotionMultiVersionWrappers;
-import com.trainguy9512.locomotion.util.TimeSpan;
-import com.trainguy9512.locomotion.util.Transition;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
@@ -70,7 +70,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier AXE = register(LocomotionMain.makeIdentifier("axe"), HandPoseDefinition.builder(
             "axe",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandAxeMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.AXES),
             50)
@@ -79,7 +79,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier SHOVEL = register(LocomotionMain.makeIdentifier("shovel"), HandPoseDefinition.builder(
             "shovel",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            FirstPersonMining::constructMainHandShovelMiningPoseFunction,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.SHOVELS),
             40)

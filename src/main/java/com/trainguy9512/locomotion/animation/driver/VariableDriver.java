@@ -1,6 +1,6 @@
 package com.trainguy9512.locomotion.animation.driver;
 
-import com.trainguy9512.locomotion.util.Interpolator;
+import com.trainguy9512.locomotion.animation.util.Interpolator;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 

@@ -17,6 +17,8 @@ public class FirstPersonAnimationSequences {
     public static final Identifier HAND_TOOL_LOWER = makeIdentifier("hand/tool/lower");
     public static final Identifier HAND_TOOL_RAISE = makeIdentifier("hand/tool/raise");
     public static final Identifier HAND_TOOL_PICKAXE_MINE_SWING = makeIdentifier("hand/tool/pickaxe/mine_swing");
+    public static final Identifier HAND_TOOL_AXE_MINE_SWING = makeIdentifier("hand/tool/axe/mine_swing");
+    public static final Identifier HAND_TOOL_SHOVEL_MINE_SWING = makeIdentifier("hand/tool/shovel/mine_swing");
     public static final Identifier HAND_TOOL_PICKAXE_MINE_FINISH = makeIdentifier("hand/tool/pickaxe/mine_finish");
     public static final Identifier HAND_TOOL_PICKAXE_ATTACK = makeIdentifier("hand/tool/pickaxe/attack");
     public static final Identifier HAND_TOOL_USE = makeIdentifier("hand/tool/use");

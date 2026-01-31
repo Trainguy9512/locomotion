@@ -2,7 +2,7 @@ package com.trainguy9512.locomotion.animation.pose.function;
 
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.Pose;
-import com.trainguy9512.locomotion.util.TimeSpan;
+import com.trainguy9512.locomotion.animation.util.TimeSpan;
 
 import java.util.function.Function;
 

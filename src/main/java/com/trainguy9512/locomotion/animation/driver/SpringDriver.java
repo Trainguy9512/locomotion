@@ -1,13 +1,10 @@
 package com.trainguy9512.locomotion.animation.driver;
 
-import com.trainguy9512.locomotion.LocomotionMain;
-import com.trainguy9512.locomotion.util.Interpolator;
-import org.joml.Vector3d;
+import com.trainguy9512.locomotion.animation.util.Interpolator;
 import org.joml.Vector3f;
 
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class SpringDriver<D> extends VariableDriver<D> {

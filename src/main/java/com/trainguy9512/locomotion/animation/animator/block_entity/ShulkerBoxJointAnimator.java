@@ -16,33 +16,33 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTra
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.LidBlockEntity;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import org.jetbrains.annotations.NotNull;
 
-public class ChestJointAnimator<B extends BlockEntity & LidBlockEntity> implements TwoStateContainerJointAnimator<B> {
+public class ShulkerBoxJointAnimator implements TwoStateContainerJointAnimator<@org.jetbrains.annotations.NotNull ShulkerBoxBlockEntity> {
 
-    public static final Identifier CHEST_SKELETON = LocomotionMain.makeIdentifier("skeletons/block_entity/chest.json");
+    public static final Identifier SHULKER_BOX_SKELETON = LocomotionMain.makeIdentifier("skeletons/block_entity/shulker_box.json");
 
-    public static final Identifier CHEST_OPEN_SEQUENCE = LocomotionMain.makeIdentifier("sequences/block_entity/chest/open.json");
-    public static final Identifier CHEST_CLOSE_SEQUENCE = LocomotionMain.makeIdentifier("sequences/block_entity/chest/close.json");
+    public static final Identifier SHULKER_BOX_OPEN_SEQUENCE = LocomotionMain.makeIdentifier("sequences/block_entity/shulker_box/open.json");
+    public static final Identifier SHULKER_BOX_CLOSE_SEQUENCE = LocomotionMain.makeIdentifier("sequences/block_entity/shulker_box/close.json");
 
     @Override
     public Identifier getJointSkeleton() {
-        return CHEST_SKELETON;
+        return SHULKER_BOX_SKELETON;
     }
 
     @Override
-    public float getOpenProgress(B blockEntity) {
-        return blockEntity.getOpenNess(0);
+    public float getOpenProgress(@NotNull ShulkerBoxBlockEntity blockEntity) {
+        return blockEntity.getProgress(0);
     }
 
     @Override
     public Identifier getOpenAnimationSequence() {
-        return CHEST_OPEN_SEQUENCE;
+        return SHULKER_BOX_OPEN_SEQUENCE;
     }
 
     @Override
     public Identifier getCloseAnimationSequence() {
-        return CHEST_CLOSE_SEQUENCE;
+        return SHULKER_BOX_CLOSE_SEQUENCE;
     }
 }
