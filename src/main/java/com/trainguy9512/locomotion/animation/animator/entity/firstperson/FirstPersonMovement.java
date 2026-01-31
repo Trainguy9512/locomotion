@@ -11,6 +11,7 @@ import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 
 import java.util.Set;
 
@@ -59,8 +60,18 @@ public class FirstPersonMovement {
         return context.driverContainer().getDriverValue(FirstPersonDrivers.IS_MOVING);
     }
 
+    public static boolean isSprinting(StateTransition.TransitionContext context) {
+        boolean isSprinting = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_SPRINTING);
+//        boolean hasBeenWalkingForLongEnough = context.timeElapsedInCurrentState().inSeconds() > 0.5f;
+        return isSprinting;
+    }
+
     public static boolean isNotWalking(StateTransition.TransitionContext context) {
         return !isWalking(context);
+    }
+
+    public static boolean isNotSprinting(StateTransition.TransitionContext context) {
+        return !context.driverContainer().getDriverValue(FirstPersonDrivers.IS_SPRINTING);
     }
 
     public static boolean isCancellingWalk(StateTransition.TransitionContext context) {
@@ -157,11 +168,17 @@ public class FirstPersonMovement {
 
     public static final String WALKING_IDLE_STATE = "idle";
     public static final String WALKING_WALKING_STATE = "walking";
+    public static final String WALKING_SPRINTING_STATE = "sprinting";
     public static final String WALKING_STOPPING_STATE = "stopping";
 
     private static String getWalkingEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
         boolean isMoving = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.IS_MOVING);
         return isMoving ? WALKING_WALKING_STATE : WALKING_IDLE_STATE;
+    }
+
+    public static TimeSpan getWalkingAnimationPosition(PoseFunction.FunctionInterpolationContext context) {
+        float walkDistance = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.WALK_DISTANCE, context.partialTicks());
+        return TimeSpan.ofTicks(walkDistance * Mth.PI);
     }
 
     public static PoseFunction<LocalSpacePose> constructWalkingStateMachine() {
@@ -173,12 +190,21 @@ public class FirstPersonMovement {
                         evaluationState -> 0.8f)
                 .build();
         PoseFunction<LocalSpacePose> stoppingPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_WALK_TO_STOP).setPlayRate(0.6f).build();
-        PoseFunction<LocalSpacePose> walkingPoseFunction = BlendedSequencePlayerFunction.builder(FirstPersonDrivers.MODIFIED_WALK_SPEED)
-                .setResetStartTimeOffset(TimeSpan.of30FramesPerSecond(5))
-                .addEntry(0f, FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE, 0.5f)
-                .addEntry(0.5f, FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING, 2f)
-                .addEntry(0.86f, FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING, 2.25f)
-                .addEntry(1f, FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING, 3.5f)
+//        PoseFunction<LocalSpacePose> walkingPoseFunction = BlendedSequencePlayerFunction.builder(FirstPersonDrivers.MODIFIED_WALK_SPEED)
+//                .setResetStartTimeOffset(TimeSpan.of30FramesPerSecond(5))
+//                .addEntry(0f, FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE, 0.5f)
+//                .addEntry(0.5f, FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING, 2f)
+//                .addEntry(0.86f, FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING, 2.25f)
+//                .addEntry(1f, FirstPersonAnimationSequences.GROUND_MOVEMENT_SPRINTING, 3.5f)
+//                .build();
+
+        PoseFunction<LocalSpacePose> walkingPoseFunction = SequenceEvaluatorFunction
+                .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING)
+                .evaluatesPoseAt(FirstPersonMovement::getWalkingAnimationPosition)
+                .build();
+        PoseFunction<LocalSpacePose> sprintingPoseFunction = SequenceEvaluatorFunction
+                .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_SPRINTING)
+                .evaluatesPoseAt(FirstPersonMovement::getWalkingAnimationPosition)
                 .build();
 
         PoseFunction<LocalSpacePose> walkingStateMachine;
@@ -194,14 +220,17 @@ public class FirstPersonMovement {
                         .build())
                 .defineState(StateDefinition.builder(WALKING_WALKING_STATE, walkingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
-                        // Stop walking with the walk-to-stop animation if the player's already been walking for a bit.
-                        .addOutboundTransition(StateTransition.builder(WALKING_STOPPING_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isEasingOutOfWalk)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_IN_OUT).build())
+                        // Begin sprinting if the player is sprinting
+                        .addOutboundTransition(StateTransition.builder(WALKING_SPRINTING_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isSprinting)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.7f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
-                        // Stop walking directly into the idle animation if the player only just began walking.
-                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isCancellingWalk)
+                        .build())
+                .defineState(StateDefinition.builder(WALKING_SPRINTING_STATE, sprintingPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        // Begin walking if the player is no longer sprinting
+                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isNotSprinting)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())
@@ -212,9 +241,27 @@ public class FirstPersonMovement {
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(1f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
-                                .isTakenIfTrue(StateTransition.CURRENT_TRANSITION_FINISHED.and(FirstPersonMovement::isWalking))
+                                .isTakenIfTrue(FirstPersonMovement::isWalking)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
+                        .build())
+                .addStateAlias(StateAlias.builder(
+                        Set.of(
+                                WALKING_WALKING_STATE,
+                                WALKING_SPRINTING_STATE
+                        ))
+                        // Stop walking with the walk-to-stop animation if the player's already been walking for a bit.
+                        .addOutboundTransition(StateTransition.builder(WALKING_STOPPING_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build())
+//                                .setCanInterruptOtherTransitions(false)
+                                .build())
+//                        // Stop walking directly into the idle animation if the player only just began walking.
+//                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
+//                                .setCanInterruptOtherTransitions(true)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_OUT).build())
+//                                .build())
                         .build())
                 .build();
         return walkingStateMachine;

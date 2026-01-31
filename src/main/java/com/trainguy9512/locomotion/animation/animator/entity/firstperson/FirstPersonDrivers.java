@@ -38,6 +38,7 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Float>> HORIZONTAL_MOVEMENT_SPEED = DriverKey.of("horizontal_movement_speed", () -> VariableDriver.ofFloat(() -> 0f));
     public static final DriverKey<VariableDriver<Float>> VERTICAL_MOVEMENT_SPEED = DriverKey.of("vertical_movement_speed", () -> VariableDriver.ofFloat(() -> 0f));
     public static final DriverKey<VariableDriver<Float>> MODIFIED_WALK_SPEED = DriverKey.of("modified_walk_speed", () -> VariableDriver.ofFloat(() -> 0f));
+    public static final DriverKey<VariableDriver<Float>> WALK_DISTANCE = DriverKey.of("walk_distance", () -> VariableDriver.ofFloat(() -> 0f));
     public static final DriverKey<VariableDriver<Boolean>> IS_MOVING = DriverKey.of("is_moving", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_SPRINTING = DriverKey.of("is_sprinting", () -> VariableDriver.ofBoolean(() -> false));
     public static final DriverKey<VariableDriver<Boolean>> IS_ON_GROUND = DriverKey.of("is_grounded", () -> VariableDriver.ofBoolean(() -> true));
