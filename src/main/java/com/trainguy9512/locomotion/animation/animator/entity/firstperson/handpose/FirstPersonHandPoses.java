@@ -5,6 +5,7 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPe
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
+import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
 import com.trainguy9512.locomotion.animation.util.Easing;
@@ -42,6 +43,7 @@ public class FirstPersonHandPoses {
             .setHandsToUsePoseIn(InteractionHand.MAIN_HAND)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_EMPTY_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_EMPTY_LOWER)
+            .setMiningPoseFunctionSuppler(FirstPersonMining::constructEmptyHandMiningPoseFunction)
             .build());
 
     public static final Identifier EMPTY_OFF_HAND = register(LocomotionMain.makeIdentifier("empty_off_hand"), HandPoseDefinition.builder(
@@ -60,6 +62,7 @@ public class FirstPersonHandPoses {
             FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE,
             itemStack -> true,
             0)
+            .setMiningPoseFunctionSuppler(FirstPersonMining::constructEmptyHandMiningPoseFunction)
             .build());
     public static final Identifier PICKAXE = register(LocomotionMain.makeIdentifier("pickaxe"), HandPoseDefinition.builder(
             "pickaxe",
@@ -116,6 +119,7 @@ public class FirstPersonHandPoses {
             90)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .setMiningPoseFunctionSuppler(() -> FirstPersonMining.constructPickaxeMiningPoseFunction(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_POSE).build()))
             .build());
     public static final Identifier BOW = register(LocomotionMain.makeIdentifier("bow"), HandPoseDefinition.builder(
             "bow",
