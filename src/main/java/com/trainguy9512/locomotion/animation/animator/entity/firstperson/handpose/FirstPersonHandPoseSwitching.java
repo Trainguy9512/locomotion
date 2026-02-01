@@ -133,7 +133,7 @@ public class FirstPersonHandPoseSwitching {
 
         PoseFunction<LocalSpacePose> miningPoseFunction = switch (hand) {
             case MAIN_HAND -> handPose.miningPoseFunctionSupplier().get();
-            case OFF_HAND -> SequenceEvaluatorFunction.builder(handPose.basePoseSequence()).build();
+            case OFF_HAND -> constructCurrentBasePoseFunction(hand);
         };
 
         PoseFunction<LocalSpacePose> posePoseFunction;

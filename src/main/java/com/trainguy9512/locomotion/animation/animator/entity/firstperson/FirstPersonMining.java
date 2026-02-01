@@ -17,6 +17,7 @@ import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.function.Function;
@@ -34,6 +35,25 @@ public class FirstPersonMining {
             Transition miningToFinishTiming,
             Transition idleToMiningTiming
     ) {
+        return constructMiningPoseFunction(
+                idlePoseFunction,
+                swingPoseFunction,
+                finishPoseFunction,
+                miningToFinishTiming,
+                idleToMiningTiming,
+                FirstPersonHandPoseSwitching.constructCurrentBasePoseFunction(InteractionHand.MAIN_HAND)
+        );
+
+    }
+
+    public static PoseFunction<LocalSpacePose> constructMiningPoseFunction(
+            PoseFunction<LocalSpacePose> idlePoseFunction,
+            PoseFunction<LocalSpacePose> swingPoseFunction,
+            PoseFunction<LocalSpacePose> finishPoseFunction,
+            Transition miningToFinishTiming,
+            Transition idleToMiningTiming,
+            PoseFunction<LocalSpacePose> basePoseFunction
+    ) {
         PoseFunction<LocalSpacePose> stateMachine = StateMachineFunction.builder(evaluationState -> MINING_IDLE_STATE)
                 .resetsUponRelevant(true)
                 .defineState(StateDefinition.builder(MINING_IDLE_STATE, idlePoseFunction)
@@ -46,7 +66,8 @@ public class FirstPersonMining {
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MINING_FINISH_STATE)
                                 .isTakenIfTrue(
-                                        StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING.and(FirstPersonMining::isNoLongerMining)
+                                        FirstPersonMining::isNoLongerMining
+//                                        StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING.and(FirstPersonMining::isNoLongerMining)
                                 )
                                 .setTiming(miningToFinishTiming)
                                 .setPriority(50)
@@ -68,9 +89,6 @@ public class FirstPersonMining {
                         .build())
                 .build();
 
-
-        PoseFunction<LocalSpacePose> basePoseFunction = FirstPersonHandPoseSwitching.constructCurrentBasePoseFunction(InteractionHand.MAIN_HAND);
-
         PoseFunction<LocalSpacePose> pose;
         pose = MakeDynamicAdditiveFunction.of(
                 stateMachine,
@@ -81,43 +99,28 @@ public class FirstPersonMining {
 
     }
 
-    public static PoseFunction<LocalSpacePose> makeMainHandMiningPoseFunction(
-            InteractionHand hand,
-            PoseFunction<LocalSpacePose> miningStateMachine,
-            Identifier miningStateMachineBasePose
-    ) {
-        PoseFunction<LocalSpacePose> basePoseFunction = FirstPersonHandPoseSwitching.constructCurrentBasePoseFunction(hand);
-        return switch (hand) {
-            case MAIN_HAND -> {
-                PoseFunction<LocalSpacePose> pose;
-                pose = MakeDynamicAdditiveFunction.of(
-                        miningStateMachine,
-                        SequenceEvaluatorFunction.builder(miningStateMachineBasePose).build()
-                );
-                pose = ApplyAdditiveFunction.of(basePoseFunction, pose);
-                yield pose;
-            }
-            case OFF_HAND -> basePoseFunction;
-        };
-    }
-
     public static Function<PoseFunction.FunctionEvaluationState, Float> getMiningPlayRateFunction(float baseMultiplier) {
-        return evaluationState -> 1.1f * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier;
+        return evaluationState -> baseMultiplier * LocomotionMain.CONFIG.data().firstPersonPlayer.miningAnimationSpeedMultiplier;
     }
 
     public static PoseFunction<LocalSpacePose> constructPickaxeMiningPoseFunction() {
+        return constructPickaxeMiningPoseFunction(FirstPersonHandPoseSwitching.constructCurrentBasePoseFunction(InteractionHand.MAIN_HAND));
+    }
+
+    public static PoseFunction<LocalSpacePose> constructPickaxeMiningPoseFunction(PoseFunction<LocalSpacePose> basePose) {
         return FirstPersonMining.constructMiningPoseFunction(
                 SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_PICKAXE_MINE_SWING)
                         .setLooping(true)
-                        .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(16))
+                        .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(10))
                         .setPlayRate(getMiningPlayRateFunction(1.1f))
                         .build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
                         .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(4))
                         .build(),
-                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
-                Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build());
+                Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_IN_OUT).build(),
+                Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.CUBIC_OUT).build(),
+                basePose);
     }
 
     public static PoseFunction<LocalSpacePose> constructAxeMiningPoseFunction() {
@@ -125,14 +128,14 @@ public class FirstPersonMining {
                 SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_AXE_MINE_SWING)
                         .setLooping(true)
-                        .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(16))
+                        .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(0))
                         .setPlayRate(getMiningPlayRateFunction(1.1f))
                         .build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
                         .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(4))
                         .build(),
-                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
-                Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build());
+                Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_IN_OUT).build(),
+                Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.CUBIC_OUT).build());
     }
 
     public static PoseFunction<LocalSpacePose> constructShovelMiningPoseFunction() {
@@ -140,14 +143,14 @@ public class FirstPersonMining {
                 SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_POSE).build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_SHOVEL_MINE_SWING)
                         .setLooping(true)
-                        .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(16))
+                        .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(0))
                         .setPlayRate(getMiningPlayRateFunction(1.1f))
                         .build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
                         .setResetStartTimeOffset(TimeSpan.of60FramesPerSecond(4))
                         .build(),
-                Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build(),
-                Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build());
+                Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_IN_OUT).build(),
+                Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.CUBIC_OUT).build());
     }
 
     public static PoseFunction<LocalSpacePose> constructEmptyHandMiningPoseFunction() {
@@ -155,11 +158,11 @@ public class FirstPersonMining {
                 SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_POSE).build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_SWING)
                         .setLooping(true)
-                        .setPlayRate(getMiningPlayRateFunction(1.1f))
+                        .setPlayRate(getMiningPlayRateFunction(1.3f))
                         .build(),
-                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_MINE_FINISH).build(),
-                Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_IN_OUT).build(),
-                Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build());
+                SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_EMPTY_RAISE).build(),
+                Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_IN_OUT).build(),
+                Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.CUBIC_OUT).build());
     }
 
 
