@@ -31,11 +31,12 @@ public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
     @Override
     public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
         TimeSpan time = this.sequenceTimeFunction.apply(context);
+        Identifier sequence = this.animationSequenceFunction.apply(context);
         return AnimationSequence.samplePose(
                 context.driverContainer().getJointSkeleton(),
-                this.animationSequenceFunction.apply(context),
+                sequence,
                 time,
-                false
+                true
         );
     }
 

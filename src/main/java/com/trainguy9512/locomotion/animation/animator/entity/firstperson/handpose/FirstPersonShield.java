@@ -1,5 +1,6 @@
-package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
+package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
@@ -53,9 +54,10 @@ public class FirstPersonShield {
 
     public static PoseFunction<LocalSpacePose> constructShieldPoseFunction(
             CachedPoseContainer cachedPoseContainer,
-            InteractionHand hand
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPosefunction
     ) {
-        PoseFunction<LocalSpacePose> shieldStateMachine = constructShieldStateMachine(cachedPoseContainer, hand);
+        PoseFunction<LocalSpacePose> shieldStateMachine = constructShieldStateMachine(cachedPoseContainer, hand, miningPosefunction);
 
         String shieldCacheIdentifier = getShieldCacheIdentifier(hand);
         cachedPoseContainer.register(shieldCacheIdentifier, shieldStateMachine, true);
@@ -119,7 +121,8 @@ public class FirstPersonShield {
 
     private static PoseFunction<LocalSpacePose> constructShieldStateMachine(
             CachedPoseContainer cachedPoseContainer,
-            InteractionHand hand
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPosefunction
     ) {
         Predicate<StateTransition.TransitionContext> isUsingShieldPredicate = context -> isUsingShield(context, hand);
         Predicate<StateTransition.TransitionContext> isNotUsingShieldPredicate = isUsingShieldPredicate.negate();
@@ -127,7 +130,7 @@ public class FirstPersonShield {
         PoseFunction<LocalSpacePose> shieldStateMachine;
         shieldStateMachine = StateMachineFunction.builder(FirstPersonShield::getShieldEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(SHIELD_LOWERED_STATE, constructStaticShieldMiningStateMachine(cachedPoseContainer, hand))
+                .defineState(StateDefinition.builder(SHIELD_LOWERED_STATE, miningPosefunction)
                         .build())
                 .defineState(StateDefinition.builder(SHIELD_BLOCKING_IN_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_BLOCK_IN).build())
                         .resetsPoseFunctionUponEntry(true)

@@ -1,5 +1,9 @@
-package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
+package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.JointTransformerFunction;
@@ -33,9 +37,9 @@ public class FirstPersonSpyglass {
 
     public static PoseFunction<LocalSpacePose> handSpyglassPoseFunction(
             CachedPoseContainer cachedPoseContainer,
-            InteractionHand hand
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
     ) {
-        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> lookingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT).build();
         PoseFunction<LocalSpacePose> lookingExitPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT)
                 .setPlayRate(1)
@@ -43,7 +47,7 @@ public class FirstPersonSpyglass {
                 .build();
 
         return StateMachineFunction.builder(FirstPersonSpyglass::getSpyglassEntryState)
-                .defineState(StateDefinition.builder(SPYGLASS_IDLE_STATE, idlePoseFunction)
+                .defineState(StateDefinition.builder(SPYGLASS_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_STATE)
                                 .isTakenIfTrue(context -> isUsingItem(context, hand))

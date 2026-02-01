@@ -1,5 +1,8 @@
-package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
+package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
@@ -25,17 +28,25 @@ public class FirstPersonMace {
         return !isFalling(context);
     }
 
-    public static PoseFunction<LocalSpacePose> handMacePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
+    public static PoseFunction<LocalSpacePose> handMacePoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
+    ) {
         return switch (hand) {
-            case MAIN_HAND -> macePrepareStateMachine(cachedPoseContainer, hand);
-            case OFF_HAND -> FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
+            case MAIN_HAND -> macePrepareStateMachine(cachedPoseContainer, hand, miningPoseFunction);
+            case OFF_HAND -> miningPoseFunction;
         };
     }
 
     public static final String MACE_PREPARE_IDLE_STATE = "idle";
     public static final String MACE_PREPARE_FALLING_STATE = "falling";
 
-    public static PoseFunction<LocalSpacePose> macePrepareStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
+    public static PoseFunction<LocalSpacePose> macePrepareStateMachine(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
+    ) {
         PoseFunction<LocalSpacePose> fallAnticipationSequencePlayer = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_MACE_FALL_ANTICIPATION)
                 .setLooping(false)
                 .setPlayRate(1)
@@ -43,7 +54,7 @@ public class FirstPersonMace {
 
         return StateMachineFunction.builder(evaluationState -> MACE_PREPARE_IDLE_STATE)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(MACE_PREPARE_IDLE_STATE, FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand))
+                .defineState(StateDefinition.builder(MACE_PREPARE_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(MACE_PREPARE_FALLING_STATE)
                                 .isTakenIfTrue(FirstPersonMace::isFalling)
