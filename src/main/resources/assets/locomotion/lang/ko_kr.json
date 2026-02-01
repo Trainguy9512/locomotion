@@ -35,6 +35,9 @@
   "locomotion.config.option.first_person_mining_speed.name": "채광 애니메이션 속도 배율",
   "locomotion.config.option.first_person_mining_speed.description": "채광 애니메이션이 재생되는 속도를 조절합니다. 1은 기본 속도, 0.5는 절반 속도, 2는 두 배 속도입니다.",
 
+  "locomotion.config.option.running_arm_swing_intensity.name": "달리기 팔 흔들림 강도",
+  "locomotion.config.option.running_arm_swing_intensity.description": "달리기 애니메이션에서 팔이 얼마나 크게 흔들리는지를 조절합니다. 값이 0이면 걷기 애니메이션과 동일하게 재생되며, 값이 1이면 걷이 애니메이션 대신 완전한 달리기 팔 흔들림 애니메이션이 재생됩니다.",
+  
   "locomotion.config.group.first_person_map.name": "지도 아이템",
   "locomotion.config.group.first_person_map.description": "지도 아이템의 표시 방식 및 애니메이션 관련 설정입니다.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "지도 이동 애니메이션 강도",
