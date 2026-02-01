@@ -31,13 +31,17 @@ public class FirstPersonTrident {
         return TRIDENT_IDLE_STATE;
     }
 
-    public static PoseFunction<LocalSpacePose> handTridentPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
+    public static PoseFunction<LocalSpacePose> handTridentPoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
+    ) {
         DriverKey<VariableDriver<Boolean>> usingItemDriverKey = FirstPersonDrivers.getUsingItemDriver(hand);
 
         PoseFunction<LocalSpacePose> tridentStateMachine;
         tridentStateMachine = StateMachineFunction.builder(FirstPersonTrident::getTridentEntryState)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(TRIDENT_IDLE_STATE, FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand))
+                .defineState(StateDefinition.builder(TRIDENT_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .defineState(StateDefinition.builder(TRIDENT_CHARGE_THROW_STATE, SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TRIDENT_CHARGE_THROW).build())

@@ -37,9 +37,9 @@ public class FirstPersonSpyglass {
 
     public static PoseFunction<LocalSpacePose> handSpyglassPoseFunction(
             CachedPoseContainer cachedPoseContainer,
-            InteractionHand hand
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
     ) {
-        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> lookingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT).build();
         PoseFunction<LocalSpacePose> lookingExitPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT)
                 .setPlayRate(1)
@@ -47,7 +47,7 @@ public class FirstPersonSpyglass {
                 .build();
 
         return StateMachineFunction.builder(FirstPersonSpyglass::getSpyglassEntryState)
-                .defineState(StateDefinition.builder(SPYGLASS_IDLE_STATE, idlePoseFunction)
+                .defineState(StateDefinition.builder(SPYGLASS_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_STATE)
                                 .isTakenIfTrue(context -> isUsingItem(context, hand))

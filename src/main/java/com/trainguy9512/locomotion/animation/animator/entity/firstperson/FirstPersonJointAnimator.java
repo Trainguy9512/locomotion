@@ -140,7 +140,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         pose = FirstPersonAttackAnimations.constructWithOffsetOffHandAttack(pose);
 
         // Punch mining animation
-        pose = FirstPersonMining.constructWithPunchMiningPoseFunction(pose);
+//        pose = FirstPersonMining.constructWithPunchMiningPoseFunction(pose);
 
         // Adding in the movement animations.
         pose = FirstPersonMovement.constructWithMovementAnimations(pose, cachedPoseContainer);

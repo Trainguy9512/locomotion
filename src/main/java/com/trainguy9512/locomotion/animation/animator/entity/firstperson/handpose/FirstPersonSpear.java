@@ -27,10 +27,14 @@ import java.util.Set;
 
 public class FirstPersonSpear {
 
-    public static PoseFunction<LocalSpacePose> constructSpearPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
-        PoseFunction<LocalSpacePose> pose;
+    public static PoseFunction<LocalSpacePose> constructSpearPoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
+    ) {
+        PoseFunction<LocalSpacePose> pose = miningPoseFunction;
 
-        pose = constructChargePoseFunction(cachedPoseContainer, hand);
+        pose = constructChargePoseFunction(cachedPoseContainer, hand, pose);
         pose = constructWithSpearImpact(pose);
 
         return pose;
@@ -53,9 +57,12 @@ public class FirstPersonSpear {
     public static String CHARGE_STAGE_3_STATE = "stage_3";
     public static String CHARGE_EXIT_STATE = "exit";
 
-    private static PoseFunction<LocalSpacePose> constructChargePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
+    private static PoseFunction<LocalSpacePose> constructChargePoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
+    ) {
 
-        PoseFunction<LocalSpacePose> chargeIdlePose = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> chargeEnterPose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_ENTER).build();
         PoseFunction<LocalSpacePose> chargeExitPose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_EXIT).build();
         PoseFunction<LocalSpacePose> chargeStage1Pose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_POSE_1).build();
@@ -67,7 +74,7 @@ public class FirstPersonSpear {
         PoseFunction<LocalSpacePose> chargeStateMachinePose;
         chargeStateMachinePose = StateMachineFunction.builder(evaluationState -> CHARGE_IDLE_STATE)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(CHARGE_IDLE_STATE, chargeIdlePose)
+                .defineState(StateDefinition.builder(CHARGE_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .defineState(StateDefinition.builder(CHARGE_ENTER_STATE, chargeEnterPose)

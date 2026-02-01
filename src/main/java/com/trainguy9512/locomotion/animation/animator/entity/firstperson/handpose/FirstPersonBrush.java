@@ -24,18 +24,18 @@ public class FirstPersonBrush {
     public static final String BRUSH_IDLE_STATE = "idle";
     public static final String BRUSH_SIFTING_STATE = "sifting";
 
-    public static PoseFunction<LocalSpacePose> handBrushPoseFunction(
+    public static PoseFunction<LocalSpacePose> constructBrushPoseFunction(
             CachedPoseContainer cachedPoseContainer,
-            InteractionHand hand
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
     ) {
-        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> siftingPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_BRUSH_SIFT_LOOP)
                 .setPlayRate(1)
                 .setLooping(true)
                 .build();
 
         return StateMachineFunction.builder(functionEvaluationState -> BRUSH_IDLE_STATE)
-                .defineState(StateDefinition.builder(BRUSH_IDLE_STATE, idlePoseFunction)
+                .defineState(StateDefinition.builder(BRUSH_IDLE_STATE, miningPoseFunction)
                         .addOutboundTransition(StateTransition.builder(BRUSH_SIFTING_STATE)
                                 .isTakenIfTrue(context -> isUsingItem(context, hand))
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(8))

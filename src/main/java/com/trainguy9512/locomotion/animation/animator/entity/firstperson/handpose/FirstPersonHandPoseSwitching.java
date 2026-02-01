@@ -131,8 +131,13 @@ public class FirstPersonHandPoseSwitching {
         String lowerState = handPose.getLowerStateIdentifier();
         String raiseState = handPose.getRaiseStateIdentifier();
 
+        PoseFunction<LocalSpacePose> miningPoseFunction = switch (hand) {
+            case MAIN_HAND -> handPose.miningPoseFunctionSupplier().get();
+            case OFF_HAND -> SequenceEvaluatorFunction.builder(handPose.basePoseSequence()).build();
+        };
+
         PoseFunction<LocalSpacePose> posePoseFunction;
-        posePoseFunction = handPose.poseFunctionProvider().apply(cachedPoseContainer, hand);
+        posePoseFunction = handPose.poseFunctionSupplier().constructHandPose(cachedPoseContainer, hand, miningPoseFunction);
         posePoseFunction = MontageSlotFunction.of(posePoseFunction, FirstPersonMontages.getAttackSlot(hand));
 
         PoseFunction<LocalSpacePose> raisePoseFunction;

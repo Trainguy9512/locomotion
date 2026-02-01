@@ -230,8 +230,8 @@ public class FirstPersonGenericItems {
 //        return definition.basePoseSequence;
 //    }
 
-    public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
-        PoseFunction<LocalSpacePose> pose = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
+    public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand, PoseFunction<LocalSpacePose> miningPoseFunction) {
+        PoseFunction<LocalSpacePose> pose = miningPoseFunction;
 
         PoseFunction<LocalSpacePose> consumablePose;
         consumablePose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build();

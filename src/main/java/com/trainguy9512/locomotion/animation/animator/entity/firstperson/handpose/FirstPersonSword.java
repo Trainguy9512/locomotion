@@ -23,9 +23,7 @@ public class FirstPersonSword {
         return SWORD_IDLE_STATE;
     }
 
-    public static PoseFunction<LocalSpacePose> handSwordPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
-        PoseFunction<LocalSpacePose> miningPoseFunction;
-        miningPoseFunction = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
+    public static PoseFunction<LocalSpacePose> handSwordPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand, PoseFunction<LocalSpacePose> miningPoseFunction) {
 
         return miningPoseFunction;
 //        return switch (hand) {
