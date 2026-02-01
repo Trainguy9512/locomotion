@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
+import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonMap;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -205,6 +207,10 @@ public class FirstPersonMovement {
         PoseFunction<LocalSpacePose> sprintingPoseFunction = SequenceEvaluatorFunction
                 .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_SPRINTING)
                 .evaluatesPoseAt(FirstPersonMovement::getWalkingAnimationPosition)
+                .build();
+
+        sprintingPoseFunction = BlendPosesFunction.builder(walkingPoseFunction)
+                .addBlendInput(sprintingPoseFunction, evaluationState -> LocomotionMain.CONFIG.data().firstPersonPlayer.runningArmSwingIntensity)
                 .build();
 
         PoseFunction<LocalSpacePose> walkingStateMachine;

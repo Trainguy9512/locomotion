@@ -35,6 +35,9 @@
   "locomotion.config.option.first_person_mining_speed.name": "Mining Animation Speed Multiplier",
   "locomotion.config.option.first_person_mining_speed.description": "Adjusts how fast the mining animations play. 1 is normal speed, 0.5 is half as fast, and 2 is twice as fast",
 
+  "locomotion.config.option.running_arm_swing_intensity.name": "Running Arm Swing Intensity",
+  "locomotion.config.option.running_arm_swing_intensity.description": "Adjusts much the arms will swing during running animations. With a value of 0, the animation will be the same as the walking animation. With a value of 1, the full arm swing animation will play instead of the walking animation",
+
   "locomotion.config.group.first_person_map.name": "Map Items",
   "locomotion.config.group.first_person_map.description": "Settings for how map items are displayed and animated.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Map Movement Animation Intensity",
