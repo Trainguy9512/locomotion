@@ -34,7 +34,7 @@ public class VariableDriver<D> implements Driver<D> {
     }
 
     @Override
-    public D getValueInterpolated(float partialTicks) {
+    public D getInterpolatedValue(float partialTicks) {
         return interpolator.interpolate(this.previousValue, this.currentValue, partialTicks);
     }
 
@@ -42,6 +42,7 @@ public class VariableDriver<D> implements Driver<D> {
         return this.previousValue;
     }
 
+    @Override
     public D getCurrentValue() {
         return this.currentValue;
     }

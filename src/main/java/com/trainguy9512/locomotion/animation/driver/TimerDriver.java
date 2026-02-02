@@ -40,8 +40,8 @@ public class TimerDriver extends VariableDriver<Float> {
     }
 
     @Override
-    public Float getValueInterpolated(float partialTicks) {
-        return this.easing.ease(super.getValueInterpolated(partialTicks));
+    public Float getInterpolatedValue(float partialTicks) {
+        return this.easing.ease(super.getInterpolatedValue(partialTicks));
     }
 
     @Override

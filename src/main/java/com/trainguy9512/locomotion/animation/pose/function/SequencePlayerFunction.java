@@ -1,6 +1,8 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
 import com.google.common.collect.Maps;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
@@ -23,20 +25,20 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
     private final Identifier animationSequence;
     private final boolean isLooping;
     private final boolean ignoredByRelevancyTest;
-    private final Map<String, Consumer<FunctionEvaluationState>> timeMarkerBindings;
+    private final Map<String, Consumer<PoseTickEvaluationContext>> timeMarkerBindings;
     private final boolean isAdditive;
     private final SequenceReferencePoint additiveSubtractionReferencePoint;
 
     private LocalSpacePose additiveSubtractionPose;
 
     protected SequencePlayerFunction(
-            Function<FunctionEvaluationState, Boolean> isPlayingFunction,
-            Function<FunctionEvaluationState, Float> playRateFunction,
+            Function<PoseTickEvaluationContext, Boolean> isPlayingFunction,
+            Function<PoseTickEvaluationContext, Float> playRateFunction,
             TimeSpan resetStartTimeOffset,
             Identifier animationSequence,
             boolean isLooping,
             boolean ignoredByRelevancyTest,
-            Map<String, Consumer<FunctionEvaluationState>> timeMarkerBindings,
+            Map<String, Consumer<PoseTickEvaluationContext>> timeMarkerBindings,
             boolean isAdditive,
             SequenceReferencePoint additiveSubtractionReferencePoint
     ) {
@@ -50,9 +52,9 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
         LocalSpacePose pose = AnimationSequence.samplePose(
-                context.driverContainer().getJointSkeleton(),
+                context.jointSkeleton(),
                 this.animationSequence,
                 this.getInterpolatedTimeElapsed(context),
                 this.isLooping
@@ -64,7 +66,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
         }
         if (this.additiveSubtractionPose == null) {
             this.additiveSubtractionPose = AnimationSequence.samplePose(
-                    context.driverContainer().getJointSkeleton(),
+                    context.jointSkeleton(),
                     this.animationSequence,
                     this.resetStartTimeOffset.interpolated(sequence.length(), this.additiveSubtractionReferencePoint.getProgressThroughSequence()),
                     false
@@ -76,12 +78,12 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        super.tick(evaluationState);
+    public void tick(PoseTickEvaluationContext context) {
+        super.tick(context);
         Set<String> timeMarkersToFire = LocomotionResources.getOrThrowAnimationSequence(this.animationSequence).getMarkersInRange(TimeSpan.ofTicks(this.ticksElapsed.getCurrentValue()), TimeSpan.ofTicks(this.ticksElapsed.getCurrentValue() + this.playRate), this.isLooping);
         for (String timeMarker : timeMarkersToFire) {
             if (this.timeMarkerBindings.containsKey(timeMarker)) {
-                this.timeMarkerBindings.get(timeMarker).accept(evaluationState);
+                this.timeMarkerBindings.get(timeMarker).accept(context);
             }
         }
     }
@@ -135,7 +137,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
         private final Identifier animationSequence;
         private boolean looping;
         private boolean ignoredForRelevancyTest;
-        private final Map<String, Consumer<FunctionEvaluationState>> timeMarkerBindings;
+        private final Map<String, Consumer<PoseTickEvaluationContext>> timeMarkerBindings;
         private boolean isAdditive;
         private SequenceReferencePoint additiveSubtractionReferencePoint;
 
@@ -173,7 +175,7 @@ public class SequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose
          * @param binding               Event to fire every time this time marker is passed when the sequence player is playing.
          */
         @SuppressWarnings("unchecked")
-        public B bindToTimeMarker(String timeMarkerIdentifier, Consumer<FunctionEvaluationState> binding) {
+        public B bindToTimeMarker(String timeMarkerIdentifier, Consumer<PoseTickEvaluationContext> binding) {
             this.timeMarkerBindings.computeIfPresent(timeMarkerIdentifier, (identifier, existingBinding) -> existingBinding.andThen(binding));
             this.timeMarkerBindings.putIfAbsent(timeMarkerIdentifier, binding);
             return (B) this;

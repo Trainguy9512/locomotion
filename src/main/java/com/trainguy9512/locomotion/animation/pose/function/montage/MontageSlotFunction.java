@@ -1,6 +1,8 @@
 package com.trainguy9512.locomotion.animation.pose.function.montage;
 
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,14 +16,14 @@ public record MontageSlotFunction(PoseFunction<LocalSpacePose> input, String slo
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
-        return context.montageManager().getLayeredSlotPose(this.input.compute(context), this.slot, context.driverContainer().getJointSkeleton(), context.partialTicks());
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
+        return context.montageManager().getLayeredSlotPose(this.input.compute(context), this.slot, context.jointSkeleton(), context.partialTicks());
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        if (!evaluationState.montageManager().areAnyMontagesInSlotFullyOverriding(this.slot)) {
-            this.input.tick(evaluationState);
+    public void tick(PoseTickEvaluationContext context) {
+        if (!context.montageManager().areAnyMontagesInSlotFullyOverriding(this.slot)) {
+            this.input.tick(context);
         }
     }
 

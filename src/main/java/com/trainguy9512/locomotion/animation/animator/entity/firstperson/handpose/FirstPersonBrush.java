@@ -2,7 +2,6 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
@@ -10,6 +9,7 @@ import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseConta
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransitionContext;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -17,8 +17,8 @@ import net.minecraft.world.InteractionHand;
 
 public class FirstPersonBrush {
 
-    private static boolean isUsingItem(StateTransition.TransitionContext context, InteractionHand hand) {
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
+    private static boolean isUsingItem(StateTransitionContext context, InteractionHand hand) {
+        return context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
     }
 
     public static final String BRUSH_IDLE_STATE = "idle";
@@ -34,7 +34,7 @@ public class FirstPersonBrush {
                 .setLooping(true)
                 .build();
 
-        return StateMachineFunction.builder(functionEvaluationState -> BRUSH_IDLE_STATE)
+        return StateMachineFunction.builder(functioncontext -> BRUSH_IDLE_STATE)
                 .defineState(StateDefinition.builder(BRUSH_IDLE_STATE, miningPoseFunction)
                         .addOutboundTransition(StateTransition.builder(BRUSH_SIFTING_STATE)
                                 .isTakenIfTrue(context -> isUsingItem(context, hand))

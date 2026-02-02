@@ -2,7 +2,7 @@ package com.trainguy9512.locomotion.animation.pose.function;
 
 public enum SequenceReferencePoint {
     BEGINNING(0),
-    END(1);
+    END(1f);
 
     private final float progressThroughSequence;
 

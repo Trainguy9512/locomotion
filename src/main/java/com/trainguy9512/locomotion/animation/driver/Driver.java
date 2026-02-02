@@ -17,7 +17,13 @@ public interface Driver<D> {
      * @param partialTicks      Percentage of a tick since the previous tick.
      * @return                  Interpolated value.
      */
-    D getValueInterpolated(float partialTicks);
+    D getInterpolatedValue(float partialTicks);
+
+    /**
+     * Returns the current value of the driver.
+     * @return                  Current driver value.
+     */
+    D getCurrentValue();
 
     /**
      * Prepares the driver for the next tick after it's finished being used in the current tick, which is usually setting the current value to the previous value

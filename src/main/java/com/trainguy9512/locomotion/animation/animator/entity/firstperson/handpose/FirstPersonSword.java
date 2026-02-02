@@ -1,15 +1,15 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransitionContext;
 import net.minecraft.world.InteractionHand;
 
 public class FirstPersonSword {
 
-    public static boolean shouldPlayComboAnimation(StateTransition.TransitionContext context) {
+    public static boolean shouldPlayComboAnimation(StateTransitionContext context) {
         return context.timeElapsedInCurrentState().inSeconds() > 0.2 && context.timeElapsedInCurrentState().inSeconds() < 0.7;
     }
 
@@ -19,7 +19,7 @@ public class FirstPersonSword {
     public static final String SWORD_SWING_LEFT_STATE = "swing_left";
     public static final String SWORD_SWING_RIGHT_STATE = "swing_right";
 
-    private static String getSwordEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+    private static String getSwordEntryState(PoseTickEvaluationContext context) {
         return SWORD_IDLE_STATE;
     }
 

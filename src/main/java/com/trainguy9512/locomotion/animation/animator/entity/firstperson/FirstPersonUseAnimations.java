@@ -5,7 +5,7 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoses;
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.driver.TriggerDriver;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
@@ -15,6 +15,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -39,6 +40,11 @@ public class FirstPersonUseAnimations {
             FirstPersonMontages::getUseAnimationMontage,
             UseAnimationConditionContext::swingFromClient,
             0
+    ));
+    public static final Identifier PLACE_BLOCK = register(LocomotionMain.makeIdentifier("place_block"), UseAnimationRule.of(
+            FirstPersonMontages::getPlaceBlockAnimationMontage,
+            FirstPersonUseAnimations::shouldPlayPlaceBlock,
+            5
     ));
     public static final Identifier AXE_SCRAPE = register(LocomotionMain.makeIdentifier("axe_scrape"), UseAnimationRule.of(
             FirstPersonMontages::getAxeScrapeMontage,
@@ -121,6 +127,12 @@ public class FirstPersonUseAnimations {
         return context.currentItem.is(Items.SHEARS) && context.useAnimationType() == UseAnimationType.INTERACT_ENTITY;
     }
 
+    private static boolean shouldPlayPlaceBlock(UseAnimationConditionContext context) {
+        boolean isClientSwing = context.swingFromClient();
+        boolean itemIsBlockItem = context.currentItem().getItem() instanceof BlockItem;
+        return isClientSwing && itemIsBlockItem;
+    }
+
     /**
      * Registers a use animation rule that plays a specified montage upon a use animation being triggered if it meets a condition.
      * @param identifier            Name to give the use animation
@@ -176,10 +188,9 @@ public class FirstPersonUseAnimations {
         }
     }
 
-    public static void playUseAnimationIfTriggered(OnTickDriverContainer driverContainer, MontageManager montageManager, InteractionHand hand) {
+    public static void playUseAnimationIfTriggered(DriverGetter driverContainer, MontageManager montageManager, InteractionHand hand) {
         // Scheduling the next use animation if triggered by the multiplayer game mode.
         TriggerDriver hasUsedItemDriver = driverContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand));
-        TriggerDriver hasAttackedDriver = driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED);
 
         int swingTime = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_SWING_TIME);
         InteractionHand lastUsedHand = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_HAND);

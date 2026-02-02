@@ -1,7 +1,8 @@
 package com.trainguy9512.locomotion.animation.pose.function.cache;
 
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
-import com.trainguy9512.locomotion.animation.pose.function.AnimationPlayer;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +30,7 @@ public class CachedPoseFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
         if (this.poseCache == null) {
             this.poseCache = this.input.compute(context);
         }
@@ -37,14 +38,14 @@ public class CachedPoseFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
+    public void tick(PoseTickEvaluationContext context) {
         if (!this.hasTickedAlready) {
-            if (evaluationState.currentTick() - 1 > this.lastUpdateTick && this.resetsUponRelevant) {
-                this.input.tick(evaluationState.cleared().markedForReset());
+            if (context.currentTick() - 1 > this.lastUpdateTick && this.resetsUponRelevant) {
+                this.input.tick(context.cleared().markedForReset());
             } else {
-                this.input.tick(evaluationState.cleared());
+                this.input.tick(context.cleared());
             }
-            this.lastUpdateTick = evaluationState.currentTick();
+            this.lastUpdateTick = context.currentTick();
             this.hasTickedAlready = true;
         }
     }

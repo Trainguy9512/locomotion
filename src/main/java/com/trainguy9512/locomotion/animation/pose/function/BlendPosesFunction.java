@@ -1,6 +1,8 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
 import com.google.common.collect.Maps;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
@@ -22,10 +24,10 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
         LocalSpacePose pose = this.basePoseFunction.compute(context);
         for(BlendInput blendInput : this.inputs.keySet()) {
-            float weight = this.inputs.get(blendInput).getValueInterpolated(context.partialTicks());
+            float weight = this.inputs.get(blendInput).getInterpolatedValue(context.partialTicks());
             if (weight != 0f) {
                 pose = pose.interpolated(blendInput.inputFunction.compute(context), weight, blendInput.blendMask);
             }
@@ -34,15 +36,15 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        this.basePoseFunction.tick(evaluationState);
+    public void tick(PoseTickEvaluationContext context) {
+        this.basePoseFunction.tick(context);
         this.inputs.forEach((blendInput, weightDriver) -> {
             weightDriver.pushCurrentToPrevious();
-            float weight = blendInput.weightFunction.apply(evaluationState);
+            float weight = blendInput.weightFunction.apply(context);
             weightDriver.setValue(weight);
 
             if(weight != 0f) {
-                blendInput.inputFunction.tick(evaluationState);
+                blendInput.inputFunction.tick(context);
             }
         });
     }
@@ -92,12 +94,12 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
             this.inputs = Maps.newHashMap();
         }
 
-        public Builder addBlendInput(PoseFunction<LocalSpacePose> inputFunction, Function<FunctionEvaluationState, Float> weightFunction, @Nullable BlendMask blendMask){
+        public Builder addBlendInput(PoseFunction<LocalSpacePose> inputFunction, Function<PoseTickEvaluationContext, Float> weightFunction, @Nullable BlendMask blendMask){
             this.inputs.put(new BlendInput(inputFunction, weightFunction, blendMask), VariableDriver.ofFloat(() -> 0f));
             return this;
         }
 
-        public Builder addBlendInput(PoseFunction<LocalSpacePose> inputFunction, Function<FunctionEvaluationState, Float> weightFunction){
+        public Builder addBlendInput(PoseFunction<LocalSpacePose> inputFunction, Function<PoseTickEvaluationContext, Float> weightFunction){
             return this.addBlendInput(inputFunction, weightFunction, null);
         }
 
@@ -108,7 +110,7 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
 
     public record BlendInput(
             PoseFunction<LocalSpacePose> inputFunction,
-            Function<FunctionEvaluationState, Float> weightFunction,
+            Function<PoseTickEvaluationContext, Float> weightFunction,
             @Nullable BlendMask blendMask
     ) {
 

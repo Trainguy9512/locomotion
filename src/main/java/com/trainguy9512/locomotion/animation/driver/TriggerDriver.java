@@ -64,7 +64,12 @@ public class TriggerDriver implements Driver<Boolean> {
     }
 
     @Override
-    public Boolean getValueInterpolated(float partialTicks) {
+    public Boolean getInterpolatedValue(float partialTicks) {
+        return this.getCurrentValue();
+    }
+
+    @Override
+    public Boolean getCurrentValue() {
         return this.hasBeenTriggered();
     }
 

@@ -1,9 +1,9 @@
 package com.trainguy9512.locomotion.animation.pose.function.montage;
 
 import com.google.common.collect.Maps;
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
-import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -39,8 +39,8 @@ public record MontageConfiguration(
         String identifier,
         List<String> slots,
         Identifier animationSequence,
-        Function<OnTickDriverContainer, Float> playRateFunction,
-        Map<String, Consumer<PoseFunction.FunctionEvaluationState>> timeMarkerBindings,
+        Function<DriverGetter, Float> playRateFunction,
+        Map<String, Consumer<PoseTickEvaluationContext>> timeMarkerBindings,
         @Nullable BlendMask blendMask,
         Transition transitionIn,
         Transition transitionOut,
@@ -48,7 +48,7 @@ public record MontageConfiguration(
         float transitionOutCrossfadeWeight,
         TimeSpan cooldownDuration,
         boolean isAdditive,
-        Function<OnTickDriverContainer, Identifier> additiveBasePoseProvider,
+        Function<DriverGetter, Identifier> additiveBasePoseProvider,
         SequenceReferencePoint additiveReferencePosePoint
 ) {
 
@@ -74,7 +74,7 @@ public record MontageConfiguration(
         for (String slot : this.slots) {
             builder.playsInSlot(slot);
         }
-        for (Map.Entry<String, Consumer<PoseFunction.FunctionEvaluationState>> entry : this.timeMarkerBindings.entrySet()) {
+        for (Map.Entry<String, Consumer<PoseTickEvaluationContext>> entry : this.timeMarkerBindings.entrySet()) {
             builder.bindToTimeMarker(entry.getKey(), entry.getValue());
         }
         if (this.isAdditive) {
@@ -88,8 +88,8 @@ public record MontageConfiguration(
         private final String identifier;
         private final Identifier animationSequence;
         private final List<String> slots;
-        private Function<OnTickDriverContainer, Float> playRateFunction;
-        private Map<String, Consumer<PoseFunction.FunctionEvaluationState>> timeMarkerBindings;
+        private Function<DriverGetter, Float> playRateFunction;
+        private Map<String, Consumer<PoseTickEvaluationContext>> timeMarkerBindings;
         private BlendMask blendMask;
         private Transition transitionIn;
         private Transition transitionOut;
@@ -97,7 +97,7 @@ public record MontageConfiguration(
         private float transitionOutCrossfadeWeight;
         private TimeSpan cooldownDuration;
         private boolean isAdditive;
-        private Function<OnTickDriverContainer, Identifier> additiveBasePoseProvider;
+        private Function<DriverGetter, Identifier> additiveBasePoseProvider;
         private SequenceReferencePoint additiveReferencePosePoint;
 
 
@@ -143,7 +143,7 @@ public record MontageConfiguration(
          * time a montage is played, with the constant play rate for the whole animation decided then.
          * @param playRate              Play rate function.
          */
-        public Builder setPlayRate(Function<OnTickDriverContainer, Float> playRate) {
+        public Builder setPlayRate(Function<DriverGetter, Float> playRate) {
             this.playRateFunction = playRate;
             return this;
         }
@@ -187,7 +187,7 @@ public record MontageConfiguration(
          * @param timeMarkerIdentifier  String identifier for the time marker, pointing to the associated time marker in the sequence file.
          * @param binding               Event to fire every time this time marker is passed when the sequence player is playing.
          */
-        public Builder bindToTimeMarker(String timeMarkerIdentifier, Consumer<PoseFunction.FunctionEvaluationState> binding) {
+        public Builder bindToTimeMarker(String timeMarkerIdentifier, Consumer<PoseTickEvaluationContext> binding) {
             this.timeMarkerBindings.computeIfPresent(timeMarkerIdentifier, (identifier, existingBinding) -> existingBinding.andThen(binding));
             this.timeMarkerBindings.putIfAbsent(timeMarkerIdentifier, binding);
             return this;
@@ -235,7 +235,7 @@ public record MontageConfiguration(
          * @param additiveBasePoseProvider          Base pose provider, retrieved every time a montage of this configuration is fired.
          */
         public Builder makeAdditive(
-                Function<OnTickDriverContainer, Identifier> additiveBasePoseProvider,
+                Function<DriverGetter, Identifier> additiveBasePoseProvider,
                 SequenceReferencePoint additiveReferencePosePoint
         ) {
             this.isAdditive = true;
