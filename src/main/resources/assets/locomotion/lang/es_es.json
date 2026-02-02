@@ -35,6 +35,9 @@
   "locomotion.config.option.first_person_mining_speed.name": "Multiplicador de velocidad de animación de minería",
   "locomotion.config.option.first_person_mining_speed.description": "Ajusta la velocidad a la que se reproducen las animaciones de minería. 1 es la velocidad normal, 0.5 es la mitad de velocidad y 2 es el doble de velocidad.",
 
+  "locomotion.config.option.running_arm_swing_intensity.name": "Intensidad de balanceo de brazos al correr",
+  "locomotion.config.option.running_arm_swing_intensity.description": "Ajusta cuánto se balancean los brazos durante las animaciones de correr. Con un valor de 0, la animación será igual que la de caminar. Con un valor de 1, se reproducirá el balanceo completo de brazos en lugar de la animación de caminar",
+
   "locomotion.config.group.first_person_map.name": "Objetos de mapa",
   "locomotion.config.group.first_person_map.description": "Configuración de cómo se muestran y animan los objetos de mapa.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Intensidad de animación de movimiento del mapa",
