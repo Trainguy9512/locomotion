@@ -8,8 +8,7 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManage
 import java.util.function.Function;
 
 public record PoseTickEvaluationContext(
-        @Deprecated
-        DriverGetter driverContainer,
+        DriverGetter driverGetter,
         MontageManager montageManager,
         boolean resetting,
         long currentTick
@@ -21,11 +20,11 @@ public record PoseTickEvaluationContext(
      * <p>A hard reset is an animation reset that immediately resets with no blending.</p>
      */
     public PoseTickEvaluationContext markedForReset() {
-        return new PoseTickEvaluationContext(this.driverContainer, this.montageManager, true, this.currentTick);
+        return new PoseTickEvaluationContext(this.driverGetter, this.montageManager, true, this.currentTick);
     }
 
     public PoseTickEvaluationContext cleared() {
-        return new PoseTickEvaluationContext(this.driverContainer, this.montageManager, false, this.currentTick);
+        return new PoseTickEvaluationContext(this.driverGetter, this.montageManager, false, this.currentTick);
     }
 
     /**
@@ -39,7 +38,7 @@ public record PoseTickEvaluationContext(
 
     @Override
     public <D, R extends Driver<D>> R getDriver(DriverKey<R> driverKey) {
-        return this.driverContainer.getDriver(driverKey);
+        return this.driverGetter.getDriver(driverKey);
     }
 
     public <D, R extends VariableDriver<D>> void setVariableDriverValue(DriverKey<R> driverKey, D newValue) {
