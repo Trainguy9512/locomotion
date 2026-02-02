@@ -11,8 +11,7 @@ import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import java.util.Optional;
 
 public record StateTransitionContext(
-        @Deprecated
-        DriverGetter driverContainer,
+        DriverGetter driverGetter,
         TimeSpan timeElapsedInCurrentState,
         float currentStateWeight,
         float previousStateWeight,
@@ -28,6 +27,6 @@ public record StateTransitionContext(
     @Override
     @SuppressWarnings("deprecated")
     public <D, R extends Driver<D>> R getDriver(DriverKey<R> driverKey) {
-        return this.driverContainer.getDriver(driverKey);
+        return this.driverGetter.getDriver(driverKey);
     }
 }

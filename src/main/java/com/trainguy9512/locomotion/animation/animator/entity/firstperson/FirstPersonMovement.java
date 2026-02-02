@@ -64,8 +64,8 @@ public class FirstPersonMovement {
 
     public static boolean isSprinting(StateTransitionContext context) {
         boolean isSprinting = context.getDriverValue(FirstPersonDrivers.IS_SPRINTING);
-//        boolean hasBeenWalkingForLongEnough = context.timeElapsedInCurrentState().inSeconds() > 0.5f;
-        return isSprinting;
+        boolean isCrouching = context.getDriverValue(FirstPersonDrivers.IS_CROUCHING);
+        return isSprinting && !isCrouching;
     }
 
     public static boolean isNotWalking(StateTransitionContext context) {
@@ -73,7 +73,7 @@ public class FirstPersonMovement {
     }
 
     public static boolean isNotSprinting(StateTransitionContext context) {
-        return !context.getDriverValue(FirstPersonDrivers.IS_SPRINTING);
+        return !isSprinting(context);
     }
 
     public static boolean isCancellingWalk(StateTransitionContext context) {
@@ -129,7 +129,7 @@ public class FirstPersonMovement {
     public static final String OVERRIDING_MOVEMENT_IDLE_STATE = "idle";
     public static final String OVERRIDING_MOVEMENT_SWIMMING_STATE = "swimming";
 
-    private static String getOverridingMovementEntryState(PoseTickEvaluationContext context) {
+    private static String getOverridingMovementEntryState(DriverGetter driverGetter) {
         return OVERRIDING_MOVEMENT_IDLE_STATE;
     }
 
@@ -175,7 +175,8 @@ public class FirstPersonMovement {
 
     private static String getWalkingEntryState(DriverGetter dataContainer) {
         boolean isMoving = dataContainer.getDriverValue(FirstPersonDrivers.IS_MOVING);
-        return isMoving ? WALKING_WALKING_STATE : WALKING_IDLE_STATE;
+        return WALKING_WALKING_STATE;
+//        return isMoving ? WALKING_WALKING_STATE : WALKING_IDLE_STATE;
     }
 
     public static TimeSpan getWalkingAnimationPosition(PoseCalculationContext context) {
@@ -215,17 +216,17 @@ public class FirstPersonMovement {
 
         PoseFunction<LocalSpacePose> walkingStateMachine;
         walkingStateMachine = StateMachineFunction.builder(FirstPersonMovement::getWalkingEntryState)
-                .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(WALKING_IDLE_STATE, idleAnimationPlayer)
-                        .resetsPoseFunctionUponEntry(true)
-                        // Begin walking if the player is moving horizontally
-                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isWalking)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.EXPONENTIAL_OUT).build())
-                                .build())
-                        .build())
+                .resetsUponRelevant(false)
+//                .defineState(StateDefinition.builder(WALKING_IDLE_STATE, idleAnimationPlayer)
+//                        .resetsPoseFunctionUponEntry(true)
+//                        // Begin walking if the player is moving horizontally
+//                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::isWalking)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.EXPONENTIAL_OUT).build())
+//                                .build())
+//                        .build())
                 .defineState(StateDefinition.builder(WALKING_WALKING_STATE, walkingPoseFunction)
-                        .resetsPoseFunctionUponEntry(true)
+                        .resetsPoseFunctionUponEntry(false)
                         // Begin sprinting if the player is sprinting
                         .addOutboundTransition(StateTransition.builder(WALKING_SPRINTING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isSprinting)
@@ -233,44 +234,51 @@ public class FirstPersonMovement {
                                 .build())
                         .build())
                 .defineState(StateDefinition.builder(WALKING_SPRINTING_STATE, sprintingPoseFunction)
-                        .resetsPoseFunctionUponEntry(true)
+                        .resetsPoseFunctionUponEntry(false)
                         // Begin walking if the player is no longer sprinting
                         .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNotSprinting)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(WALKING_STOPPING_STATE, stoppingPoseFunction)
-                        .resetsPoseFunctionUponEntry(true)
-                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
-                                .isTakenOnAnimationFinished(0f)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(1f)).setEasement(Easing.SINE_IN_OUT).build())
-                                .build())
-                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isWalking)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.SINE_IN_OUT).build())
-                                .build())
-                        .build())
-                .addStateAlias(StateAlias.builder(
-                        Set.of(
-                                WALKING_WALKING_STATE,
-                                WALKING_SPRINTING_STATE
-                        ))
-                        // Stop walking with the walk-to-stop animation if the player's already been walking for a bit.
-                        .addOutboundTransition(StateTransition.builder(WALKING_STOPPING_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build())
-//                                .setCanInterruptOtherTransitions(false)
-                                .build())
-//                        // Stop walking directly into the idle animation if the player only just began walking.
+//                .defineState(StateDefinition.builder(WALKING_STOPPING_STATE, stoppingPoseFunction)
+//                        .resetsPoseFunctionUponEntry(true)
 //                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
+//                                .isTakenOnAnimationFinished(0f)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(1f)).setEasement(Easing.SINE_IN_OUT).build())
+//                                .build())
+//                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::isWalking)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
+//                                .build())
+//                        .build())
+//                .addStateAlias(StateAlias.builder(
+//                        Set.of(
+//                                WALKING_WALKING_STATE,
+//                                WALKING_SPRINTING_STATE
+//                        ))
+//                        // Stop walking with the walk-to-stop animation if the player's already been walking for a bit.
+//                        .addOutboundTransition(StateTransition.builder(WALKING_STOPPING_STATE)
 //                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
 //                                .setCanInterruptOtherTransitions(true)
-//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_OUT).build())
+//                                .setPriority(50)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_IN_OUT).build())
+////                                .setCanInterruptOtherTransitions(false)
 //                                .build())
-                        .build())
+////                        // Stop walking directly into the idle animation if the player only just began walking.
+//                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
+//                                .setCanInterruptOtherTransitions(false)
+//                                .setPriority(60)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build())
+//                                .build())
+//                        .build())
                 .build();
-        return walkingStateMachine;
+
+        PoseFunction<LocalSpacePose> idleWalkingBlendPoseFunction = BlendPosesFunction.builder(idleAnimationPlayer)
+                .addBlendInput(walkingStateMachine, context -> Mth.clamp(context.getDriverValue(FirstPersonDrivers.MODIFIED_WALK_SPEED) * 4, 0, 1))
+                .build();
+        return idleWalkingBlendPoseFunction;
     }
 
     public static final String CROUCHING_STANDING_STATE = "standing";
@@ -278,8 +286,8 @@ public class FirstPersonMovement {
     public static final String CROUCHING_CROUCHING_STATE = "crouching";
     public static final String CROUCHING_CROUCH_OUT_STATE = "crouch_out";
 
-    private static String getCrouchingEntryState(PoseTickEvaluationContext context) {
-        boolean isCrouching = context.getDriverValue(FirstPersonDrivers.IS_CROUCHING);
+    private static String getCrouchingEntryState(DriverGetter driverGetter) {
+        boolean isCrouching = driverGetter.getDriverValue(FirstPersonDrivers.IS_CROUCHING);
         return isCrouching ? CROUCHING_CROUCHING_STATE : CROUCHING_STANDING_STATE;
     }
 
@@ -367,8 +375,8 @@ public class FirstPersonMovement {
     public static final String FALLING_LAND_STATE = "land";
     public static final String FALLING_SOFT_LAND_STATE = "soft_land";
 
-    private static String getFallingEntryState(PoseTickEvaluationContext context) {
-        boolean isGrounded = context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+    private static String getFallingEntryState(DriverGetter driverGetter) {
+        boolean isGrounded = driverGetter.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
         return isGrounded ? FALLING_STANDING_STATE : FALLING_FALLING_STATE;
     }
 
@@ -511,8 +519,8 @@ public class FirstPersonMovement {
     public static final String UNDERWATER_LAND_STATE = "land";
     public static final String UNDERWATER_ON_GROUND_STATE = "on_ground";
 
-    private static String getUnderwaterEntryState(PoseTickEvaluationContext context) {
-        boolean onGround = context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+    private static String getUnderwaterEntryState(DriverGetter driverGetter) {
+        boolean onGround = driverGetter.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
         return onGround ? UNDERWATER_ON_GROUND_STATE : UNDERWATER_IDLE_STATE;
     }
 
@@ -627,8 +635,8 @@ public class FirstPersonMovement {
     public static final String MOUNT_MOUNT_ENTER_STATE = "mount_enter";
     public static final String MOUNT_MOUNTED_STATE = "mounted";
 
-    private static String getMountEntryState(PoseTickEvaluationContext context) {
-        boolean isPassenger = context.getDriverValue(FirstPersonDrivers.IS_PASSENGER);
+    private static String getMountEntryState(DriverGetter driverGetter) {
+        boolean isPassenger = driverGetter.getDriverValue(FirstPersonDrivers.IS_PASSENGER);
         return isPassenger ? MOUNT_MOUNTED_STATE : MOUNT_STANDING_STATE;
     }
 

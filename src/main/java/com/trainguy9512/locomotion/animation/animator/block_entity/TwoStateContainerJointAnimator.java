@@ -61,8 +61,8 @@ public interface TwoStateContainerJointAnimator<B extends BlockEntity> extends B
     String CONTAINER_OPEN_STATE = "open";
     String CONTAINER_CLOSING_STATE = "closing";
 
-    private static String getInitialContainerState(PoseTickEvaluationContext context) {
-        return context.getDriverValue(CONTAINER_IS_OPEN) ? CONTAINER_OPEN_STATE : CONTAINER_CLOSED_STATE;
+    private static String getInitialContainerState(DriverGetter driverGetter) {
+        return driverGetter.getDriverValue(CONTAINER_IS_OPEN) ? CONTAINER_OPEN_STATE : CONTAINER_CLOSED_STATE;
     }
 
     default PoseFunction<LocalSpacePose> makeContainerOpenClosePoseFunction() {

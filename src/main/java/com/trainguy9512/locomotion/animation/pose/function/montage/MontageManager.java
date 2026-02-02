@@ -215,10 +215,12 @@ public class MontageManager {
                     );
                 }
                 if (this.additiveSubtractionPose == null) {
+                    Identifier sequenceLocation = this.configuration.animationSequence();
+                    AnimationSequence sequence = LocomotionResources.getOrThrowAnimationSequence(sequenceLocation);
                     this.additiveSubtractionPose = AnimationSequence.samplePose(
                             jointSkeleton,
-                            this.configuration.animationSequence(),
-                            this.configuration.startTimeOffset(),
+                            sequenceLocation,
+                            this.configuration.startTimeOffset().interpolated(sequence.length(), this.configuration.additiveReferencePosePoint().getProgressThroughSequence()),
                             false
                     );
                     this.additiveSubtractionPose.invert();

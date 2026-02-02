@@ -2,6 +2,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonGenericItems;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoses;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendProfile;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
@@ -223,7 +224,7 @@ public class FirstPersonTwoHandedActions {
     public static final String TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_MAIN_HAND_STATE = "crossbow_finish_reload_main_hand";
     public static final String TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_OFF_HAND_STATE = "crossbow_finish_reload_off_hand";
 
-    private static String getTwoHandedEntryState(PoseTickEvaluationContext context) {
+    private static String getTwoHandedEntryState(DriverGetter driverGetter) {
         return TWO_HANDED_ACTION_NORMAL_STATE;
     }
 

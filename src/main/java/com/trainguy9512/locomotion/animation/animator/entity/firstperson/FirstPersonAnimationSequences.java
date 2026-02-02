@@ -56,6 +56,7 @@ public class FirstPersonAnimationSequences {
     public static final Identifier HAND_GENERIC_ITEM_SHEARS_USE = makeIdentifier("hand/generic_item/shears_use");
     public static final Identifier HAND_GENERIC_ITEM_BUCKET_COLLECT = makeIdentifier("hand/generic_item/bucket_collect");
     public static final Identifier HAND_GENERIC_ITEM_BUCKET_EMPTY = makeIdentifier("hand/generic_item/bucket_empty");
+    public static final Identifier HAND_GENERIC_ITEM_USE = makeIdentifier("hand/generic_item/use");
 
     public static final Identifier HAND_BRUSH_POSE = makeIdentifier("hand/brush/pose");
     public static final Identifier HAND_BRUSH_SIFT_LOOP = makeIdentifier("hand/brush/sift_loop");

@@ -3,6 +3,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
@@ -26,7 +27,7 @@ public class FirstPersonSpyglass {
     public static final String SPYGLASS_LOOKING_STATE = "looking";
     public static final String SPYGLASS_LOOKING_EXIT_STATE = "looking_exit";
 
-    private static String getSpyglassEntryState(PoseTickEvaluationContext context) {
+    private static String getSpyglassEntryState(DriverGetter driverGetter) {
         return SPYGLASS_IDLE_STATE;
     }
 

@@ -1,6 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function.statemachine;
 
 import com.google.common.collect.Maps;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
@@ -36,7 +37,7 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/StateMachineFunction");
 
     private final Map<String, StateDefinition> states;
-    private final Function<PoseTickEvaluationContext, String> initialStateFunction;
+    private final Function<DriverGetter, String> initialStateFunction;
     private final List<StateBlendLayer> stateBlendLayerStack;
 
     private long lastUpdateTick;
@@ -45,7 +46,7 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
 
     private StateMachineFunction(
             Map<String, StateDefinition> states,
-            Function<PoseTickEvaluationContext, String> initialStateFunction,
+            Function<DriverGetter, String> initialStateFunction,
             boolean resetsUponRelevant,
             List<DriverKey<VariableDriver<String>>> driversToUpdateOnStateChanged
     ) {
@@ -277,20 +278,20 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
      *
      * @param entryStateFunction        Function to determine the entry state
      */
-    public static Builder builder(Function<PoseTickEvaluationContext, String> entryStateFunction) {
+    public static Builder builder(Function<DriverGetter, String> entryStateFunction) {
         return new Builder(entryStateFunction);
     }
 
     public static class Builder {
 
-        private final Function<PoseTickEvaluationContext, String> initialState;
+        private final Function<DriverGetter, String> initialState;
         private final Map<String, StateDefinition> states;
         private final List<StateAlias> stateAliases;
 
         private boolean resetUponRelevant;
         private final List<DriverKey<VariableDriver<String>>> driversToUpdateOnStateChanged;
 
-        protected Builder(Function<PoseTickEvaluationContext, String> initialState) {
+        protected Builder(Function<DriverGetter, String> initialState) {
             this.initialState = initialState;
             this.states = Maps.newHashMap();
             this.stateAliases = new ArrayList<>();

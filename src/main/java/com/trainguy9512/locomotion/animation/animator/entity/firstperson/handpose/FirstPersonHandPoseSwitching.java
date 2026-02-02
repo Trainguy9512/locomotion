@@ -2,6 +2,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
@@ -24,12 +25,12 @@ import java.util.Set;
 
 public class FirstPersonHandPoseSwitching {
 
-    public static String getEntryHandPoseState(PoseTickEvaluationContext context, InteractionHand hand) {
+    public static String getEntryHandPoseState(DriverGetter driverGetter, InteractionHand hand) {
 //        if (hand == InteractionHand.OFF_HAND) {
 //            return FirstPersonHandPoses.getOrThrowFromIdentifier(FirstPersonHandPoses.EMPTY_OFF_HAND).getLowerStateIdentifier();
 //        }
 
-        Identifier handPoseIdentifier = context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
+        Identifier handPoseIdentifier = driverGetter.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
         FirstPersonHandPoses.HandPoseDefinition definition = FirstPersonHandPoses.getOrThrowFromIdentifier(handPoseIdentifier);
         return definition.stateIdentifier();
     }

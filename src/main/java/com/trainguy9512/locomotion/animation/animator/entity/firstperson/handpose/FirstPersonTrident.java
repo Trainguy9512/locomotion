@@ -2,6 +2,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
@@ -24,7 +25,7 @@ public class FirstPersonTrident {
     public static final String TRIDENT_RIPTIDE_STATE = "riptide";
     public static final String TRIDENT_RIPTIDE_END_STATE = "riptide_end";
 
-    private static String getTridentEntryState(PoseTickEvaluationContext context) {
+    private static String getTridentEntryState(DriverGetter driverGetter) {
         return TRIDENT_IDLE_STATE;
     }
 
