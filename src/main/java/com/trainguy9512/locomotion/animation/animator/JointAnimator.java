@@ -1,7 +1,6 @@
 package com.trainguy9512.locomotion.animation.animator;
 
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
-import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -23,10 +22,10 @@ public interface JointAnimator<T> {
     /**
      * Uses an object for data reference and updates the animation data container. Called once per tick, prior to pose samplers updating and pose calculation.
      * @param dataReference                 Object used as reference for updating the animation data container
-     * @param dataContainer                 Data container from the previous tick
+     * @param dataContainer                 Data container for getting and setting drivers
      * @param montageManager                Controls data used for getting and playing animation montages.
      */
-    void extractAnimationData(T dataReference, OnTickDriverContainer dataContainer, MontageManager montageManager);
+    void extractAnimationData(T dataReference, DriverGetter dataContainer, MontageManager montageManager);
 
     /**
      * Creates the pose function that will return an animation pose for the joint animator.

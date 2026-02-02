@@ -4,6 +4,7 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.BlendPosesFunction;
@@ -43,7 +44,7 @@ public class FirstPersonMap {
                 .build();
     }
 
-    public static float getMapMovementAnimationWeight(PoseFunction.FunctionEvaluationState context, InteractionHand hand) {
+    public static float getMapMovementAnimationWeight(PoseTickEvaluationContext context, InteractionHand hand) {
         Identifier handPose = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
         if (handPose == FirstPersonHandPoses.MAP) {
             return 1 - LocomotionMain.CONFIG.data().firstPersonPlayer.mapMovementAnimationIntensity;

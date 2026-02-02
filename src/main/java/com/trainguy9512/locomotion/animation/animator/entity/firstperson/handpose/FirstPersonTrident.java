@@ -2,17 +2,14 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -27,7 +24,7 @@ public class FirstPersonTrident {
     public static final String TRIDENT_RIPTIDE_STATE = "riptide";
     public static final String TRIDENT_RIPTIDE_END_STATE = "riptide_end";
 
-    private static String getTridentEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+    private static String getTridentEntryState(PoseTickEvaluationContext context) {
         return TRIDENT_IDLE_STATE;
     }
 
@@ -92,7 +89,7 @@ public class FirstPersonTrident {
         return tridentStateMachine;
     }
 
-    private static boolean shouldPlayRiptideAnimation(StateTransition.TransitionContext context, InteractionHand hand) {
+    private static boolean shouldPlayRiptideAnimation(StateTransitionContext context, InteractionHand hand) {
         boolean isInRiptide = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_IN_RIPTIDE);
         InteractionHand lastUsedHand = context.driverContainer().getDriverValue(FirstPersonDrivers.LAST_USED_HAND);
         return isInRiptide && lastUsedHand == hand;

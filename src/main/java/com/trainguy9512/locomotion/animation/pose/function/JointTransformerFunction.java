@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.joint.Transformer;
 import com.trainguy9512.locomotion.animation.pose.Pose;
@@ -22,9 +24,9 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
     private final TransformChannelConfiguration<Quaternionf> rotationConfiguration;
     private final TransformChannelConfiguration<Vector3f> scaleConfiguration;
     private final TransformChannelConfiguration<Matrix4f> matrixConfiguration;
-    private final Function<FunctionInterpolationContext, Float> weightFunction;
+    private final Function<PoseCalculationContext, Float> weightFunction;
 
-    private JointTransformerFunction(PoseFunction<P> input, String joint, TransformChannelConfiguration<Vector3f> translationConfiguration, TransformChannelConfiguration<Quaternionf> rotationConfiguration, TransformChannelConfiguration<Vector3f> scaleConfiguration, TransformChannelConfiguration<Matrix4f> matrixConfiguration, Function<FunctionInterpolationContext, Float> weightFunction) {
+    private JointTransformerFunction(PoseFunction<P> input, String joint, TransformChannelConfiguration<Vector3f> translationConfiguration, TransformChannelConfiguration<Quaternionf> rotationConfiguration, TransformChannelConfiguration<Vector3f> scaleConfiguration, TransformChannelConfiguration<Matrix4f> matrixConfiguration, Function<PoseCalculationContext, Float> weightFunction) {
         this.input = input;
         this.joint = joint;
         this.translationConfiguration = translationConfiguration;
@@ -39,9 +41,9 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
     }
 
     @Override
-    public @NotNull P compute(FunctionInterpolationContext context) {
-        if (!context.driverContainer().getJointSkeleton().containsJoint(this.joint)) {
-            throw new IllegalArgumentException("Cannot run joint transformer function on joint " + this.joint + ", for it is not present within the skeleton. Valid joints: " + context.driverContainer().getJointSkeleton().getJoints());
+    public @NotNull P compute(PoseCalculationContext context) {
+        if (!context.jointSkeleton().containsJoint(this.joint)) {
+            throw new IllegalArgumentException("Cannot run joint transformer function on joint " + this.joint + ", for it is not present within the skeleton. Valid joints: " + context.jointSkeleton().getJoints());
         }
 
         P pose = this.input.compute(context);
@@ -63,13 +65,13 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
         return pose;
     }
 
-    private <X> void transformJoint(JointChannel jointChannel, FunctionInterpolationContext context, TransformChannelConfiguration<X> configuration, Transformer<X> transformer){
+    private <X> void transformJoint(JointChannel jointChannel, PoseCalculationContext context, TransformChannelConfiguration<X> configuration, Transformer<X> transformer){
         transformer.transform(jointChannel, configuration.transformFunction.apply(context), configuration.transformSpace, configuration.transformType);
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        this.input.tick(evaluationState);
+    public void tick(PoseTickEvaluationContext context) {
+        this.input.tick(context);
     }
 
     @Override
@@ -98,7 +100,7 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
         private TransformChannelConfiguration<Quaternionf> rotationConfiguration;
         private TransformChannelConfiguration<Vector3f> scaleConfiguration;
         private TransformChannelConfiguration<Matrix4f> matrixConfiguration;
-        private Function<FunctionInterpolationContext, Float> weightFunction;
+        private Function<PoseCalculationContext, Float> weightFunction;
 
         private Builder(PoseFunction<P> poseFunction, String joint){
             this.joint = joint;
@@ -107,20 +109,20 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
             this.rotationConfiguration = TransformChannelConfiguration.of((context) -> new Quaternionf().identity(), JointChannel.TransformType.IGNORE, JointChannel.TransformSpace.LOCAL);
             this.scaleConfiguration = TransformChannelConfiguration.of((context) -> new Vector3f(0), JointChannel.TransformType.IGNORE, JointChannel.TransformSpace.LOCAL);
             this.matrixConfiguration = TransformChannelConfiguration.of((context) -> new Matrix4f().identity(), JointChannel.TransformType.IGNORE, JointChannel.TransformSpace.LOCAL);
-            this.weightFunction = evaluationState -> 1f;
+            this.weightFunction = context -> 1f;
         }
 
-        public Builder<P> setTranslation(Function<FunctionInterpolationContext, Vector3f> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
+        public Builder<P> setTranslation(Function<PoseCalculationContext, Vector3f> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
             this.translationConfiguration = TransformChannelConfiguration.of(transformFunction, transformType, transformSpace);
             return this;
         }
 
-        public Builder<P> setRotationQuaternion(Function<FunctionInterpolationContext, Quaternionf> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
+        public Builder<P> setRotationQuaternion(Function<PoseCalculationContext, Quaternionf> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
             this.rotationConfiguration = TransformChannelConfiguration.of(transformFunction, transformType, transformSpace);
             return this;
         }
 
-        public Builder<P> setRotationEuler(Function<FunctionInterpolationContext, Vector3f> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
+        public Builder<P> setRotationEuler(Function<PoseCalculationContext, Vector3f> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
             this.rotationConfiguration = TransformChannelConfiguration.of(context -> {
                 Vector3f eulerRotation = transformFunction.apply(context);
                 return new Quaternionf().rotationXYZ(eulerRotation.x(), eulerRotation.y(), eulerRotation.z());
@@ -128,17 +130,17 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
             return this;
         }
 
-        public Builder<P> setScale(Function<FunctionInterpolationContext, Vector3f> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
+        public Builder<P> setScale(Function<PoseCalculationContext, Vector3f> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
             this.scaleConfiguration = TransformChannelConfiguration.of(transformFunction, transformType, transformSpace);
             return this;
         }
 
-        public Builder<P> setMatrix(Function<FunctionInterpolationContext, Matrix4f> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
+        public Builder<P> setMatrix(Function<PoseCalculationContext, Matrix4f> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
             this.matrixConfiguration = TransformChannelConfiguration.of(transformFunction, transformType, transformSpace);
             return this;
         }
 
-        public Builder<P> setWeight(Function<FunctionInterpolationContext, Float> weightFunction){
+        public Builder<P> setWeight(Function<PoseCalculationContext, Float> weightFunction){
             this.weightFunction = weightFunction;
             return this;
         }
@@ -148,9 +150,9 @@ public class JointTransformerFunction<P extends Pose> implements PoseFunction<P>
         }
     }
 
-    private record TransformChannelConfiguration<X>(Function<FunctionInterpolationContext, X> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
+    private record TransformChannelConfiguration<X>(Function<PoseCalculationContext, X> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
 
-        private static <X> TransformChannelConfiguration<X> of(Function<FunctionInterpolationContext, X> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
+        private static <X> TransformChannelConfiguration<X> of(Function<PoseCalculationContext, X> transformFunction, JointChannel.TransformType transformType, JointChannel.TransformSpace transformSpace){
             return new TransformChannelConfiguration<>(transformFunction, transformType, transformSpace);
         }
     }

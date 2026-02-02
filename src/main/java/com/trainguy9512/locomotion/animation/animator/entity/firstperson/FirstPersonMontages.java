@@ -2,7 +2,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonGenericItems;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoses;
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
@@ -25,12 +25,12 @@ public class FirstPersonMontages {
         return hand == InteractionHand.MAIN_HAND ? MAIN_HAND_ATTACK_SLOT : OFF_HAND_ATTACK_SLOT;
     }
 
-    public static Identifier getBaseHandPose(OnTickDriverContainer driverContainer) {
+    public static Identifier getBaseHandPose(DriverGetter driverContainer) {
         Identifier handPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
         if (handPose == FirstPersonHandPoses.GENERIC_ITEM) {
             return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
         }
-        return FirstPersonHandPoses.getOrThrowFromIdentifier(handPose).basePoseSequence();
+        return FirstPersonHandPoses.getOrThrowFromIdentifier(handPose).currentBasePoseSupplier().apply(driverContainer, InteractionHand.MAIN_HAND);
     }
 
 
@@ -238,7 +238,7 @@ public class FirstPersonMontages {
         };
     }
 
-    public static void playAttackMontage(OnTickDriverContainer driverContainer, MontageManager montageManager) {
+    public static void playAttackMontage(DriverGetter driverContainer, MontageManager montageManager) {
 //        FirstPersonHandPose firstPersonHandPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
 //        MontageConfiguration montage = firstPersonHandPose.getAttackMontage(driverContainer);
 //        if (montage != null) {

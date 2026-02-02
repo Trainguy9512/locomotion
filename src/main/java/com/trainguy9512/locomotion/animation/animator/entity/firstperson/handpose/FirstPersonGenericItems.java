@@ -2,7 +2,9 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -140,6 +142,12 @@ public class FirstPersonGenericItems {
 
     private static boolean isDoorItem(ItemStack itemStack) {
         return itemStack.is(ItemTags.DOORS);
+    }
+
+    public static Identifier getCurrentBasePose(DriverGetter dataContainer, InteractionHand hand) {
+        Identifier currentGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(hand));
+        GenericItemPoseDefinition definition = FirstPersonGenericItems.getOrThrowFromIdentifier(currentGenericItemPose);
+        return definition.basePoseSequence();
     }
 
     public record GenericItemPoseDefinition(

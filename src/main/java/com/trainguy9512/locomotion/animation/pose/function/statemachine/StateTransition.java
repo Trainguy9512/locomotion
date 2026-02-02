@@ -1,11 +1,9 @@
 package com.trainguy9512.locomotion.animation.pose.function.statemachine;
 
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.Driver;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
-import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.AnimationPlayer;
-import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.util.Tuple;
@@ -13,39 +11,38 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public record StateTransition(
         String target,
-        Predicate<TransitionContext> conditionPredicate,
+        Predicate<StateTransitionContext> conditionPredicate,
         Transition transition,
         int priority,
-        Consumer<PoseFunction.FunctionEvaluationState> onTransitionTakenListener,
+        Consumer<PoseTickEvaluationContext> onTransitionTakenListener,
         boolean isAutomaticTransition
 ) implements Comparable<StateTransition> {
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/StateTransition");
 
-    public static final Predicate<TransitionContext> ALWAYS_TRUE = transitionContext -> true;
-    public static final Predicate<TransitionContext> CURRENT_TRANSITION_FINISHED = transitionContext -> transitionContext.currentStateWeight() == 1 && transitionContext.previousStateWeight() == 1;
-    public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING = context -> hasMostRelevantAnimationPlayerFinished(context, 1f);
-    public static final Predicate<TransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED = context -> hasMostRelevantAnimationPlayerFinished(context, 0f);
+    public static final Predicate<StateTransitionContext> ALWAYS_TRUE = transitionContext -> true;
+    public static final Predicate<StateTransitionContext> CURRENT_TRANSITION_FINISHED = transitionContext -> transitionContext.currentStateWeight() == 1 && transitionContext.previousStateWeight() == 1;
+    public static final Predicate<StateTransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_IS_FINISHING = context -> hasMostRelevantAnimationPlayerFinished(context, 1f);
+    public static final Predicate<StateTransitionContext> MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED = context -> hasMostRelevantAnimationPlayerFinished(context, 0f);
 
-    public static <D extends Driver<Boolean>> Predicate<TransitionContext> takeIfBooleanDriverTrue(DriverKey<D> booleanDriverKey) {
-        return transitionContext -> transitionContext.driverContainer.getDriverValue(booleanDriverKey);
+    public static <D extends Driver<Boolean>> Predicate<StateTransitionContext> takeIfBooleanDriverTrue(DriverKey<D> booleanDriverKey) {
+        return transitionContext -> transitionContext.getDriverValue(booleanDriverKey);
     }
 
-    public static Predicate<TransitionContext> takeIfTimeInStateLessThan(TimeSpan time) {
+    public static Predicate<StateTransitionContext> takeIfTimeInStateLessThan(TimeSpan time) {
         return context -> context.timeElapsedInCurrentState().inTicks() < time.inTicks();
     }
 
-    public static Predicate<TransitionContext> takeIfTimeInStateGreaterThan(TimeSpan time) {
+    public static Predicate<StateTransitionContext> takeIfTimeInStateGreaterThan(TimeSpan time) {
         return context -> context.timeElapsedInCurrentState().inTicks() > time.inTicks();
     }
 
-    public static boolean hasMostRelevantAnimationPlayerFinished(TransitionContext context, float crossFadeWeight) {
+    public static boolean hasMostRelevantAnimationPlayerFinished(StateTransitionContext context, float crossFadeWeight) {
         var potentialPlayer = context.findMostRelevantAnimationPlayer();
         if (potentialPlayer.isPresent()) {
             AnimationPlayer player = potentialPlayer.get();
@@ -79,10 +76,10 @@ public record StateTransition(
 
     public static class Builder {
         private final String target;
-        private Predicate<TransitionContext> conditionPredicate;
+        private Predicate<StateTransitionContext> conditionPredicate;
         private Transition transition;
         private int priority;
-        private Consumer<PoseFunction.FunctionEvaluationState> onTransitionTakenListener;
+        private Consumer<PoseTickEvaluationContext> onTransitionTakenListener;
         private boolean canInterruptOtherTransitions;
         private boolean automaticTransition;
         private float automaticTransitionCrossfadeWeight;
@@ -92,7 +89,7 @@ public record StateTransition(
             this.target = target;
             this.transition = Transition.SINGLE_TICK;
             this.priority = 50;
-            this.onTransitionTakenListener = evaluationState -> {};
+            this.onTransitionTakenListener = context -> {};
             this.canInterruptOtherTransitions = true;
             this.automaticTransition = false;
             this.automaticTransitionCrossfadeWeight = 1f;
@@ -132,7 +129,7 @@ public record StateTransition(
          *
          * @param conditionPredicate Function that returns true or false based on the transition context.
          */
-        public final Builder isTakenIfTrue(Predicate<TransitionContext> conditionPredicate) {
+        public final Builder isTakenIfTrue(Predicate<StateTransitionContext> conditionPredicate) {
             this.conditionPredicate = conditionPredicate;
             return this;
         }
@@ -166,7 +163,7 @@ public record StateTransition(
          *
          * <p>Multiple events can be chained together with multiple calls to this method.</p>
          */
-        public Builder bindToOnTransitionTaken(Consumer<PoseFunction.FunctionEvaluationState> onTransitionTaken) {
+        public Builder bindToOnTransitionTaken(Consumer<PoseTickEvaluationContext> onTransitionTaken) {
             this.onTransitionTakenListener = this.onTransitionTakenListener.andThen(onTransitionTaken);
             return this;
         }
@@ -188,21 +185,4 @@ public record StateTransition(
         }
     }
 
-    public record TransitionContext(
-            OnTickDriverContainer driverContainer,
-            TimeSpan timeElapsedInCurrentState,
-            float currentStateWeight,
-            float previousStateWeight,
-            PoseFunction<LocalSpacePose> currentStateInput,
-            TimeSpan transitionDuration
-    ) {
-        public static TransitionContext of(OnTickDriverContainer dataContainer, TimeSpan timeElapsedInCurrentState, float currentStateWeight, float previousStateWeight, PoseFunction<LocalSpacePose> currentStateInput, TimeSpan transitionDuration) {
-            return new TransitionContext(dataContainer, timeElapsedInCurrentState, currentStateWeight, previousStateWeight, currentStateInput, transitionDuration);
-        }
-
-        public Optional<AnimationPlayer> findMostRelevantAnimationPlayer() {
-            Optional<PoseFunction<?>> foundPoseFunction = this.currentStateInput.searchDownChainForMostRelevant(poseFunction -> poseFunction instanceof AnimationPlayer);
-            return foundPoseFunction.map(poseFunction -> (AnimationPlayer) poseFunction);
-        }
-    }
 }

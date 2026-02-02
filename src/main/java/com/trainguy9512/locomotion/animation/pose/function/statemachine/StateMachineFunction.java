@@ -1,9 +1,11 @@
 package com.trainguy9512.locomotion.animation.pose.function.statemachine;
 
 import com.google.common.collect.Maps;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.TimeBasedPoseFunction;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
@@ -34,7 +36,7 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/StateMachineFunction");
 
     private final Map<String, StateDefinition> states;
-    private final Function<FunctionEvaluationState, String> initialStateFunction;
+    private final Function<PoseTickEvaluationContext, String> initialStateFunction;
     private final List<StateBlendLayer> stateBlendLayerStack;
 
     private long lastUpdateTick;
@@ -43,11 +45,11 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
 
     private StateMachineFunction(
             Map<String, StateDefinition> states,
-            Function<FunctionEvaluationState, String> initialStateFunction,
+            Function<PoseTickEvaluationContext, String> initialStateFunction,
             boolean resetsUponRelevant,
             List<DriverKey<VariableDriver<String>>> driversToUpdateOnStateChanged
     ) {
-        super(evaluationState -> true, evaluationState -> 1f, TimeSpan.ZERO);
+        super(context -> true, context -> 1f, TimeSpan.ZERO);
         this.states = states;
         this.initialStateFunction = initialStateFunction;
         this.stateBlendLayerStack = new ArrayList<>();
@@ -58,7 +60,7 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
         // If the list of active states is empty, throw an error because this should never be the case unless something has gone wrong.
         if(this.stateBlendLayerStack.isEmpty()){
             LOGGER.error("State machine active states list found to be empty. Throwing error...");
@@ -80,7 +82,7 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
             for (StateBlendLayer stateBlendLayer : this.stateBlendLayerStack.subList(1, stateBlendLayerStack.size())) {
                 pose.interpolatedByTransition(
                         layerStackPoses.get(stateBlendLayer.identifier),
-                        stateBlendLayer.weight.getValueInterpolated(context.partialTicks()),
+                        stateBlendLayer.weight.getInterpolatedValue(context.partialTicks()),
                         stateBlendLayer.entranceTransition.transition(),
                         null
                 );
@@ -90,19 +92,19 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
+    public void tick(PoseTickEvaluationContext context) {
         // Add to the current elapsed ticks
-        super.tick(evaluationState);
+        super.tick(context);
 
-        this.takeInitialStateIfResetting(evaluationState);
+        this.takeInitialStateIfResetting(context);
 
-        Optional<StateTransition> potentialStateTransition = this.testForOutboundTransition(evaluationState);
+        Optional<StateTransition> potentialStateTransition = this.testForOutboundTransition(context);
 
         // If there is a transition occurring, add a new state blend layer instance to the layer stack, and resets the elapsed time in the state machine.
         String stateBeingEntered = null;
         if (potentialStateTransition.isPresent()) {
             StateTransition transition = potentialStateTransition.get();
-            this.takeTransition(evaluationState, transition);
+            this.takeTransition(context, transition);
             stateBeingEntered = transition.target();
         }
 
@@ -110,17 +112,17 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
         this.stateBlendLayerStack.forEach(StateBlendLayer::tick);
         this.popOverriddenStates();
 
-        this.tickPoseFunctionsInActiveStates(evaluationState, stateBeingEntered);
+        this.tickPoseFunctionsInActiveStates(context, stateBeingEntered);
     }
 
-    private void takeInitialStateIfResetting(FunctionEvaluationState evaluationState) {
+    private void takeInitialStateIfResetting(PoseTickEvaluationContext context) {
         // If the state machine has no active states, initialize it using the initial state function.
         // If the state machine is just now becoming relevant again after not being relevant, re-initialize it.
         boolean layerStackIsEmpty = this.stateBlendLayerStack.isEmpty();
-        boolean hasBecomeRelevant = evaluationState.currentTick() - 1 > this.lastUpdateTick;
+        boolean hasBecomeRelevant = context.currentTick() - 1 > this.lastUpdateTick;
         if (layerStackIsEmpty || (hasBecomeRelevant && this.resetsUponRelevant)) {
             this.stateBlendLayerStack.clear();
-            String initialStateIdentifier = this.initialStateFunction.apply(evaluationState);
+            String initialStateIdentifier = this.initialStateFunction.apply(context);
             if (this.states.containsKey(initialStateIdentifier)) {
                 this.stateBlendLayerStack.addLast(new StateBlendLayer(
                         initialStateIdentifier,
@@ -133,10 +135,10 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
                 throw new IllegalStateException("Initial state " + initialStateIdentifier + " not found to be present in the state machine");
             }
         }
-        this.lastUpdateTick = evaluationState.currentTick();
+        this.lastUpdateTick = context.currentTick();
     }
 
-    private Optional<StateTransition> testForOutboundTransition(FunctionEvaluationState evaluationState) {
+    private Optional<StateTransition> testForOutboundTransition(PoseTickEvaluationContext context) {
         // Get the current active state
         String currentActiveStateIdentifier = this.stateBlendLayerStack.getLast().identifier;
         StateDefinition currentActiveStateDefinition = this.states.get(currentActiveStateIdentifier);
@@ -148,8 +150,8 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
                     boolean transitionTargetIncludedInThisMachine = this.states.containsKey(stateTransition.target());
                     boolean targetIsNotCurrentActiveState = !Objects.equals(stateTransition.target(), currentActiveStateIdentifier);
                     if(transitionTargetIncludedInThisMachine && targetIsNotCurrentActiveState){
-                        StateTransition.TransitionContext transitionContext = StateTransition.TransitionContext.of(
-                                evaluationState.driverContainer(),
+                        StateTransitionContext transitionContext = new StateTransitionContext(
+                                context,
                                 TimeSpan.ofTicks(this.ticksElapsed.getCurrentValue()),
                                 this.stateBlendLayerStack.getLast().weight.getCurrentValue(),
                                 this.stateBlendLayerStack.getLast().weight.getPreviousValue(),
@@ -169,11 +171,11 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
                 .findFirst();
     }
 
-    private void takeTransition(FunctionEvaluationState evaluationState, StateTransition transition) {
-        transition.onTransitionTakenListener().accept(evaluationState);
+    private void takeTransition(PoseTickEvaluationContext context, StateTransition transition) {
+        transition.onTransitionTakenListener().accept(context);
         this.driversToUpdateOnStateChanged.forEach(driverKey -> {
             LOGGER.info(driverKey.getIdentifier());
-            evaluationState.driverContainer().getDriver(driverKey).setValue(transition.target());
+            context.getDriver(driverKey).setValue(transition.target());
         });
         this.stateBlendLayerStack.addLast(new StateBlendLayer(transition.target(), transition));
         this.resetTime();
@@ -194,12 +196,12 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
         this.stateBlendLayerStack.removeAll(inactiveLayers);
     }
 
-    private void tickPoseFunctionsInActiveStates(FunctionEvaluationState evaluationState, @Nullable String stateBeingEntered) {
+    private void tickPoseFunctionsInActiveStates(PoseTickEvaluationContext context, @Nullable String stateBeingEntered) {
         for (String stateIdentifier : this.getStatesInLayerStack()) {
             StateDefinition stateDefinition = this.states.get(stateIdentifier);
             PoseFunction<?> statePoseFunction = stateDefinition.inputFunction;
             boolean shouldResetStatePoseFunction = Objects.equals(stateBeingEntered, stateIdentifier) && stateDefinition.resetUponEntry;
-            statePoseFunction.tick(shouldResetStatePoseFunction ? evaluationState.markedForReset() : evaluationState);
+            statePoseFunction.tick(shouldResetStatePoseFunction ? context.markedForReset() : context);
         }
     }
 
@@ -275,20 +277,20 @@ public class StateMachineFunction extends TimeBasedPoseFunction<LocalSpacePose> 
      *
      * @param entryStateFunction        Function to determine the entry state
      */
-    public static Builder builder(Function<FunctionEvaluationState, String> entryStateFunction) {
+    public static Builder builder(Function<PoseTickEvaluationContext, String> entryStateFunction) {
         return new Builder(entryStateFunction);
     }
 
     public static class Builder {
 
-        private final Function<FunctionEvaluationState, String> initialState;
+        private final Function<PoseTickEvaluationContext, String> initialState;
         private final Map<String, StateDefinition> states;
         private final List<StateAlias> stateAliases;
 
         private boolean resetUponRelevant;
         private final List<DriverKey<VariableDriver<String>>> driversToUpdateOnStateChanged;
 
-        protected Builder(Function<FunctionEvaluationState, String> initialState) {
+        protected Builder(Function<PoseTickEvaluationContext, String> initialState) {
             this.initialState = initialState;
             this.states = Maps.newHashMap();
             this.stateAliases = new ArrayList<>();

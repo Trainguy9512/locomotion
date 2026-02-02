@@ -2,7 +2,6 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
@@ -10,6 +9,7 @@ import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseConta
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransitionContext;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -17,14 +17,14 @@ import net.minecraft.world.InteractionHand;
 
 public class FirstPersonMace {
 
-    private static boolean isFalling(StateTransition.TransitionContext context) {
+    private static boolean isFalling(StateTransitionContext context) {
         if (context.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND)) {
             return false;
         }
         return context.driverContainer().getDriverValue(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED) < -0.5f;
     }
 
-    private static boolean isNoLongerFalling(StateTransition.TransitionContext context) {
+    private static boolean isNoLongerFalling(StateTransitionContext context) {
         return !isFalling(context);
     }
 
@@ -52,7 +52,7 @@ public class FirstPersonMace {
                 .setPlayRate(1)
                 .build();
 
-        return StateMachineFunction.builder(evaluationState -> MACE_PREPARE_IDLE_STATE)
+        return StateMachineFunction.builder(context -> MACE_PREPARE_IDLE_STATE)
                 .resetsUponRelevant(true)
                 .defineState(StateDefinition.builder(MACE_PREPARE_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)

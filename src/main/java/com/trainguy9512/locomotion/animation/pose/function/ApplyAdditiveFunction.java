@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import org.jetbrains.annotations.NotNull;
@@ -16,15 +18,15 @@ public class ApplyAdditiveFunction implements PoseFunction<LocalSpacePose> {
     private final PoseFunction<LocalSpacePose> basePoseInput;
     private final PoseFunction<LocalSpacePose> additivePoseInput;
 
-    private final Function<FunctionInterpolationContext, Float> alphaFunction;
+    private final Function<PoseCalculationContext, Float> alphaFunction;
 
-    public ApplyAdditiveFunction(PoseFunction<LocalSpacePose> basePoseInput, PoseFunction<LocalSpacePose> additivePoseInput, Function<FunctionInterpolationContext, Float> alphaFunction) {
+    public ApplyAdditiveFunction(PoseFunction<LocalSpacePose> basePoseInput, PoseFunction<LocalSpacePose> additivePoseInput, Function<PoseCalculationContext, Float> alphaFunction) {
         this.basePoseInput = basePoseInput;
         this.additivePoseInput = additivePoseInput;
         this.alphaFunction = alphaFunction;
     }
 
-    public static ApplyAdditiveFunction of(PoseFunction<LocalSpacePose> basePoseInput, PoseFunction<LocalSpacePose> additivePoseInput, Function<FunctionInterpolationContext, Float> weightFunction) {
+    public static ApplyAdditiveFunction of(PoseFunction<LocalSpacePose> basePoseInput, PoseFunction<LocalSpacePose> additivePoseInput, Function<PoseCalculationContext, Float> weightFunction) {
         return new ApplyAdditiveFunction(basePoseInput, additivePoseInput, weightFunction);
     }
 
@@ -33,7 +35,7 @@ public class ApplyAdditiveFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
         LocalSpacePose basePose = this.basePoseInput.compute(context);
 
         LocalSpacePose additivePose = this.additivePoseInput.compute(context);
@@ -51,9 +53,9 @@ public class ApplyAdditiveFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        this.basePoseInput.tick(evaluationState);
-        this.additivePoseInput.tick(evaluationState);
+    public void tick(PoseTickEvaluationContext context) {
+        this.basePoseInput.tick(context);
+        this.additivePoseInput.tick(context);
     }
 
     @Override

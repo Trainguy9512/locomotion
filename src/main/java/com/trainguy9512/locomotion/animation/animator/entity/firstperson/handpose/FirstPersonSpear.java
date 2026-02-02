@@ -2,18 +2,14 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMontages;
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageSlotFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -72,7 +68,7 @@ public class FirstPersonSpear {
         PoseFunction<LocalSpacePose> chargeStage2To3Pose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_WEAKEN_2).build();
 
         PoseFunction<LocalSpacePose> chargeStateMachinePose;
-        chargeStateMachinePose = StateMachineFunction.builder(evaluationState -> CHARGE_IDLE_STATE)
+        chargeStateMachinePose = StateMachineFunction.builder(context -> CHARGE_IDLE_STATE)
                 .resetsUponRelevant(true)
                 .defineState(StateDefinition.builder(CHARGE_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
@@ -174,29 +170,29 @@ public class FirstPersonSpear {
         return chargeStateMachinePose;
     }
 
-    public static boolean isUsingSpear(StateTransition.TransitionContext context, InteractionHand hand) {
+    public static boolean isUsingSpear(StateTransitionContext context, InteractionHand hand) {
         boolean isUsing = context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
         boolean handPoseIsSpear = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.SPEAR;
         boolean spearCanDamage = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
         return isUsing && handPoseIsSpear && spearCanDamage;
     }
 
-    public static boolean spearCanNoLongerDismount(StateTransition.TransitionContext context) {
+    public static boolean spearCanNoLongerDismount(StateTransitionContext context) {
         boolean spearCanDismount = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DISMOUNT);
         return !spearCanDismount;
     }
 
-    public static boolean spearCanNoLongerKnockback(StateTransition.TransitionContext context) {
+    public static boolean spearCanNoLongerKnockback(StateTransitionContext context) {
         boolean spearCanKnockback = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_KNOCKBACK);
         return !spearCanKnockback;
     }
 
-    public static boolean spearCanNoLongerDamage(StateTransition.TransitionContext context) {
+    public static boolean spearCanNoLongerDamage(StateTransitionContext context) {
         boolean spearCanDamage = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
         return !spearCanDamage;
     }
 
-    public static void extractSpearData(LocalPlayer player, OnTickDriverContainer driverContainer, MontageManager montageManager) {
+    public static void extractSpearData(LocalPlayer player, DriverGetter driverContainer, MontageManager montageManager) {
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack itemStack = player.getItemInHand(hand);
             KineticWeapon kineticWeapon = itemStack.get(DataComponents.KINETIC_WEAPON);

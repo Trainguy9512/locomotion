@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
@@ -12,15 +14,15 @@ import java.util.function.Predicate;
 
 public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
 
-    private final Function<FunctionInterpolationContext, Identifier> animationSequenceFunction;
-    private final Function<FunctionInterpolationContext, TimeSpan> sequenceTimeFunction;
+    private final Function<PoseCalculationContext, Identifier> animationSequenceFunction;
+    private final Function<PoseCalculationContext, TimeSpan> sequenceTimeFunction;
 
-    private SequenceEvaluatorFunction(Function<FunctionInterpolationContext, Identifier> animationSequenceFunction, Function<FunctionInterpolationContext, TimeSpan> sequenceTimeFunction) {
+    private SequenceEvaluatorFunction(Function<PoseCalculationContext, Identifier> animationSequenceFunction, Function<PoseCalculationContext, TimeSpan> sequenceTimeFunction) {
         this.animationSequenceFunction = animationSequenceFunction;
         this.sequenceTimeFunction = sequenceTimeFunction;
     }
 
-    public static Builder builder(Function<FunctionInterpolationContext, Identifier> animationSequenceFunction) {
+    public static Builder builder(Function<PoseCalculationContext, Identifier> animationSequenceFunction) {
         return new Builder(animationSequenceFunction);
     }
 
@@ -29,11 +31,11 @@ public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
         TimeSpan time = this.sequenceTimeFunction.apply(context);
         Identifier sequence = this.animationSequenceFunction.apply(context);
         return AnimationSequence.samplePose(
-                context.driverContainer().getJointSkeleton(),
+                context.jointSkeleton(),
                 sequence,
                 time,
                 true
@@ -41,7 +43,7 @@ public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
+    public void tick(PoseTickEvaluationContext context) {
 
     }
 
@@ -56,15 +58,15 @@ public class SequenceEvaluatorFunction implements PoseFunction<LocalSpacePose> {
     }
 
     public static class Builder {
-        private final Function<FunctionInterpolationContext, Identifier> animationSequenceFunction;
-        private Function<FunctionInterpolationContext, TimeSpan> sequenceTimeFunction;
+        private final Function<PoseCalculationContext, Identifier> animationSequenceFunction;
+        private Function<PoseCalculationContext, TimeSpan> sequenceTimeFunction;
 
-        public Builder(Function<FunctionInterpolationContext, Identifier> animationSequenceFunction) {
+        public Builder(Function<PoseCalculationContext, Identifier> animationSequenceFunction) {
             this.animationSequenceFunction = animationSequenceFunction;
             this.sequenceTimeFunction = context -> TimeSpan.ZERO;
         }
 
-        public Builder evaluatesPoseAt(Function<FunctionInterpolationContext, TimeSpan> sequenceTimeFunction) {
+        public Builder evaluatesPoseAt(Function<PoseCalculationContext, TimeSpan> sequenceTimeFunction) {
             this.sequenceTimeFunction = sequenceTimeFunction;
             return this;
         }

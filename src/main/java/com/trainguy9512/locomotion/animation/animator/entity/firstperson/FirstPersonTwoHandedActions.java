@@ -2,16 +2,14 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonGenericItems;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoses;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendProfile;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.MirrorFunction;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -46,12 +44,12 @@ public class FirstPersonTwoHandedActions {
         String bowReleaseState = getBowReleaseState(hand);
 
         PoseFunction<LocalSpacePose> pullPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_BOW_PULL)
-                .bindToTimeMarker("arrow_placed_in_bow", evaluationState -> {
-                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
-                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPoses.getEmptyHandPose(hand));
-                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
+                .bindToTimeMarker("arrow_placed_in_bow", context -> {
+                    context.getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
+                    context.getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPoses.getEmptyHandPose(hand));
+                    context.getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
                 })
-                .bindToTimeMarker("get_new_arrow", evaluationState -> {
+                .bindToTimeMarker("get_new_arrow", context -> {
                 })
                 .build();
         PoseFunction<LocalSpacePose> releasePoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_BOW_RELEASE)
@@ -76,10 +74,10 @@ public class FirstPersonTwoHandedActions {
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(bowReleaseState)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.getUsingItemDriver(hand)).negate().and(StateTransition.CURRENT_TRANSITION_FINISHED))
-                                .bindToOnTransitionTaken(evaluationState -> {
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPoses.getEmptyHandPose(oppositeHand));
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
+                                .bindToOnTransitionTaken(context -> {
+                                    context.getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
+                                    context.getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPoses.getEmptyHandPose(oppositeHand));
+                                    context.getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
                                 })
                                 .setTiming(Transition.builder(TimeSpan.ofTicks(1f)).setBlendProfile(releaseBlendProfile).build())
                                 .build())
@@ -99,14 +97,14 @@ public class FirstPersonTwoHandedActions {
                         .addOutboundTransition(StateTransition.builder(bowPullState)
                                 .isTakenIfTrue(
                                         StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.getUsingItemDriver(hand))
-                                                .and(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.BOW)
-                                                .and(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() == ItemUseAnimation.BOW)
+                                                .and(context -> context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.BOW)
+                                                .and(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() == ItemUseAnimation.BOW)
                                 )
-                                .bindToOnTransitionTaken(evaluationState -> {
-                                    ItemStack projectileStack = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.PROJECTILE_ITEM);
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(projectileStack);
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getConfigurationFromItem(projectileStack));
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPoses.GENERIC_ITEM);
+                                .bindToOnTransitionTaken(context -> {
+                                    ItemStack projectileStack = context.getDriverValue(FirstPersonDrivers.PROJECTILE_ITEM);
+                                    context.getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(projectileStack);
+                                    context.getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getConfigurationFromItem(projectileStack));
+                                    context.getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPoses.GENERIC_ITEM);
                                 })
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(12))
                                         .setEasement(Easing.SINE_IN_OUT)
@@ -120,7 +118,7 @@ public class FirstPersonTwoHandedActions {
                                         bowReleaseState
                                 ))
                         .addOutboundTransition(StateTransition.builder(TWO_HANDED_ACTION_NORMAL_STATE)
-                                .isTakenIfTrue(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.BOW)
+                                .isTakenIfTrue(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.BOW)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build()
@@ -133,26 +131,26 @@ public class FirstPersonTwoHandedActions {
         String crossbowFinishReloadState = getCrossbowFinishReloadState(hand);
 
         PoseFunction<LocalSpacePose> crossbowReloadPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_CROSSBOW_RELOAD)
-                .setPlayRate(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED))
+                .setPlayRate(context -> context.getDriverValue(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED))
                 .build();
         PoseFunction<LocalSpacePose> crossbowFinishReloadPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_CROSSBOW_RELOAD_FINISH)
                 .build();
 
-        Predicate<StateTransition.TransitionContext> isReloadingEmptyCrossbow = transitionContext -> {
-//            if (!transitionContext.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getCurrentValue()) {
+        Predicate<StateTransitionContext> isReloadingEmptyCrossbow = context -> {
+//            if (!transitioncontext.getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getCurrentValue()) {
 //                return false;
 //            }
-            if (!transitionContext.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getPreviousValue()) {
+            if (!context.getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getPreviousValue()) {
                 return false;
             }
 
-            if (transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) != FirstPersonHandPoses.CROSSBOW) {
+            if (context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) != FirstPersonHandPoses.CROSSBOW) {
                 return false;
             }
-            if (transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.CROSSBOW) {
+            if (context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.CROSSBOW) {
                 return false;
             }
-            ChargedProjectiles chargedProjectiles = transitionContext.driverContainer().getDriver(FirstPersonDrivers.getItemDriver(hand)).getCurrentValue().get(DataComponents.CHARGED_PROJECTILES);
+            ChargedProjectiles chargedProjectiles = context.getDriver(FirstPersonDrivers.getItemDriver(hand)).getCurrentValue().get(DataComponents.CHARGED_PROJECTILES);
             if (chargedProjectiles == null) {
                 return false;
             }
@@ -171,8 +169,8 @@ public class FirstPersonTwoHandedActions {
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(crossbowFinishReloadState)
                                 .isTakenIfTrue(isReloadingEmptyCrossbow.negate())
-                                .bindToOnTransitionTaken(evaluationState -> {
-                                    FirstPersonDrivers.updateRenderedItem(evaluationState.driverContainer(), hand);
+                                .bindToOnTransitionTaken(context -> {
+                                    FirstPersonDrivers.updateRenderedItem(context, hand);
                                 })
                                 .setTiming(Transition.SINGLE_TICK)
                                 .build())
@@ -190,10 +188,10 @@ public class FirstPersonTwoHandedActions {
                                 ))
                         .addOutboundTransition(StateTransition.builder(crossbowReloadState)
                                 .isTakenIfTrue(isReloadingEmptyCrossbow)
-                                .bindToOnTransitionTaken(evaluationState -> {
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPoses.getEmptyHandPose(oppositeHand));
-                                    evaluationState.driverContainer().getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
+                                .bindToOnTransitionTaken(context -> {
+                                    context.getDriver(FirstPersonDrivers.getRenderedItemDriver(oppositeHand)).setValue(ItemStack.EMPTY);
+                                    context.getDriver(FirstPersonDrivers.getHandPoseDriver(oppositeHand)).setValue(FirstPersonHandPoses.getEmptyHandPose(oppositeHand));
+                                    context.getDriver(FirstPersonDrivers.getGenericItemPoseDriver(oppositeHand)).setValue(FirstPersonGenericItems.getFallback());
                                 })
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(12))
                                         .setEasement(Easing.SINE_IN_OUT)
@@ -206,9 +204,9 @@ public class FirstPersonTwoHandedActions {
                                         crossbowFinishReloadState
                                 ))
                         .addOutboundTransition(StateTransition.builder(TWO_HANDED_ACTION_NORMAL_STATE)
-                                .isTakenIfTrue(transitionContext -> transitionContext.driverContainer().getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.CROSSBOW)
+                                .isTakenIfTrue(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.CROSSBOW)
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
-                                .bindToOnTransitionTaken(evaluationState -> {
+                                .bindToOnTransitionTaken(context -> {
                                 })
                                 .build())
                         .build()
@@ -225,7 +223,7 @@ public class FirstPersonTwoHandedActions {
     public static final String TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_MAIN_HAND_STATE = "crossbow_finish_reload_main_hand";
     public static final String TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_OFF_HAND_STATE = "crossbow_finish_reload_off_hand";
 
-    private static String getTwoHandedEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+    private static String getTwoHandedEntryState(PoseTickEvaluationContext context) {
         return TWO_HANDED_ACTION_NORMAL_STATE;
     }
 

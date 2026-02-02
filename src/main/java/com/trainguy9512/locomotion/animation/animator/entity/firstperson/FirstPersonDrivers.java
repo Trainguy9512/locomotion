@@ -3,7 +3,7 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonGenericItems;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoses;
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.driver.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
@@ -82,7 +82,7 @@ public class FirstPersonDrivers {
     public static final DriverKey<VariableDriver<Float>> ITEM_CONSUMPTION_SPEED = DriverKey.of("item_consumption_speed", () -> VariableDriver.ofFloat(() -> 1f));
     public static final DriverKey<VariableDriver<Boolean>> IS_IN_RIPTIDE = DriverKey.of("is_in_riptide", () -> VariableDriver.ofBoolean(() -> false));
 
-    public static void updateRenderedItem(OnTickDriverContainer driverContainer, InteractionHand hand) {
+    public static void updateRenderedItem(DriverGetter driverContainer, InteractionHand hand) {
         ItemStack newRenderedItem = driverContainer.getDriverValue(getItemDriver(hand)).copy();
         driverContainer.getDriver(getRenderedItemDriver(hand)).setValue(newRenderedItem);
         Identifier handPose = FirstPersonHandPoses.testForNextHandPose(newRenderedItem, hand);
@@ -95,7 +95,7 @@ public class FirstPersonDrivers {
         }
     }
 
-    public static void updateRenderedItemIfNoTwoHandOverrides(OnTickDriverContainer driverContainer, InteractionHand hand) {
+    public static void updateRenderedItemIfNoTwoHandOverrides(DriverGetter driverContainer, InteractionHand hand) {
         if (Objects.equals(driverContainer.getDriverValue(CURRENT_TWO_HANDED_OVERRIDE_STATE), FirstPersonTwoHandedActions.TWO_HANDED_ACTION_NORMAL_STATE)) {
             updateRenderedItem(driverContainer, hand);
         }
