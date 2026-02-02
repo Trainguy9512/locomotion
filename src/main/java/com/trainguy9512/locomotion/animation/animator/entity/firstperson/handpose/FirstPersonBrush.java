@@ -18,7 +18,7 @@ import net.minecraft.world.InteractionHand;
 public class FirstPersonBrush {
 
     private static boolean isUsingItem(StateTransitionContext context, InteractionHand hand) {
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
+        return context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
     }
 
     public static final String BRUSH_IDLE_STATE = "idle";

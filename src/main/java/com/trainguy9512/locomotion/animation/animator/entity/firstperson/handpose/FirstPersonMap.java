@@ -45,7 +45,7 @@ public class FirstPersonMap {
     }
 
     public static float getMapMovementAnimationWeight(PoseTickEvaluationContext context, InteractionHand hand) {
-        Identifier handPose = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
+        Identifier handPose = context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
         if (handPose == FirstPersonHandPoses.MAP) {
             return 1 - LocomotionMain.CONFIG.data().firstPersonPlayer.mapMovementAnimationIntensity;
         }

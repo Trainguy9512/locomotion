@@ -18,10 +18,10 @@ import net.minecraft.world.InteractionHand;
 public class FirstPersonMace {
 
     private static boolean isFalling(StateTransitionContext context) {
-        if (context.driverContainer().getDriverValue(FirstPersonDrivers.IS_ON_GROUND)) {
+        if (context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND)) {
             return false;
         }
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED) < -0.5f;
+        return context.getDriverValue(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED) < -0.5f;
     }
 
     private static boolean isNoLongerFalling(StateTransitionContext context) {

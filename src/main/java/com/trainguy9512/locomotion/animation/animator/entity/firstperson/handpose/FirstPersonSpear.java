@@ -171,24 +171,24 @@ public class FirstPersonSpear {
     }
 
     public static boolean isUsingSpear(StateTransitionContext context, InteractionHand hand) {
-        boolean isUsing = context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
-        boolean handPoseIsSpear = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.SPEAR;
-        boolean spearCanDamage = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
+        boolean isUsing = context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
+        boolean handPoseIsSpear = context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.SPEAR;
+        boolean spearCanDamage = context.getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
         return isUsing && handPoseIsSpear && spearCanDamage;
     }
 
     public static boolean spearCanNoLongerDismount(StateTransitionContext context) {
-        boolean spearCanDismount = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DISMOUNT);
+        boolean spearCanDismount = context.getDriverValue(FirstPersonDrivers.SPEAR_CAN_DISMOUNT);
         return !spearCanDismount;
     }
 
     public static boolean spearCanNoLongerKnockback(StateTransitionContext context) {
-        boolean spearCanKnockback = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_KNOCKBACK);
+        boolean spearCanKnockback = context.getDriverValue(FirstPersonDrivers.SPEAR_CAN_KNOCKBACK);
         return !spearCanKnockback;
     }
 
     public static boolean spearCanNoLongerDamage(StateTransitionContext context) {
-        boolean spearCanDamage = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
+        boolean spearCanDamage = context.getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
         return !spearCanDamage;
     }
 

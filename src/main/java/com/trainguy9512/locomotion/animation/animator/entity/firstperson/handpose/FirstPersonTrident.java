@@ -90,8 +90,8 @@ public class FirstPersonTrident {
     }
 
     private static boolean shouldPlayRiptideAnimation(StateTransitionContext context, InteractionHand hand) {
-        boolean isInRiptide = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_IN_RIPTIDE);
-        InteractionHand lastUsedHand = context.driverContainer().getDriverValue(FirstPersonDrivers.LAST_USED_HAND);
+        boolean isInRiptide = context.getDriverValue(FirstPersonDrivers.IS_IN_RIPTIDE);
+        InteractionHand lastUsedHand = context.getDriverValue(FirstPersonDrivers.LAST_USED_HAND);
         return isInRiptide && lastUsedHand == hand;
     }
 }

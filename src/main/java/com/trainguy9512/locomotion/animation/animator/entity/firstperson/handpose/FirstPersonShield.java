@@ -26,19 +26,19 @@ public class FirstPersonShield {
     }
 
     public static boolean isUsingShield(StateTransitionContext context, InteractionHand hand) {
-        boolean isUsing = context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
-        boolean handPoseIsShield = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.SHIELD;
+        boolean isUsing = context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
+        boolean handPoseIsShield = context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.SHIELD;
         return isUsing && handPoseIsShield;
     }
 
     public static boolean hasShieldEnteredCooldown(StateTransitionContext context, InteractionHand hand) {
-        boolean isHandOnCooldown = context.driverContainer().getDriverValue(FirstPersonDrivers.getItemOnCooldownDriver(hand));
-        boolean wasUsingShield = context.driverContainer().getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getPreviousValue();
+        boolean isHandOnCooldown = context.getDriverValue(FirstPersonDrivers.getItemOnCooldownDriver(hand));
+        boolean wasUsingShield = context.getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getPreviousValue();
         return isHandOnCooldown && wasUsingShield;
     }
 
     public static boolean isShieldNotOnCooldown(StateTransitionContext context, InteractionHand hand) {
-        boolean isHandOnCooldown = context.driverContainer().getDriverValue(FirstPersonDrivers.getItemOnCooldownDriver(hand));
+        boolean isHandOnCooldown = context.getDriverValue(FirstPersonDrivers.getItemOnCooldownDriver(hand));
         return !isHandOnCooldown;
     }
 

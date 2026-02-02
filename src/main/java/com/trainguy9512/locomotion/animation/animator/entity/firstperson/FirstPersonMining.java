@@ -248,7 +248,7 @@ public class FirstPersonMining {
     }
 
     public static boolean isMining(StateTransitionContext context) {
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.IS_MINING);
+        return context.getDriverValue(FirstPersonDrivers.IS_MINING);
     }
 
     public static boolean isNoLongerMining(StateTransitionContext context) {
@@ -256,22 +256,22 @@ public class FirstPersonMining {
     }
 
     public static boolean isPunchMining(StateTransitionContext context) {
-        boolean isMainHandInEmptyPose = context.driverContainer().getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE) == FirstPersonHandPoses.EMPTY_MAIN_HAND;
-        boolean isMainHandEmpty = context.driverContainer().getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM).isEmpty();
+        boolean isMainHandInEmptyPose = context.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE) == FirstPersonHandPoses.EMPTY_MAIN_HAND;
+        boolean isMainHandEmpty = context.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM).isEmpty();
         return isMining(context) && isMainHandInEmptyPose && isMainHandEmpty;
     }
 
     public static boolean isNoLongerPunchMining(StateTransitionContext context) {
-        boolean isMainHandEmpty = context.driverContainer().getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM).isEmpty();
+        boolean isMainHandEmpty = context.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM).isEmpty();
         return isNoLongerMining(context) || !isMainHandEmpty;
     }
 
     public static boolean shouldInterruptFinishAnimation(StateTransitionContext context) {
-        boolean hasAttacked = context.driverContainer().getDriverValue(FirstPersonDrivers.HAS_ATTACKED);
-        boolean hasUsedItem = context.driverContainer().getDriverValue(FirstPersonDrivers.IS_USING_MAIN_HAND_ITEM);
-        hasUsedItem = hasUsedItem || context.driverContainer().getDriverValue(FirstPersonDrivers.IS_USING_OFF_HAND_ITEM);
-        hasUsedItem = hasUsedItem || context.driverContainer().getDriverValue(FirstPersonDrivers.HAS_USED_MAIN_HAND_ITEM);
-        hasUsedItem = hasUsedItem || context.driverContainer().getDriverValue(FirstPersonDrivers.HAS_USED_OFF_HAND_ITEM);
+        boolean hasAttacked = context.getDriverValue(FirstPersonDrivers.HAS_ATTACKED);
+        boolean hasUsedItem = context.getDriverValue(FirstPersonDrivers.IS_USING_MAIN_HAND_ITEM);
+        hasUsedItem = hasUsedItem || context.getDriverValue(FirstPersonDrivers.IS_USING_OFF_HAND_ITEM);
+        hasUsedItem = hasUsedItem || context.getDriverValue(FirstPersonDrivers.HAS_USED_MAIN_HAND_ITEM);
+        hasUsedItem = hasUsedItem || context.getDriverValue(FirstPersonDrivers.HAS_USED_OFF_HAND_ITEM);
         return hasAttacked || hasUsedItem;
     }
 
