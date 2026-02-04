@@ -35,6 +35,9 @@
   "locomotion.config.option.first_person_mining_speed.name": "Множитель скорости анимации копания",
   "locomotion.config.option.first_person_mining_speed.description": "Регулирует скорость воспроизведения анимаций копания. 1 - нормальная скорость, 0.5 - в два раза медленнее, 2 - в два раза быстрее.",
 
+   "locomotion.config.option.running_arm_swing_intensity.name": "Интенсивность покачивания рук при беге",
+  "locomotion.config.option.running_arm_swing_intensity.description": "Регулирует силу покачивания рук во время анимации бега. При значении 0 анимация будет идентична анимации ходьбы. При значении 1 вместо анимации покачивания при ходьбе будет проигрываться анимация покачивания рук при беге.",
+
    "locomotion.config.group.first_person_map.name": "Отображение карты",
   "locomotion.config.group.first_person_map.description": "Настройки отображения и анимации карты от первого лица.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Интенсивность движения карты",
@@ -47,5 +50,20 @@
   "locomotion.config.option.first_person_arm_offset_y.name": "Сдвиг положения руки по оси Y",
   "locomotion.config.option.first_person_arm_offset_y.description": "Сдвиг положения руки по оси Y (по вертикали)",
   "locomotion.config.option.first_person_arm_offset_z.name": "Сдвиг положения руки по оси Z",
-  "locomotion.config.option.first_person_arm_offset_z.description": "Сдвиг положения руки по оси Z (в грубину)"
+  "locomotion.config.option.first_person_arm_offset_z.description": "Сдвиг положения руки по оси Z (в грубину)",
+
+  "locomotion.config.category.block_entities.name": "Анимации блоков",
+  "locomotion.config.category.block_entities.tooltip": "Настройки для различных анимаций блоков",
+
+  "locomotion.config.group.individual_block_entity_toggles.name": "Индивидуальные переключатели блоков",
+  "locomotion.config.group.individual_block_entity_toggles.description": "Переключатели для каждого из блоков",
+
+  "locomotion.config.group.block_entity_optimization.name": "Оптимизация",
+  "locomotion.config.group.block_entity_optimization.description": "Настройки для анимаций блоков, которые влияют на производительность.",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.name": "Частота вычисления поз",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.description": "Как часто вычисляются позы анимаций блоков. В режиме «один раз в тик» анимация рассчитывается один раз за каждый игровой тик, а затем линейно интерполируется. В режиме «каждый кадр» поза вычисляется заново для каждого кадра без интерполяции. Режим «Один раз в тик», как правило, более оптимизирован, но обеспечивает интерполированную анимацию с частотой 20 кадров в секунду.",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.enum.calculate_once_per_tick": "Один раз в тик с интерполяцией",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.enum.calculate_every_frame": "Каждый кадр",
+  "locomotion.config.option.block_entity_animation_distance.name": "Дистанция анимации",
+  "locomotion.config.option.block_entity_animation_distance.description": "Как далеко от игрока будут проигрываться анимации. За пределами радиуса будут проигрываться обычные анимаци."
 }
