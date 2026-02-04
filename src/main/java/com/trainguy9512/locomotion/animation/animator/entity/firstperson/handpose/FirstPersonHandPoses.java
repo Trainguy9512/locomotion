@@ -1,8 +1,13 @@
-package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
+package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
 import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMining;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
+import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.render.ItemRenderType;
 import com.trainguy9512.locomotion.animation.util.Easing;
@@ -19,7 +24,9 @@ import net.minecraft.world.item.ShieldItem;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class FirstPersonHandPoses {
@@ -33,18 +40,19 @@ public class FirstPersonHandPoses {
 
     public static final Identifier EMPTY_MAIN_HAND = register(LocomotionMain.makeIdentifier("empty_main_hand"), HandPoseDefinition.builder(
             "empty_main_hand",
-            FirstPersonMining::constructMainHandEmptyHandMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_EMPTY_POSE,
             ItemStack::isEmpty,
             10)
             .setHandsToUsePoseIn(InteractionHand.MAIN_HAND)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_EMPTY_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_EMPTY_LOWER)
+            .setMiningPoseFunctionSuppler(FirstPersonMining::constructEmptyHandMiningPoseFunction)
             .build());
 
     public static final Identifier EMPTY_OFF_HAND = register(LocomotionMain.makeIdentifier("empty_off_hand"), HandPoseDefinition.builder(
             "empty_off_hand",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_EMPTY_LOWERED,
             ItemStack::isEmpty,
             10)
@@ -55,13 +63,14 @@ public class FirstPersonHandPoses {
     public static final Identifier GENERIC_ITEM = register(LocomotionMain.makeIdentifier("generic_item"), HandPoseDefinition.builder(
             "generic_item",
             FirstPersonGenericItems::constructPoseFunction,
-            FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE,
+            FirstPersonGenericItems::getCurrentBasePose,
             itemStack -> true,
             0)
+            .setMiningPoseFunctionSuppler(FirstPersonMining::constructEmptyHandMiningPoseFunction)
             .build());
     public static final Identifier PICKAXE = register(LocomotionMain.makeIdentifier("pickaxe"), HandPoseDefinition.builder(
             "pickaxe",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.PICKAXES),
             60)
@@ -70,25 +79,27 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier AXE = register(LocomotionMain.makeIdentifier("axe"), HandPoseDefinition.builder(
             "axe",
-            FirstPersonMining::constructMainHandAxeMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.AXES),
             50)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .setMiningPoseFunctionSuppler(FirstPersonMining::constructAxeMiningPoseFunction)
             .build());
     public static final Identifier SHOVEL = register(LocomotionMain.makeIdentifier("shovel"), HandPoseDefinition.builder(
             "shovel",
-            FirstPersonMining::constructMainHandShovelMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.SHOVELS),
             40)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .setMiningPoseFunctionSuppler(FirstPersonMining::constructShovelMiningPoseFunction)
             .build());
     public static final Identifier HOE = register(LocomotionMain.makeIdentifier("hoe"), HandPoseDefinition.builder(
             "hoe",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_TOOL_POSE,
             itemStack -> itemStack.is(ItemTags.HOES),
             40)
@@ -112,10 +123,11 @@ public class FirstPersonHandPoses {
             90)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
+            .setMiningPoseFunctionSuppler(() -> FirstPersonMining.constructPickaxeMiningPoseFunction(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SHIELD_POSE).build()))
             .build());
     public static final Identifier BOW = register(LocomotionMain.makeIdentifier("bow"), HandPoseDefinition.builder(
             "bow",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_BOW_POSE,
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.BOW,
             100)
@@ -124,7 +136,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier CROSSBOW = register(LocomotionMain.makeIdentifier("crossbow"), HandPoseDefinition.builder(
             "crossbow",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_CROSSBOW_POSE,
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.CROSSBOW,
             100)
@@ -142,7 +154,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier BRUSH = register(LocomotionMain.makeIdentifier("brush"), HandPoseDefinition.builder(
             "brush",
-            FirstPersonBrush::handBrushPoseFunction,
+            FirstPersonBrush::constructBrushPoseFunction,
             FirstPersonAnimationSequences.HAND_BRUSH_POSE,
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.BRUSH,
             100)
@@ -169,7 +181,7 @@ public class FirstPersonHandPoses {
             .build());
     public static final Identifier MAP = register(LocomotionMain.makeIdentifier("map"), HandPoseDefinition.builder(
             "map",
-            FirstPersonMining::constructMainHandPickaxeMiningPoseFunction,
+            HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_MAP_SINGLE_HAND_POSE,
             itemStack -> itemStack.has(DataComponents.MAP_ID),
             100)
@@ -212,8 +224,9 @@ public class FirstPersonHandPoses {
             String stateIdentifier,
             Predicate<ItemStack> choosePoseIfTrue,
             int evaluationPriority,
-            BiFunction<CachedPoseContainer, InteractionHand, PoseFunction<LocalSpacePose>> poseFunctionProvider,
-            Identifier basePoseSequence,
+            HandPoseFunctionSupplier poseFunctionSupplier,
+            Supplier<PoseFunction<LocalSpacePose>> miningPoseFunctionSupplier,
+            BiFunction<DriverGetter, InteractionHand, Identifier> currentBasePoseSupplier,
             Identifier raiseSequence,
             Identifier lowerSequence,
             Transition raiseToPoseTransition,
@@ -230,22 +243,38 @@ public class FirstPersonHandPoses {
             return this.stateIdentifier + "_lower";
         }
 
+        public PoseFunction<LocalSpacePose> constructBasePoseFunction(InteractionHand hand) {
+            return SequenceEvaluatorFunction.builder(context -> this.currentBasePoseSupplier().apply(context, hand)).build();
+        }
+
         public static Builder builder(
                 String stateIdentifier,
-                BiFunction<CachedPoseContainer, InteractionHand, PoseFunction<LocalSpacePose>> poseFunctionProvider,
+                HandPoseFunctionSupplier poseFunctionSupplier,
+                BiFunction<DriverGetter, InteractionHand, Identifier> basePoseSequence,
+                Predicate<ItemStack> choosePoseIfTrue,
+                int chooseEvaluationPriority
+        ) {
+            return new Builder(stateIdentifier, poseFunctionSupplier, basePoseSequence, choosePoseIfTrue, chooseEvaluationPriority);
+        }
+
+        public static Builder builder(
+                String stateIdentifier,
+                HandPoseFunctionSupplier poseFunctionSupplier,
                 Identifier basePoseSequence,
                 Predicate<ItemStack> choosePoseIfTrue,
                 int chooseEvaluationPriority
         ) {
-            return new Builder(stateIdentifier, poseFunctionProvider, basePoseSequence, choosePoseIfTrue, chooseEvaluationPriority);
+            return new Builder(stateIdentifier, poseFunctionSupplier, (context, hand) -> basePoseSequence, choosePoseIfTrue, chooseEvaluationPriority);
         }
+
         public static class Builder {
             private final String stateIdentifier;
             private final Predicate<ItemStack> choosePoseIfTrue;
             private final int evaluationPriority;
-            private final BiFunction<CachedPoseContainer, InteractionHand, PoseFunction<LocalSpacePose>> poseFunctionProvider;
-            private final Identifier basePoseSequence;
+            private final HandPoseFunctionSupplier poseFunctionSupplier;
+            private final BiFunction<DriverGetter, InteractionHand, Identifier> basePoseSequenceSupplier;
 
+            private Supplier<PoseFunction<LocalSpacePose>> miningPoseFunctionSupplier;
             private Identifier raiseSequence;
             private Identifier lowerSequence;
             private Transition raiseToPoseTransition;
@@ -255,17 +284,18 @@ public class FirstPersonHandPoses {
 
             private Builder(
                     String stateIdentifier,
-                    BiFunction<CachedPoseContainer, InteractionHand, PoseFunction<LocalSpacePose>> poseFunctionProvider,
-                    Identifier basePoseSequence,
+                    HandPoseFunctionSupplier poseFunctionSupplier,
+                    BiFunction<DriverGetter, InteractionHand, Identifier> basePoseSequenceSupplier,
                     Predicate<ItemStack> choosePoseIfTrue,
                     int evaluationPriority
             ) {
                 this.stateIdentifier = stateIdentifier;
-                this.poseFunctionProvider = poseFunctionProvider;
+                this.poseFunctionSupplier = poseFunctionSupplier;
                 this.choosePoseIfTrue = choosePoseIfTrue;
                 this.evaluationPriority = evaluationPriority;
-                this.basePoseSequence = basePoseSequence;
+                this.basePoseSequenceSupplier = basePoseSequenceSupplier;
 
+                this.miningPoseFunctionSupplier = FirstPersonMining::constructPickaxeMiningPoseFunction;
                 this.raiseSequence = FirstPersonAnimationSequences.HAND_GENERIC_ITEM_RAISE;
                 this.lowerSequence = FirstPersonAnimationSequences.HAND_GENERIC_ITEM_LOWER;
                 this.raiseToPoseTransition = Transition.builder(TimeSpan.of60FramesPerSecond(6)).setEasement(Easing.SINE_IN_OUT).build();
@@ -304,13 +334,19 @@ public class FirstPersonHandPoses {
                 return this;
             }
 
+            public Builder setMiningPoseFunctionSuppler(Supplier<PoseFunction<LocalSpacePose>> miningPoseFunctionSuppler) {
+                this.miningPoseFunctionSupplier = miningPoseFunctionSuppler;
+                return this;
+            }
+
             public HandPoseDefinition build() {
                 return new HandPoseDefinition(
                         this.stateIdentifier,
                         this.choosePoseIfTrue,
                         this.evaluationPriority,
-                        this.poseFunctionProvider,
-                        this.basePoseSequence,
+                        this.poseFunctionSupplier,
+                        this.miningPoseFunctionSupplier,
+                        this.basePoseSequenceSupplier,
                         this.raiseSequence,
                         this.lowerSequence,
                         this.raiseToPoseTransition,
@@ -319,6 +355,23 @@ public class FirstPersonHandPoses {
                         this.handsToUsePoseIn
                 );
             }
+        }
+    }
+
+    @FunctionalInterface
+    public interface HandPoseFunctionSupplier {
+        PoseFunction<LocalSpacePose> constructHandPose(
+                CachedPoseContainer cachedPoseContainer,
+                InteractionHand hand,
+                PoseFunction<LocalSpacePose> miningPoseFunction
+        );
+
+        static PoseFunction<LocalSpacePose> constructOnlyWithMiningAnimation(
+                CachedPoseContainer cachedPoseContainer,
+                InteractionHand hand,
+                PoseFunction<LocalSpacePose> miningPoseFunction
+        ) {
+            return miningPoseFunction;
         }
     }
 

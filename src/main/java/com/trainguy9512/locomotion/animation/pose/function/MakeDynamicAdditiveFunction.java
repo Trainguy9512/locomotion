@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +27,7 @@ public class MakeDynamicAdditiveFunction implements PoseFunction<LocalSpacePose>
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
         LocalSpacePose additivePose = this.additivePoseInput.compute(context);
         LocalSpacePose additivePoseReference = this.basePoseInput.compute(context);
 
@@ -36,9 +38,9 @@ public class MakeDynamicAdditiveFunction implements PoseFunction<LocalSpacePose>
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        this.additivePoseInput.tick(evaluationState);
-        this.basePoseInput.tick(evaluationState);
+    public void tick(PoseTickEvaluationContext context) {
+        this.additivePoseInput.tick(context);
+        this.basePoseInput.tick(context);
     }
 
     @Override

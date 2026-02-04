@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.ComponentSpacePose;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.Pose;
@@ -18,13 +20,13 @@ import java.util.function.Predicate;
  */
 public record PoseConversionFunction<I extends Pose, O extends Pose>(PoseFunction<I> input, Function<I, O> converter) implements PoseFunction<O> {
     @Override
-    public @NotNull O compute(FunctionInterpolationContext context) {
+    public @NotNull O compute(PoseCalculationContext context) {
         return this.converter.apply(this.input.compute(context));
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        this.input.tick(evaluationState);
+    public void tick(PoseTickEvaluationContext context) {
+        this.input.tick(context);
     }
 
     @Override

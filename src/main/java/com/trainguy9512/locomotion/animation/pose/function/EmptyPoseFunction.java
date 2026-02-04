@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,8 +25,8 @@ public class EmptyPoseFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
-        LocalSpacePose pose = LocalSpacePose.of(context.driverContainer().getJointSkeleton());
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
+        LocalSpacePose pose = LocalSpacePose.of(context.jointSkeleton());
         if (!this.useReferencePose) {
             pose.setIdentity();
         }
@@ -32,7 +34,7 @@ public class EmptyPoseFunction implements PoseFunction<LocalSpacePose> {
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
+    public void tick(PoseTickEvaluationContext context) {
 
     }
 

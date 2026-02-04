@@ -1,6 +1,7 @@
 package com.trainguy9512.locomotion.animation.animator.block_entity;
 
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
@@ -29,11 +30,11 @@ public interface TwoStateContainerJointAnimator<B extends BlockEntity> extends B
     Identifier getCloseAnimationSequence();
 
     @Override
-    default void extractAnimationData(B blockEntity, OnTickDriverContainer dataContainer, MontageManager montageManager) {
+    default void extractAnimationData(B blockEntity, DriverGetter dataContainer, MontageManager montageManager) {
         this.extractContainerOpennessData(blockEntity, dataContainer);
     }
 
-    default void extractContainerOpennessData(B blockEntity, OnTickDriverContainer dataContainer) {
+    default void extractContainerOpennessData(B blockEntity, DriverGetter dataContainer) {
         dataContainer.getDriver(CONTAINER_OPENNESS).setValue(this.getOpenProgress(blockEntity));
 
         float currentShulkerBoxOpenness = dataContainer.getDriver(CONTAINER_OPENNESS).getCurrentValue();
@@ -60,8 +61,8 @@ public interface TwoStateContainerJointAnimator<B extends BlockEntity> extends B
     String CONTAINER_OPEN_STATE = "open";
     String CONTAINER_CLOSING_STATE = "closing";
 
-    private static String getInitialContainerState(PoseFunction.FunctionEvaluationState evaluationState) {
-        return evaluationState.driverContainer().getDriverValue(CONTAINER_IS_OPEN) ? CONTAINER_OPEN_STATE : CONTAINER_CLOSED_STATE;
+    private static String getInitialContainerState(DriverGetter driverGetter) {
+        return driverGetter.getDriverValue(CONTAINER_IS_OPEN) ? CONTAINER_OPEN_STATE : CONTAINER_CLOSED_STATE;
     }
 
     default PoseFunction<LocalSpacePose> makeContainerOpenClosePoseFunction() {

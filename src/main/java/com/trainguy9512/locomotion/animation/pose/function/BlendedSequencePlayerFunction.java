@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.Driver;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
@@ -18,15 +20,15 @@ import java.util.function.Predicate;
 public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSpacePose> {
 
     private final TreeMap<Float, BlendSpace1DEntry> blendSpaceEntries;
-    private final Function<FunctionEvaluationState, Float> blendPositionFunction;
+    private final Function<PoseTickEvaluationContext, Float> blendPositionFunction;
     private final VariableDriver<Float> blendPosition;
 
     private BlendedSequencePlayerFunction(
-            Function<FunctionEvaluationState, Boolean> isPlayingFunction,
-            Function<FunctionEvaluationState, Float> playRateFunction,
+            Function<PoseTickEvaluationContext, Boolean> isPlayingFunction,
+            Function<PoseTickEvaluationContext, Float> playRateFunction,
             TimeSpan resetStartTimeOffset,
             TreeMap<Float, BlendSpace1DEntry> blendSpaceEntries,
-            Function<FunctionEvaluationState, Float> blendPositionFunction
+            Function<PoseTickEvaluationContext, Float> blendPositionFunction
     ) {
         super(isPlayingFunction, playRateFunction, resetStartTimeOffset);
         this.blendSpaceEntries = blendSpaceEntries;
@@ -35,15 +37,15 @@ public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSp
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        float position = this.blendPositionFunction.apply(evaluationState);
+    public void tick(PoseTickEvaluationContext context) {
+        float position = this.blendPositionFunction.apply(context);
         this.blendPosition.pushCurrentToPrevious();
         this.blendPosition.setValue(position);
 
-        this.isPlaying = isPlayingFunction.apply(evaluationState);
-        this.playRate = this.isPlaying ? playRateFunction.apply(evaluationState) * this.getPlayRateAtPosition(position) : 0;
+        this.isPlaying = isPlayingFunction.apply(context);
+        this.playRate = this.isPlaying ? playRateFunction.apply(context) * this.getPlayRateAtPosition(position) : 0;
 
-        super.updateTime(evaluationState);
+        super.updateTime(context);
     }
 
     private float getPlayRateAtPosition(float position){
@@ -65,25 +67,25 @@ public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSp
     }
 
     @Override
-    public @NotNull LocalSpacePose compute(FunctionInterpolationContext context) {
-        float interpolatedPosition = this.blendPosition.getValueInterpolated(context.partialTicks());
+    public @NotNull LocalSpacePose compute(PoseCalculationContext context) {
+        float interpolatedPosition = this.blendPosition.getInterpolatedValue(context.partialTicks());
         TimeSpan time = this.getInterpolatedTimeElapsed(context);
 
         var floorEntry = this.blendSpaceEntries.floorEntry(interpolatedPosition);
         var ceilingEntry = this.blendSpaceEntries.ceilingEntry(interpolatedPosition);
 
         if (floorEntry == null)
-            return AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), ceilingEntry.getValue().animationSequence(), time, true);
+            return AnimationSequence.samplePose(context.jointSkeleton(), ceilingEntry.getValue().animationSequence(), time, true);
         if (ceilingEntry == null)
-            return AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
+            return AnimationSequence.samplePose(context.jointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
 
         // If they're both the same frame
         if (floorEntry.getKey().equals(ceilingEntry.getKey()))
-            return AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
+            return AnimationSequence.samplePose(context.jointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
 
         float relativeTime = (interpolatedPosition - floorEntry.getKey()) / (ceilingEntry.getKey() - floorEntry.getKey());
-        LocalSpacePose floorPose = AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
-        LocalSpacePose ceilingPose = AnimationSequence.samplePose(context.driverContainer().getJointSkeleton(), ceilingEntry.getValue().animationSequence(), time, true);
+        LocalSpacePose floorPose = AnimationSequence.samplePose(context.jointSkeleton(), floorEntry.getValue().animationSequence(), time, true);
+        LocalSpacePose ceilingPose = AnimationSequence.samplePose(context.jointSkeleton(), ceilingEntry.getValue().animationSequence(), time, true);
 
         return floorPose.interpolated(ceilingPose, relativeTime);
     }
@@ -99,12 +101,12 @@ public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSp
         return findCondition.test(this) ? Optional.of(this) : Optional.empty();
     }
 
-    public static Builder<?> builder(Function<FunctionEvaluationState, Float> blendValueFunction) {
+    public static Builder<?> builder(Function<PoseTickEvaluationContext, Float> blendValueFunction) {
         return new Builder<>(blendValueFunction);
     }
 
     public static Builder<?> builder(DriverKey<? extends Driver<Float>> floatDriverKey) {
-        return builder(evaluationState -> evaluationState.driverContainer().getDriverValue(floatDriverKey));
+        return builder(context -> context.getDriverValue(floatDriverKey));
     }
 
     private record BlendSpace1DEntry(Identifier animationSequence, float playRate) {
@@ -114,10 +116,10 @@ public class BlendedSequencePlayerFunction extends TimeBasedPoseFunction<LocalSp
     public static class Builder<B extends Builder<B>> extends TimeBasedPoseFunction.Builder<B> {
 
         private final TreeMap<Float, BlendSpace1DEntry> blendSpaceEntries;
-        private final Function<FunctionEvaluationState, Float> blendValueFunction;
+        private final Function<PoseTickEvaluationContext, Float> blendValueFunction;
 
 
-        private Builder(Function<FunctionEvaluationState, Float> blendValueFunction) {
+        private Builder(Function<PoseTickEvaluationContext, Float> blendValueFunction) {
             this.blendSpaceEntries = new TreeMap<>();
             this.blendValueFunction = blendValueFunction;
         }

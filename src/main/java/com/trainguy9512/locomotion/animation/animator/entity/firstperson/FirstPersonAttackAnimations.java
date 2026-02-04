@@ -2,7 +2,8 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.LocomotionMain;
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
@@ -155,12 +156,12 @@ public class FirstPersonAttackAnimations {
 
     }
 
-    public static void tryPlayingAttackAnimation(OnTickDriverContainer driverContainer, MontageManager montageManager) {
+    public static void tryPlayingAttackAnimation(DriverGetter dataContainer, MontageManager montageManager) {
 
-        AttackAnimationConditionContext context = new AttackAnimationConditionContext(
-                driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM),
-                driverContainer.getDriverValue(FirstPersonDrivers.MEETS_CRITICAL_ATTACK_CONDITIONS),
-                driverContainer.getDriverValue(FirstPersonDrivers.MEETS_SPRINT_ATTACK_CONDITIONS)
+        AttackAnimationConditionContext attackAnimationContext = new AttackAnimationConditionContext(
+                dataContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_ITEM),
+                dataContainer.getDriverValue(FirstPersonDrivers.MEETS_CRITICAL_ATTACK_CONDITIONS),
+                dataContainer.getDriverValue(FirstPersonDrivers.MEETS_SPRINT_ATTACK_CONDITIONS)
         );
 
         Map<Identifier, AttackAnimationRule> sortedAttackAnimationRules = ATTACK_ANIMATION_RULES_BY_IDENTIFIER.entrySet()
@@ -175,7 +176,7 @@ public class FirstPersonAttackAnimations {
 
         for (Identifier ruleIdentifier : sortedAttackAnimationRules.keySet()) {
             AttackAnimationRule rule = sortedAttackAnimationRules.get(ruleIdentifier);
-            if (rule.shouldChooseAttackAnimation().test(context)) {
+            if (rule.shouldChooseAttackAnimation().test(attackAnimationContext)) {
                 LocomotionMain.DEBUG_LOGGER.info("Playing use animation \"{}\"", ruleIdentifier);
 
                 MontageConfiguration montage = rule.montageToPlay();
@@ -206,9 +207,9 @@ public class FirstPersonAttackAnimations {
         }
     }
 
-    public static void cancelAttackOffHandOffset(PoseFunction.FunctionEvaluationState evaluationState) {
+    public static void cancelAttackOffHandOffset(PoseTickEvaluationContext context) {
         Transition outTransition = Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build();
-        evaluationState.montageManager().interruptMontagesInSlot(ATTACK_OFF_HAND_OFFSET_SLOT, outTransition);
+        context.montageManager().interruptMontagesInSlot(ATTACK_OFF_HAND_OFFSET_SLOT, outTransition);
     }
 
     public static PoseFunction<LocalSpacePose> constructWithOffsetOffHandAttack(PoseFunction<LocalSpacePose> inputOffHandPose) {
@@ -219,7 +220,7 @@ public class FirstPersonAttackAnimations {
         offsetAdditivePose = MontageSlotFunction.of(offsetBasePose, ATTACK_OFF_HAND_OFFSET_SLOT);
         offsetAdditivePose = MakeDynamicAdditiveFunction.of(offsetAdditivePose, offsetBasePose);
         offsetAdditivePose = BlendPosesFunction.builder(EmptyPoseFunction.of(false))
-                .addBlendInput(offsetAdditivePose, evaluationState -> 1f, FirstPersonJointAnimator.LEFT_SIDE_MASK)
+                .addBlendInput(offsetAdditivePose, context -> 1f, FirstPersonJointAnimator.LEFT_SIDE_MASK)
                 .build();
 
         PoseFunction<LocalSpacePose> pose;

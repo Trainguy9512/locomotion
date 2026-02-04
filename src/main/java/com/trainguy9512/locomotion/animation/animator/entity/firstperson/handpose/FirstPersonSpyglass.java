@@ -1,15 +1,19 @@
-package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
+package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
-import com.trainguy9512.locomotion.animation.pose.function.JointTransformerFunction;
-import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
-import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
-import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
+import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransitionContext;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -23,19 +27,19 @@ public class FirstPersonSpyglass {
     public static final String SPYGLASS_LOOKING_STATE = "looking";
     public static final String SPYGLASS_LOOKING_EXIT_STATE = "looking_exit";
 
-    private static String getSpyglassEntryState(PoseFunction.FunctionEvaluationState evaluationState) {
+    private static String getSpyglassEntryState(DriverGetter driverGetter) {
         return SPYGLASS_IDLE_STATE;
     }
 
-    private static boolean isUsingItem(StateTransition.TransitionContext context, InteractionHand hand) {
-        return context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
+    private static boolean isUsingItem(StateTransitionContext context, InteractionHand hand) {
+        return context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
     }
 
     public static PoseFunction<LocalSpacePose> handSpyglassPoseFunction(
             CachedPoseContainer cachedPoseContainer,
-            InteractionHand hand
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
     ) {
-        PoseFunction<LocalSpacePose> idlePoseFunction = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> lookingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT).build();
         PoseFunction<LocalSpacePose> lookingExitPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPYGLASS_LOOKING_EXIT)
                 .setPlayRate(1)
@@ -43,7 +47,7 @@ public class FirstPersonSpyglass {
                 .build();
 
         return StateMachineFunction.builder(FirstPersonSpyglass::getSpyglassEntryState)
-                .defineState(StateDefinition.builder(SPYGLASS_IDLE_STATE, idlePoseFunction)
+                .defineState(StateDefinition.builder(SPYGLASS_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(SPYGLASS_LOOKING_STATE)
                                 .isTakenIfTrue(context -> isUsingItem(context, hand))
@@ -76,21 +80,10 @@ public class FirstPersonSpyglass {
     /**
      * If the item the player is currently using is a spyglass, return a vector with 0. Otherwise return 1.
      */
-    private static Vector3f getHiddenScale(PoseFunction.FunctionInterpolationContext context) {
+    private static Vector3f getHiddenScale(PoseCalculationContext context) {
         for (InteractionHand hand : InteractionHand.values()) {
-            if (context
-                    .driverContainer()
-                    .getInterpolatedDriverValue(
-                            FirstPersonDrivers.getUsingItemDriver(hand),
-                            context.partialTicks()
-                    )
-            ) {
-                ItemUseAnimation itemUseAnimation = context
-                        .driverContainer()
-                        .getInterpolatedDriverValue(
-                                FirstPersonDrivers.getItemDriver(hand),
-                                context.partialTicks()
-                        ).getUseAnimation();
+            if (context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand))) {
+                ItemUseAnimation itemUseAnimation = context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation();
                 if (itemUseAnimation == ItemUseAnimation.SPYGLASS) {
                     return new Vector3f(0);
                 }

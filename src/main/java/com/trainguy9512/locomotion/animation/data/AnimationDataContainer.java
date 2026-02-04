@@ -21,7 +21,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import java.util.Map;
 import java.util.function.Function;
 
-public class AnimationDataContainer implements PoseCalculationDataContainer, OnTickDriverContainer {
+public class AnimationDataContainer implements DriverGetter {
 
     private final Map<DriverKey<? extends Driver<?>>, Driver<?>> drivers;
     private final CachedPoseContainer savedCachedPoseContainer;
@@ -59,11 +59,11 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
         this.montageManager.tick();
         this.drivers.values().forEach(Driver::tick);
         this.getDriver(this.gameTimeTicksDriverKey).setValue(this.getDriver(this.gameTimeTicksDriverKey).getCurrentValue() + 1);
-        this.poseFunction.tick(PoseFunction.FunctionEvaluationState.of(
+        this.poseFunction.tick(new PoseTickEvaluationContext(
                 this,
                 this.montageManager,
                 false,
-                this.getDriver(this.gameTimeTicksDriverKey).getCurrentValue()
+                this.getDriverValue(this.gameTimeTicksDriverKey)
         ));
     }
 
@@ -73,17 +73,13 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
 
     public LocalSpacePose computePose(float partialTicks) {
         this.savedCachedPoseContainer.clearCaches();
-        return this.poseFunction.compute(PoseFunction.FunctionInterpolationContext.of(
+        return this.poseFunction.compute(new PoseCalculationContext(
                 this,
+                this.jointSkeleton,
                 this.montageManager,
                 partialTicks,
                 TimeSpan.ofTicks(this.getInterpolatedDriverValue(gameTimeTicksDriverKey, 1) + partialTicks)
         ));
-    }
-
-    @Override
-    public JointSkeleton getJointSkeleton() {
-        return this.jointSkeleton;
     }
 
     public DriverKey<VariableDriver<LocalSpacePose>> getPerTickCalculatedPoseDriverKey() {
@@ -98,9 +94,8 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
         return this.drivers;
     }
 
-    @Override
     public <D, R extends Driver<D>> D getInterpolatedDriverValue(DriverKey<R> driverKey, float partialTicks) {
-        return this.getDriver(driverKey).getValueInterpolated(partialTicks);
+        return this.getDriver(driverKey).getInterpolatedValue(partialTicks);
     }
 
     @Override
@@ -114,9 +109,8 @@ public class AnimationDataContainer implements PoseCalculationDataContainer, OnT
         return (R) this.drivers.computeIfAbsent(driverKey, DriverKey::createInstance);
     }
 
-    @Override
-    public long getCurrentTick() {
-        return this.getDriverValue(this.gameTimeTicksDriverKey);
+    private JointSkeleton getJointSkeleton() {
+        return this.jointSkeleton;
     }
 
     public ModelPartSpacePose getInterpolatedAnimationPose(float partialTicks){

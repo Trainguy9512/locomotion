@@ -1,15 +1,15 @@
-package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
+package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMontages;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageSlotFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -23,10 +23,14 @@ import java.util.Set;
 
 public class FirstPersonSpear {
 
-    public static PoseFunction<LocalSpacePose> constructSpearPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
-        PoseFunction<LocalSpacePose> pose;
+    public static PoseFunction<LocalSpacePose> constructSpearPoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
+    ) {
+        PoseFunction<LocalSpacePose> pose = miningPoseFunction;
 
-        pose = constructChargePoseFunction(cachedPoseContainer, hand);
+        pose = constructChargePoseFunction(cachedPoseContainer, hand, pose);
         pose = constructWithSpearImpact(pose);
 
         return pose;
@@ -49,9 +53,12 @@ public class FirstPersonSpear {
     public static String CHARGE_STAGE_3_STATE = "stage_3";
     public static String CHARGE_EXIT_STATE = "exit";
 
-    private static PoseFunction<LocalSpacePose> constructChargePoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
+    private static PoseFunction<LocalSpacePose> constructChargePoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
+    ) {
 
-        PoseFunction<LocalSpacePose> chargeIdlePose = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
         PoseFunction<LocalSpacePose> chargeEnterPose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_ENTER).build();
         PoseFunction<LocalSpacePose> chargeExitPose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_EXIT).build();
         PoseFunction<LocalSpacePose> chargeStage1Pose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_POSE_1).build();
@@ -61,9 +68,9 @@ public class FirstPersonSpear {
         PoseFunction<LocalSpacePose> chargeStage2To3Pose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_SPEAR_CHARGE_WEAKEN_2).build();
 
         PoseFunction<LocalSpacePose> chargeStateMachinePose;
-        chargeStateMachinePose = StateMachineFunction.builder(evaluationState -> CHARGE_IDLE_STATE)
+        chargeStateMachinePose = StateMachineFunction.builder(context -> CHARGE_IDLE_STATE)
                 .resetsUponRelevant(true)
-                .defineState(StateDefinition.builder(CHARGE_IDLE_STATE, chargeIdlePose)
+                .defineState(StateDefinition.builder(CHARGE_IDLE_STATE, miningPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .defineState(StateDefinition.builder(CHARGE_ENTER_STATE, chargeEnterPose)
@@ -163,29 +170,29 @@ public class FirstPersonSpear {
         return chargeStateMachinePose;
     }
 
-    public static boolean isUsingSpear(StateTransition.TransitionContext context, InteractionHand hand) {
-        boolean isUsing = context.driverContainer().getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
-        boolean handPoseIsSpear = context.driverContainer().getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.SPEAR;
-        boolean spearCanDamage = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
+    public static boolean isUsingSpear(StateTransitionContext context, InteractionHand hand) {
+        boolean isUsing = context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand));
+        boolean handPoseIsSpear = context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.SPEAR;
+        boolean spearCanDamage = context.getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
         return isUsing && handPoseIsSpear && spearCanDamage;
     }
 
-    public static boolean spearCanNoLongerDismount(StateTransition.TransitionContext context) {
-        boolean spearCanDismount = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DISMOUNT);
+    public static boolean spearCanNoLongerDismount(StateTransitionContext context) {
+        boolean spearCanDismount = context.getDriverValue(FirstPersonDrivers.SPEAR_CAN_DISMOUNT);
         return !spearCanDismount;
     }
 
-    public static boolean spearCanNoLongerKnockback(StateTransition.TransitionContext context) {
-        boolean spearCanKnockback = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_KNOCKBACK);
+    public static boolean spearCanNoLongerKnockback(StateTransitionContext context) {
+        boolean spearCanKnockback = context.getDriverValue(FirstPersonDrivers.SPEAR_CAN_KNOCKBACK);
         return !spearCanKnockback;
     }
 
-    public static boolean spearCanNoLongerDamage(StateTransition.TransitionContext context) {
-        boolean spearCanDamage = context.driverContainer().getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
+    public static boolean spearCanNoLongerDamage(StateTransitionContext context) {
+        boolean spearCanDamage = context.getDriverValue(FirstPersonDrivers.SPEAR_CAN_DAMAGE);
         return !spearCanDamage;
     }
 
-    public static void extractSpearData(LocalPlayer player, OnTickDriverContainer driverContainer, MontageManager montageManager) {
+    public static void extractSpearData(LocalPlayer player, DriverGetter driverContainer, MontageManager montageManager) {
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack itemStack = player.getItemInHand(hand);
             KineticWeapon kineticWeapon = itemStack.get(DataComponents.KINETIC_WEAPON);

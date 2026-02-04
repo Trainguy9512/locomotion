@@ -56,6 +56,7 @@ public class FirstPersonAnimationSequences {
     public static final Identifier HAND_GENERIC_ITEM_SHEARS_USE = makeIdentifier("hand/generic_item/shears_use");
     public static final Identifier HAND_GENERIC_ITEM_BUCKET_COLLECT = makeIdentifier("hand/generic_item/bucket_collect");
     public static final Identifier HAND_GENERIC_ITEM_BUCKET_EMPTY = makeIdentifier("hand/generic_item/bucket_empty");
+    public static final Identifier HAND_GENERIC_ITEM_USE = makeIdentifier("hand/generic_item/use");
 
     public static final Identifier HAND_BRUSH_POSE = makeIdentifier("hand/brush/pose");
     public static final Identifier HAND_BRUSH_SIFT_LOOP = makeIdentifier("hand/brush/sift_loop");
@@ -96,6 +97,7 @@ public class FirstPersonAnimationSequences {
     public static final Identifier GROUND_MOVEMENT_POSE = makeIdentifier("ground_movement/pose");
     public static final Identifier GROUND_MOVEMENT_IDLE = makeIdentifier("ground_movement/idle");
     public static final Identifier GROUND_MOVEMENT_WALKING = makeIdentifier("ground_movement/walking");
+    public static final Identifier GROUND_MOVEMENT_SPRINTING = makeIdentifier("ground_movement/sprinting");
     public static final Identifier GROUND_MOVEMENT_WALK_TO_STOP = makeIdentifier("ground_movement/walk_to_stop");
     public static final Identifier GROUND_MOVEMENT_JUMP = makeIdentifier("ground_movement/jump");
     public static final Identifier GROUND_MOVEMENT_FALLING_DOWN = makeIdentifier("ground_movement/falling_down");

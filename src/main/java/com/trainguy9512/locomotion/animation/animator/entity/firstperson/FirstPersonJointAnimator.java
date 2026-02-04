@@ -2,9 +2,12 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.LivingEntityJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoseSwitching;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonShield;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonSpear;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonSpyglass;
 import com.trainguy9512.locomotion.animation.data.*;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
-import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
@@ -119,8 +122,8 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 ));
 
         PoseFunction<LocalSpacePose> pose = BlendPosesFunction.builder(cachedPoseContainer.getOrThrow(MAIN_HAND_POSE_CACHE))
-                .addBlendInput(cachedPoseContainer.getOrThrow(OFF_HAND_POSE_CACHE), evaluationState -> 1f, LEFT_SIDE_MASK)
-                .addBlendInput(composedCameraPoseFunction, evaluationState -> 1f, CAMERA_MASK)
+                .addBlendInput(cachedPoseContainer.getOrThrow(OFF_HAND_POSE_CACHE), context -> 1f, LEFT_SIDE_MASK)
+                .addBlendInput(composedCameraPoseFunction, context -> 1f, CAMERA_MASK)
                 .build();
 
         // Offsetting the hands from the config on the X axis prior to the two handed animations.
@@ -137,7 +140,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         pose = FirstPersonAttackAnimations.constructWithOffsetOffHandAttack(pose);
 
         // Punch mining animation
-        pose = FirstPersonMining.constructWithPunchMiningPoseFunction(pose);
+//        pose = FirstPersonMining.constructWithPunchMiningPoseFunction(pose);
 
         // Adding in the movement animations.
         pose = FirstPersonMovement.constructWithMovementAnimations(pose, cachedPoseContainer);
@@ -146,7 +149,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         pose = BlendPosesFunction.builder(pose)
                 .addBlendInput(
                         EmptyPoseFunction.of(),
-                        functionEvaluationState -> 1 - LocomotionMain.CONFIG.data().firstPersonPlayer.cameraShakeMasterIntensity,
+                        functioncontext -> 1 - LocomotionMain.CONFIG.data().firstPersonPlayer.cameraShakeMasterIntensity,
                         FirstPersonJointAnimator.CAMERA_MASK
                 )
                 .build();
@@ -155,23 +158,24 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         pose = MirrorFunction.of(pose, context -> Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT);
 
 
-        pose = JointTransformerFunction.localOrParentSpaceBuilder(pose, ARM_BUFFER_JOINT)
-                        .setTranslation(
-                                context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET, context.partialTicks()).mul(1.5f, new Vector3f()),
-                                JointChannel.TransformType.ADD,
-                                JointChannel.TransformSpace.COMPONENT
-                        )
-                        .setRotationEuler(
-                                context -> {
-                                    Vector3f main_rotation = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING, context.partialTicks());
-                                    float z_rotation = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_Z_ROTATION_DAMPING, context.partialTicks());
-                                    return new Vector3f(main_rotation.x, main_rotation.y, z_rotation).mul(-0.15f, -0.15f, -0.08f, new Vector3f());
-                                },
-                                JointChannel.TransformType.ADD,
-                                JointChannel.TransformSpace.COMPONENT
-                        )
-                        .setWeight(interpolationContext -> LocomotionMain.CONFIG.data().firstPersonPlayer.enableCameraRotationDamping ? 1f : 0f)
-                        .build();
+        // Movement direction offset
+//        pose = JointTransformerFunction.localOrParentSpaceBuilder(pose, ARM_BUFFER_JOINT)
+//                        .setTranslation(
+//                                context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET, context.partialTicks()).mul(1.5f, new Vector3f()),
+//                                JointChannel.TransformType.ADD,
+//                                JointChannel.TransformSpace.COMPONENT
+//                        )
+//                        .setRotationEuler(
+//                                context -> {
+//                                    Vector3f main_rotation = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING, context.partialTicks());
+//                                    float z_rotation = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_Z_ROTATION_DAMPING, context.partialTicks());
+//                                    return new Vector3f(main_rotation.x, main_rotation.y, z_rotation).mul(-0.15f, -0.15f, -0.08f, new Vector3f());
+//                                },
+//                                JointChannel.TransformType.ADD,
+//                                JointChannel.TransformSpace.COMPONENT
+//                        )
+//                        .setWeight(interpolationContext -> LocomotionMain.CONFIG.data().firstPersonPlayer.enableCameraRotationDamping ? 1f : 0f)
+//                        .build();
 
         // Scaling the whole arms based on whether a spyglass is being used or not.
         pose = FirstPersonSpyglass.getHiddenArmsSpyglassPose(pose);
@@ -181,7 +185,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     }
 
     @Override
-    public void extractAnimationData(LocalPlayer player, OnTickDriverContainer driverContainer, MontageManager montageManager){
+    public void extractAnimationData(LocalPlayer player, DriverGetter driverContainer, MontageManager montageManager){
 
         this.extractMovementPoseData(player, driverContainer);
         this.extractItemData(player, driverContainer);
@@ -202,8 +206,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         this.extractDampedCameraData(player, driverContainer, montageManager);
     }
 
-    public void extractMovementPoseData(LocalPlayer player, OnTickDriverContainer driverContainer) {
+    public void extractMovementPoseData(LocalPlayer player, DriverGetter driverContainer) {
         driverContainer.getDriver(FirstPersonDrivers.MODIFIED_WALK_SPEED).setValue(player.walkAnimation.speed());
+        driverContainer.getDriver(FirstPersonDrivers.WALK_DISTANCE).setValue(player.walkAnimation.position());
         driverContainer.getDriver(FirstPersonDrivers.HORIZONTAL_MOVEMENT_SPEED).setValue(new Vector3f((float) (player.getX() - player.xo), 0.0f, (float) (player.getZ() - player.zo)).length());
         driverContainer.getDriver(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED).setValue((float) (player.getY() - player.yo));
 
@@ -225,7 +230,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         driverContainer.getDriver(FirstPersonDrivers.IS_SWIMMING_UNDERWATER).setValue(isSwimmingUnderwater);
     }
 
-    public void extractItemData(LocalPlayer player, OnTickDriverContainer driverContainer) {
+    public void extractItemData(LocalPlayer player, DriverGetter driverContainer) {
         for (InteractionHand hand : InteractionHand.values()) {
             VariableDriver<ItemStack> itemDriver = driverContainer.getDriver(FirstPersonDrivers.getItemDriver(hand));
             VariableDriver<ItemStack> itemCopyReferenceDriver = driverContainer.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(hand));
@@ -235,7 +240,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         }
     }
 
-    public void handleMontagesFromTriggerDrivers(LocalPlayer player, OnTickDriverContainer driverContainer, MontageManager montageManager) {
+    public void handleMontagesFromTriggerDrivers(LocalPlayer player, DriverGetter driverContainer, MontageManager montageManager) {
         driverContainer.getDriver(FirstPersonDrivers.HAS_DROPPED_ITEM).runAndConsumeIfTriggered(() -> {
             montageManager.playMontage(FirstPersonMontages.USE_MAIN_HAND_MONTAGE);
         });
@@ -255,7 +260,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
     }
 
-    public void extractAttackConditionData(LocalPlayer player, OnTickDriverContainer driverContainer) {
+    public void extractAttackConditionData(LocalPlayer player, DriverGetter driverContainer) {
         boolean meetsCriticalAttackConditions = player.fallDistance > 0.0
                 && !player.onGround()
                 && !player.onClimbable()
@@ -272,7 +277,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         driverContainer.getDriver(FirstPersonDrivers.MEETS_SPRINT_ATTACK_CONDITIONS).setValue(meetsSprintAttackConditions);
     }
 
-    public void extractInteractionHandData(LocalPlayer dataReference, OnTickDriverContainer driverContainer, MontageManager montageManager) {
+    public void extractInteractionHandData(LocalPlayer dataReference, DriverGetter driverContainer, MontageManager montageManager) {
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack itemInHand = driverContainer.getDriverValue(FirstPersonDrivers.getItemDriver(hand));
             ItemStack renderedItemInHand = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
@@ -314,7 +319,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         }
     }
 
-//    public void extractHandSwapData(LocalPlayer dataReference, OnTickDriverContainer driverContainer, MontageManager montageManager) {
+//    public void extractHandSwapData(LocalPlayer dataReference, DriverGetter driverContainer, MontageManager montageManager) {
 //        ItemStack currentMainHandItem = driverContainer.getDriver(FirstPersonDrivers.getItemDriver(InteractionHand.MAIN_HAND)).getCurrentValue();
 //        ItemStack previousOffHandItem = driverContainer.getDriver(FirstPersonDrivers.getItemDriver(InteractionHand.OFF_HAND)).getPreviousValue();
 //
@@ -330,7 +335,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 //        }
 //    }
 
-    public void extractDampedCameraData(LocalPlayer dataReference, OnTickDriverContainer driverContainer, MontageManager montageManager) {
+    public void extractDampedCameraData(LocalPlayer dataReference, DriverGetter driverContainer, MontageManager montageManager) {
         Vector3f velocity = new Vector3f((float) (dataReference.getX() - dataReference.xo), (float) (dataReference.getY() - dataReference.yo), (float) (dataReference.getZ() - dataReference.zo));
         // We don't want vertical velocity to be factored into the movement direction offset as much as the horizontal velocity.
         velocity.mul(1, 0f, 1).mul(dataReference.isSprinting() ? 4f : 3f).min(new Vector3f(1)).max(new Vector3f(-1));

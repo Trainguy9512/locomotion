@@ -1,6 +1,10 @@
-package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
+package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
 import com.trainguy9512.locomotion.LocomotionMain;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -140,6 +144,12 @@ public class FirstPersonGenericItems {
         return itemStack.is(ItemTags.DOORS);
     }
 
+    public static Identifier getCurrentBasePose(DriverGetter dataContainer, InteractionHand hand) {
+        Identifier currentGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(hand));
+        GenericItemPoseDefinition definition = FirstPersonGenericItems.getOrThrowFromIdentifier(currentGenericItemPose);
+        return definition.basePoseSequence();
+    }
+
     public record GenericItemPoseDefinition(
             Identifier basePoseSequence,
             Predicate<ItemStack> choosePoseIfTrue,
@@ -228,8 +238,8 @@ public class FirstPersonGenericItems {
 //        return definition.basePoseSequence;
 //    }
 
-    public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand) {
-        PoseFunction<LocalSpacePose> pose = FirstPersonMining.constructMainHandPickaxeMiningPoseFunction(cachedPoseContainer, hand);
+    public static PoseFunction<LocalSpacePose> constructPoseFunction(CachedPoseContainer cachedPoseContainer, InteractionHand hand, PoseFunction<LocalSpacePose> miningPoseFunction) {
+        PoseFunction<LocalSpacePose> pose = miningPoseFunction;
 
         PoseFunction<LocalSpacePose> consumablePose;
         consumablePose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_2D_ITEM_POSE).build();

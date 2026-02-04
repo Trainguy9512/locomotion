@@ -1,16 +1,15 @@
-package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
+package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
-import com.trainguy9512.locomotion.animation.data.OnTickDriverContainer;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
+import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.ApplyAdditiveFunction;
 import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -32,7 +31,7 @@ public class FirstPersonDrinking {
     public static PoseFunction<LocalSpacePose> constructWithDrinkingStateMachine(CachedPoseContainer cachedPoseContainer, InteractionHand hand, PoseFunction<LocalSpacePose> idlePoseFunction) {
         PoseFunction<LocalSpacePose> drinkingLoopPoseFunction = ApplyAdditiveFunction.of(
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_PROGRESS)
-                        .setPlayRate(evaluationState -> evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED))
+                        .setPlayRate(context -> context.getDriverValue(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED))
                         .build(),
                 SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_DRINK_LOOP)
                         .setLooping(true)
@@ -48,7 +47,7 @@ public class FirstPersonDrinking {
                 .build();
         PoseFunction<LocalSpacePose> eatingBeginPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_EAT_BEGIN).build();
 
-        return StateMachineFunction.builder(evaluationState -> DRINKING_IDLE_STATE)
+        return StateMachineFunction.builder(context -> DRINKING_IDLE_STATE)
                 .resetsUponRelevant(true)
                 .defineState(StateDefinition.builder(DRINKING_IDLE_STATE, idlePoseFunction)
                         .resetsPoseFunctionUponEntry(true)
@@ -88,7 +87,7 @@ public class FirstPersonDrinking {
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
-                                .bindToOnTransitionTaken(evaluationState -> FirstPersonDrivers.updateRenderedItem(evaluationState.driverContainer(), hand))
+                                .bindToOnTransitionTaken(context -> FirstPersonDrivers.updateRenderedItem(context, hand))
                                 .build())
                         .build())
                 .addStateAlias(StateAlias.builder(
@@ -102,7 +101,7 @@ public class FirstPersonDrinking {
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
-                                .bindToOnTransitionTaken(evaluationState -> updateConsumptionSpeed(evaluationState, hand))
+                                .bindToOnTransitionTaken(context -> updateConsumptionSpeed(context, hand))
                                 .build())
                         .build())
                 .addStateAlias(StateAlias.builder(
@@ -117,27 +116,26 @@ public class FirstPersonDrinking {
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f))
                                         .setEasement(Easing.SINE_IN_OUT)
                                         .build())
-                                .bindToOnTransitionTaken(evaluationState -> updateConsumptionSpeed(evaluationState, hand))
+                                .bindToOnTransitionTaken(context -> updateConsumptionSpeed(context, hand))
                                 .build())
                         .build())
                 .build();
     }
 
-    public static void updateConsumptionSpeed(PoseFunction.FunctionEvaluationState evaluationState, InteractionHand hand) {
-        ItemStack item = evaluationState.driverContainer().getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
+    public static void updateConsumptionSpeed(PoseTickEvaluationContext context, InteractionHand hand) {
+        ItemStack item = context.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
         if (!item.has(DataComponents.CONSUMABLE)) {
             return;
         }
         float speed = Objects.requireNonNull(item.get(DataComponents.CONSUMABLE)).consumeSeconds();
         speed = 1f / Math.max(speed, 0.1f);
-        evaluationState.driverContainer().getDriver(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED).setValue(speed);
+        context.getDriver(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED).setValue(speed);
     }
 
-    private static boolean isDrinking(StateTransition.TransitionContext context, InteractionHand hand) {
-        OnTickDriverContainer driverContainer = context.driverContainer();
-        if (!driverContainer.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand))) {
+    private static boolean isDrinking(StateTransitionContext context, InteractionHand hand) {
+        if (!context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand))) {
             return false;
         }
-        return driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand)).getUseAnimation() == ItemUseAnimation.DRINK;
+        return context.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand)).getUseAnimation() == ItemUseAnimation.DRINK;
     }
 }

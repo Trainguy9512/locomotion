@@ -70,7 +70,9 @@ public abstract class MixinMinecraft {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
     public void injectStartAttackMiss(CallbackInfoReturnable<Boolean> cir) {
         JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer().ifPresent(dataContainer -> {
-            dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger();
+            if (!dataContainer.getDriverValue(FirstPersonDrivers.IS_MINING)) {
+                dataContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED).trigger();
+            }
         });
     }
 

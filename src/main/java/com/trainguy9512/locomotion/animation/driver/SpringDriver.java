@@ -86,8 +86,8 @@ public class SpringDriver<D> extends VariableDriver<D> {
     }
 
     @Override
-    public D getValueInterpolated(float partialTicks) {
-        D interpolatedValue = super.getValueInterpolated(partialTicks);
+    public D getInterpolatedValue(float partialTicks) {
+        D interpolatedValue = super.getInterpolatedValue(partialTicks);
         if (this.returnsDelta) {
             D targetInterpolatedValue = this.interpolator.interpolate(this.previousTargetValue, this.currentTargetValue, partialTicks);
             return this.addition.apply(targetInterpolatedValue, this.multiplication.apply(interpolatedValue, -1f));

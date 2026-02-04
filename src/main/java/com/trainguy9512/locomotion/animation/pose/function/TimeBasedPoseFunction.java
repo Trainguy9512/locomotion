@@ -1,5 +1,7 @@
 package com.trainguy9512.locomotion.animation.pose.function;
 
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
 import com.trainguy9512.locomotion.animation.pose.Pose;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
@@ -8,15 +10,15 @@ import java.util.function.Function;
 
 public abstract class TimeBasedPoseFunction<P extends Pose> implements PoseFunction<P> {
 
-    protected final Function<FunctionEvaluationState, Boolean> isPlayingFunction;
-    protected final Function<FunctionEvaluationState, Float> playRateFunction;
+    protected final Function<PoseTickEvaluationContext, Boolean> isPlayingFunction;
+    protected final Function<PoseTickEvaluationContext, Float> playRateFunction;
     protected final TimeSpan resetStartTimeOffset;
 
     protected final VariableDriver<Float> ticksElapsed;
     protected float playRate;
     protected boolean isPlaying;
 
-    protected TimeBasedPoseFunction(Function<FunctionEvaluationState, Boolean> isPlayingFunction, Function<FunctionEvaluationState, Float> playRateFunction, TimeSpan resetStartTimeOffset){
+    protected TimeBasedPoseFunction(Function<PoseTickEvaluationContext, Boolean> isPlayingFunction, Function<PoseTickEvaluationContext, Float> playRateFunction, TimeSpan resetStartTimeOffset){
         this.isPlayingFunction = isPlayingFunction;
         this.playRateFunction = playRateFunction;
         this.resetStartTimeOffset = resetStartTimeOffset;
@@ -25,16 +27,16 @@ public abstract class TimeBasedPoseFunction<P extends Pose> implements PoseFunct
     }
 
     @Override
-    public void tick(FunctionEvaluationState evaluationState) {
-        this.isPlaying = isPlayingFunction.apply(evaluationState);
-        this.playRate = this.isPlaying ? playRateFunction.apply(evaluationState) : 0;
+    public void tick(PoseTickEvaluationContext context) {
+        this.isPlaying = isPlayingFunction.apply(context);
+        this.playRate = this.isPlaying ? playRateFunction.apply(context) : 0;
 
-        this.updateTime(evaluationState);
+        this.updateTime(context);
     }
 
-    protected void updateTime(FunctionEvaluationState evaluationState) {
+    protected void updateTime(PoseTickEvaluationContext context) {
         this.ticksElapsed.pushCurrentToPrevious();
-        evaluationState.ifMarkedForReset(this::resetTime);
+        context.ifMarkedForReset(this::resetTime);
         if (this.isPlaying) {
             this.ticksElapsed.modifyValue(currentValue -> currentValue + this.playRate);
         }
@@ -44,14 +46,14 @@ public abstract class TimeBasedPoseFunction<P extends Pose> implements PoseFunct
         this.ticksElapsed.hardReset();
     }
 
-    protected TimeSpan getInterpolatedTimeElapsed(FunctionInterpolationContext context){
-        return TimeSpan.ofTicks(this.ticksElapsed.getValueInterpolated(context.partialTicks()));
+    protected TimeSpan getInterpolatedTimeElapsed(PoseCalculationContext context){
+        return TimeSpan.ofTicks(this.ticksElapsed.getInterpolatedValue(context.partialTicks()));
     }
 
     public static class Builder<B> {
 
-        protected Function<FunctionEvaluationState, Float> playRateFunction;
-        protected Function<FunctionEvaluationState, Boolean> isPlayingFunction;
+        protected Function<PoseTickEvaluationContext, Float> playRateFunction;
+        protected Function<PoseTickEvaluationContext, Boolean> isPlayingFunction;
         protected TimeSpan resetStartTimeOffsetTicks;
 
         protected Builder() {
@@ -66,7 +68,7 @@ public abstract class TimeBasedPoseFunction<P extends Pose> implements PoseFunct
          * The play rate is used as a multiplier when incrementing time, so 1 is normal time, 0.5 is half as fast, and 2 is twice as fast.
          */
         @SuppressWarnings("unchecked")
-        public B setPlayRate(Function<FunctionEvaluationState, Float> playRateFunction) {
+        public B setPlayRate(Function<PoseTickEvaluationContext, Float> playRateFunction) {
             this.playRateFunction = playRateFunction;
             return (B) this;
         }
@@ -78,7 +80,7 @@ public abstract class TimeBasedPoseFunction<P extends Pose> implements PoseFunct
          */
         @SuppressWarnings("unchecked")
         public B setPlayRate(float playRate) {
-            this.playRateFunction = evaluationState -> playRate;
+            this.playRateFunction = context -> playRate;
             return (B) this;
         }
 
@@ -86,7 +88,7 @@ public abstract class TimeBasedPoseFunction<P extends Pose> implements PoseFunct
          * Sets the function that is used to update whether the function is playing or not each tick.
          */
         @SuppressWarnings("unchecked")
-        public B setIsPlaying(Function<FunctionEvaluationState, Boolean> isPlayingFunction) {
+        public B setIsPlaying(Function<PoseTickEvaluationContext, Boolean> isPlayingFunction) {
             this.isPlayingFunction = isPlayingFunction;
             return (B) this;
         }
