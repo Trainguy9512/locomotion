@@ -4,7 +4,6 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import com.trainguy9512.locomotion.animation.data.DriverGetter;
-import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -39,7 +38,7 @@ public class FirstPersonGenericItems {
                     FirstPersonAnimationSequences.HAND_GENERIC_ITEM_FIXED_ITEM_POSE,
                     itemStack -> true,
                     0)
-            .setItemRenderType(ItemRenderType.FIXED)
+            .setItemRenderType(ItemRenderType.ON_SHELF)
             .build());
     public static final Identifier ROD = register(LocomotionMain.makeIdentifier("rod"), GenericItemPoseDefinition.builder(
             FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE,
