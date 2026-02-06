@@ -88,6 +88,20 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             .defineForJoint(LEFT_ARM_JOINT, 1f)
             .build();
 
+    public static String getArmJoint(HumanoidArm arm) {
+        return switch (arm) {
+            case LEFT -> LEFT_ARM_JOINT;
+            case RIGHT -> RIGHT_ARM_JOINT;
+        };
+    }
+
+    public static String getItemJoint(HumanoidArm arm) {
+        return switch (arm) {
+            case LEFT -> LEFT_ITEM_JOINT;
+            case RIGHT -> RIGHT_ITEM_JOINT;
+        };
+    }
+
     @Override
     public void postProcessModelParts(EntityModel<AvatarRenderState> entityModel, AvatarRenderState entityRenderState) {
     }

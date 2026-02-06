@@ -2,7 +2,6 @@ package com.trainguy9512.locomotion.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.trainguy9512.locomotion.access.FirstPersonSingleBlockRenderer;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
@@ -10,7 +9,10 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpos
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoses;
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
+import com.trainguy9512.locomotion.animation.pose.ModelPartSpacePose;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -24,7 +26,6 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.resources.Identifier;
@@ -35,9 +36,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +68,72 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         this.blockRenderer = context.getBlockRenderDispatcher();
         this.itemModelResolver = context.getItemModelResolver();
         this.jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
+    }
+
+    public void renderLocomotionArmWithItem(float partialTick, PoseStack poseStack, SubmitNodeCollector nodeCollector, AbstractClientPlayer player, int combinedLight, InteractionHand hand) {
+
+        CURRENT_PARTIAL_TICKS = partialTick;
+        JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
+
+        if (jointAnimatorDispatcher.getFirstPersonPlayerDataContainer().isEmpty()) {
+            return;
+        }
+        if (jointAnimatorDispatcher.getInterpolatedFirstPersonPlayerPose().isEmpty()) {
+            return;
+        }
+        // Getting the arm side
+        boolean leftHanded = this.minecraft.options.mainHand().get() == HumanoidArm.LEFT;
+        HumanoidArm side = hand == InteractionHand.MAIN_HAND ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
+        if (leftHanded) {
+            side = side.getOpposite();
+        }
+
+        AnimationDataContainer dataContainer = jointAnimatorDispatcher.getFirstPersonPlayerDataContainer().get();
+        ModelPartSpacePose pose = jointAnimatorDispatcher.getInterpolatedFirstPersonPlayerPose().get();
+
+        JointChannel armPose = pose.getJointChannel(FirstPersonJointAnimator.getArmJoint(side));
+        JointChannel itemPose = pose.getJointChannel(FirstPersonJointAnimator.getItemJoint(side));
+
+
+        //? if >= 1.21.9 {
+        AvatarRenderer<@NotNull AbstractClientPlayer> playerRenderer = this.entityRenderDispatcher.getPlayerRenderer(player);
+        //?} else {
+        /*PlayerRenderer playerRenderer = (PlayerRenderer)this.entityRenderDispatcher.getRenderer(abstractClientPlayer);
+         *///?}
+
+        // Posing the player model
+        PlayerModel playerModel = playerRenderer.getModel();
+//        playerModel.resetPose();
+        ModelPart armModelPart = playerModel.getArm(side);
+        ((MatrixModelPart)(Object)armModelPart).locomotion$setMatrix(armPose.getTransform());
+
+        // Rendering the arm
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+        this.renderArm(player, playerModel, side, poseStack, nodeCollector, combinedLight);
+
+        Identifier genericItemPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(hand));
+        FirstPersonGenericItems.GenericItemPoseDefinition genericItemPoseDefinition = FirstPersonGenericItems.getOrThrowFromIdentifier(genericItemPoseIdentifier);
+        Identifier handPoseIdentifier = dataContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
+        FirstPersonHandPoses.HandPoseDefinition handPose = FirstPersonHandPoses.getOrThrowFromIdentifier(handPoseIdentifier);
+        ItemRenderType itemRenderType = handPoseIdentifier == FirstPersonHandPoses.GENERIC_ITEM ? genericItemPoseDefinition.itemRenderType() : handPose.itemRenderType();
+
+        ItemStack item = getItemStackInHandToRender(dataContainer, player, hand);
+
+        this.renderItem(
+                player,
+                item,
+                poseStack,
+                itemPose,
+                nodeCollector,
+                combinedLight,
+                HumanoidArm.RIGHT,
+                !leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
+                itemRenderType
+        );
+
+
+        poseStack.popPose();
     }
 
     public void render(float partialTicks, PoseStack poseStack, SubmitNodeCollector nodeCollector, LocalPlayer player, int combinedLight) {
@@ -178,8 +242,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         this.minecraft.renderBuffers().bufferSource().endBatch();
     }
 
-    private static ItemStack getItemStackInHandToRender(AnimationDataContainer dataContainer, LocalPlayer localPlayer, InteractionHand hand) {
-        ItemStack driverItem = dataContainer.getDriverValue(FirstPersonDrivers.getItemDriver(hand));
+    private static ItemStack getItemStackInHandToRender(AnimationDataContainer dataContainer, AbstractClientPlayer localPlayer, InteractionHand hand) {
         ItemStack driverRenderedItem = dataContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
         ItemStack playerItem = localPlayer.getItemInHand(hand);
 
@@ -219,7 +282,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         Identifier skinTextureLocation = skin.body().texturePath();
 
         // Getting the model parts
-        ModelPart armModelPart = leftArm ? playerModel.leftArm : playerModel.rightArm;
+        ModelPart armModelPart = playerModel.getArm(arm);
         ModelPart sleeveModelPart = leftArm ? playerModel.leftSleeve : playerModel.rightSleeve;
         PlayerModelPart sleevePlayerModelPart = leftArm ? PlayerModelPart.LEFT_SLEEVE : PlayerModelPart.RIGHT_SLEEVE;
 
@@ -266,7 +329,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             }
             switch (renderType) {
                 case MAP -> this.renderMap(nodeCollector, poseStack, itemStack, combinedLight);
-                case THIRD_PERSON_ITEM, MIRRORED_THIRD_PERSON_ITEM, FIXED -> {
+                case THIRD_PERSON_ITEM, MIRRORED_THIRD_PERSON_ITEM, ON_SHELF -> {
                     //? if >= 1.21.9 {
 
                     ItemDisplayContext displayContext = renderType.getItemDisplayContext(side);
@@ -276,44 +339,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
 
                     //?} else if >= 1.21.5 {
                     /*this.itemRenderer.renderStatic(entity, itemStack, displayContext, poseStack, bufferSource, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());
-                    *///?} else
+                     *///?} else
                     /*this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, side == HumanoidArm.LEFT, poseStack, buffer, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());*/
-                }
-                case BLOCK_STATE -> {
-                    FirstPersonBlockItemRenderer.submit(
-                            itemStack,
-                            poseStack,
-                            nodeCollector,
-                            combinedLight,
-                            side
-                    );
-//
-//                    Block block = ((BlockItem)itemStack.getItem()).getBlock();
-//                    BlockState blockState = this.getDefaultBlockState(block);
-//
-//
-//                    if (block instanceof FenceGateBlock || block instanceof ConduitBlock) {
-//                        poseStack.translate(0, -0.4f, 0);
-//                    }
-//                    if (block instanceof SporeBlossomBlock) {
-//                        poseStack.translate(0, 1, 1);
-//                        poseStack.mulPose(Axis.XP.rotation(Mth.PI));
-//                    }
-//
-//                    this.renderBlock(nodeCollector, poseStack, blockState, combinedLight);
-//                    if (block instanceof WallBlock) {
-//                        this.renderWallBlock(blockState, poseStack, nodeCollector, combinedLight);
-//                    } else if (block instanceof FenceBlock) {
-//                        this.renderFenceBlock(blockState, poseStack, nodeCollector, combinedLight);
-//                    } else if (block instanceof BedBlock) {
-//                        this.renderBedBlock(blockState, poseStack, nodeCollector, combinedLight);
-//                    } else if (block instanceof DoorBlock) {
-//                        this.renderDoorBlock(blockState, poseStack, nodeCollector, combinedLight);
-//                    } else {
-
-//                        ((AlternateSingleBlockRenderer)(this.blockRenderer)).locomotion$renderSingleBlockWithEmission(blockState, poseStack, nodeCollector, combinedLight);
-//                        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
-//                    }
                 }
             }
             SHOULD_FLIP_ITEM_TRANSFORM = false;
@@ -321,6 +348,7 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             poseStack.popPose();
         }
     }
+
 
     private static final RenderType MAP_BACKGROUND = RenderTypes.text(Identifier.withDefaultNamespace("textures/map/map_background.png"));
     private static final RenderType MAP_BACKGROUND_CHECKERBOARD = RenderTypes.text(
@@ -354,94 +382,6 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         }
     }
 
-    private void renderBlock(SubmitNodeCollector nodeCollector, PoseStack poseStack, BlockState blockState, int combinedLight) {
-
-        // Render the block through the special block renderer if it has one (skulls, beds, banners)
-
-        ((FirstPersonSingleBlockRenderer) Minecraft.getInstance().getBlockRenderer()).locomotion$submitSingleBlockWithEmission(blockState, poseStack, nodeCollector, combinedLight);
-//        nodeCollector.submitBlockModel(
-//                poseStack,
-//                ItemBlockRenderTypes.getRenderType(blockState),
-//                this.blockRenderer.getBlockModel(blockState),
-//                1.0F,
-//                1.0F,
-//                1.0F,
-//                combinedLight,
-//                OverlayTexture.NO_OVERLAY,
-//                0
-//        );
-//        nodeCollector.submitBlockModel(poseStack, RenderType.entitySolidZOffsetForward(TextureAtlas.LOCATION_BLOCKS), this.blockRenderer.getBlockModel(blockState), );
-//        nodeCollector.submitBlock(poseStack, blockState, combinedLight, OverlayTexture.NO_OVERLAY, 0);
-    }
-
-    private BlockState getDefaultBlockState(Block block) {
-        BlockState blockState = block.defaultBlockState();
-        blockState = blockState.trySetValue(BlockStateProperties.ROTATION_16, 8);
-        blockState = blockState.trySetValue(BlockStateProperties.ATTACH_FACE, AttachFace.FLOOR);
-        blockState = blockState.trySetValue(BlockStateProperties.DOWN, true);
-        if (block instanceof StairBlock) {
-            blockState = blockState.trySetValue(BlockStateProperties.FACING, Direction.NORTH);
-            blockState = blockState.trySetValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH);
-        } else {
-            blockState = blockState.trySetValue(BlockStateProperties.FACING, Direction.SOUTH);
-            blockState = blockState.trySetValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH);
-        }
-        return blockState;
-    }
-
-    private void renderBedBlock(
-            BlockState blockState,
-            PoseStack poseStack,
-            MultiBufferSource multiVersionRenderData,
-            int combinedLight
-    ) {
-        poseStack.translate(1f, -0.25f, 0.5f);
-        poseStack.mulPose(Axis.YP.rotation(Mth.PI));
-//        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
-    }
-
-    private void renderDoorBlock(
-            BlockState blockState,
-            PoseStack poseStack,
-            MultiBufferSource multiVersionRenderData,
-            int combinedLight
-    ) {
-//        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
-//        this.renderUpperHalfBlock(blockState, poseStack, bufferSource, combinedLight);
-    }
-
-    private void renderFenceBlock(
-            BlockState blockState,
-            PoseStack poseStack,
-            MultiBufferSource bufferSource,
-            int combinedLight
-    ) {
-        blockState = blockState.setValue(BlockStateProperties.EAST, true);
-        blockState = blockState.setValue(BlockStateProperties.WEST, true);
-        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
-    }
-
-    private void renderWallBlock(
-            BlockState blockState,
-            PoseStack poseStack,
-            MultiBufferSource bufferSource,
-            int combinedLight
-    ) {
-         blockState = blockState.setValue(BlockStateProperties.EAST_WALL, WallSide.LOW);
-         blockState = blockState.setValue(BlockStateProperties.WEST_WALL, WallSide.LOW);
-         this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
-    }
-
-    private void renderUpperHalfBlock(
-            BlockState blockState,
-            PoseStack poseStack,
-            MultiBufferSource bufferSource,
-            int combinedLight
-    ) {
-        poseStack.translate(0, 1, 0);
-        blockState = blockState.setValue(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER);
-        this.blockRenderer.renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
-    }
 
     public void transformCamera(PoseStack poseStack){
         if(this.minecraft.options.getCameraType().isFirstPerson()){
@@ -463,21 +403,4 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
         assert minecraft.player != null;
         return entityRenderDispatcher.getPlayerRenderer(minecraft.player).getModel();
     }
-
-//    private enum ItemRenderType {
-//        THIRD_PERSON_ITEM,
-//        DEFAULT_BLOCK_STATE,
-//        MAP;
-//
-//        public static ItemRenderType fromItemStack(ItemStack itemStack, FirstPersonHandPose handPose, FirstPersonGenericItemPose genericItemPose) {
-//            Item item = itemStack.getItem();
-//            if (handPose == FirstPersonHandPose.MAP) {
-//                return MAP;
-//            }
-//            if (genericItemPose.shouldRenderBlockstate() && item instanceof BlockItem && handPose == FirstPersonHandPose.GENERIC_ITEM) {
-//                return DEFAULT_BLOCK_STATE;
-//            }
-//            return THIRD_PERSON_ITEM;
-//        }
-//    }
 }
