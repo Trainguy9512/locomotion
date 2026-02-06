@@ -62,7 +62,7 @@ public class FirstPersonMovement {
         return context.getDriverValue(FirstPersonDrivers.IS_MOVING);
     }
 
-    public static boolean isSprinting(StateTransitionContext context) {
+    public static boolean isSprinting(DriverGetter context) {
         boolean isSprinting = context.getDriverValue(FirstPersonDrivers.IS_SPRINTING);
         boolean isCrouching = context.getDriverValue(FirstPersonDrivers.IS_CROUCHING);
         return isSprinting && !isCrouching;
@@ -214,71 +214,22 @@ public class FirstPersonMovement {
                 .addBlendInput(sprintingPoseFunction, context -> LocomotionMain.CONFIG.data().firstPersonPlayer.runningArmSwingIntensity)
                 .build();
 
-        PoseFunction<LocalSpacePose> walkingStateMachine;
-        walkingStateMachine = StateMachineFunction.builder(FirstPersonMovement::getWalkingEntryState)
-                .resetsUponRelevant(false)
-//                .defineState(StateDefinition.builder(WALKING_IDLE_STATE, idleAnimationPlayer)
-//                        .resetsPoseFunctionUponEntry(true)
-//                        // Begin walking if the player is moving horizontally
-//                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
-//                                .isTakenIfTrue(FirstPersonMovement::isWalking)
-//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.EXPONENTIAL_OUT).build())
-//                                .build())
-//                        .build())
-                .defineState(StateDefinition.builder(WALKING_WALKING_STATE, walkingPoseFunction)
-                        .resetsPoseFunctionUponEntry(false)
-                        // Begin sprinting if the player is sprinting
-                        .addOutboundTransition(StateTransition.builder(WALKING_SPRINTING_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isSprinting)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.7f)).setEasement(Easing.SINE_IN_OUT).build())
-                                .build())
-                        .build())
-                .defineState(StateDefinition.builder(WALKING_SPRINTING_STATE, sprintingPoseFunction)
-                        .resetsPoseFunctionUponEntry(false)
-                        // Begin walking if the player is no longer sprinting
-                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isNotSprinting)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.3f)).setEasement(Easing.SINE_IN_OUT).build())
-                                .build())
-                        .build())
-//                .defineState(StateDefinition.builder(WALKING_STOPPING_STATE, stoppingPoseFunction)
-//                        .resetsPoseFunctionUponEntry(true)
-//                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
-//                                .isTakenOnAnimationFinished(0f)
-//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(1f)).setEasement(Easing.SINE_IN_OUT).build())
-//                                .build())
-//                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
-//                                .isTakenIfTrue(FirstPersonMovement::isWalking)
-//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build())
-//                                .build())
-//                        .build())
-//                .addStateAlias(StateAlias.builder(
-//                        Set.of(
-//                                WALKING_WALKING_STATE,
-//                                WALKING_SPRINTING_STATE
-//                        ))
-//                        // Stop walking with the walk-to-stop animation if the player's already been walking for a bit.
-//                        .addOutboundTransition(StateTransition.builder(WALKING_STOPPING_STATE)
-//                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
-//                                .setCanInterruptOtherTransitions(true)
-//                                .setPriority(50)
-//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_IN_OUT).build())
-////                                .setCanInterruptOtherTransitions(false)
-//                                .build())
-////                        // Stop walking directly into the idle animation if the player only just began walking.
-//                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
-//                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
-//                                .setCanInterruptOtherTransitions(false)
-//                                .setPriority(60)
-//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.CUBIC_OUT).build())
-//                                .build())
-//                        .build())
+        PoseFunction<LocalSpacePose> walkingRunningPoseFunction = BlendPosesByBooleanFunction.builder(walkingPoseFunction, sprintingPoseFunction)
+                .setPredicate(FirstPersonMovement::isSprinting)
+                .setFalseToTrueDuration(TimeSpan.ofSeconds(0.6f))
+                .setTrueToFalseDuration(TimeSpan.ofSeconds(0.6f))
+                .setBlendEasement(Easing.CUBIC_IN_OUT)
                 .build();
 
-        PoseFunction<LocalSpacePose> idleWalkingBlendPoseFunction = BlendPosesFunction.builder(idleAnimationPlayer)
-                .addBlendInput(walkingStateMachine, context -> Mth.clamp(context.getDriverValue(FirstPersonDrivers.MODIFIED_WALK_SPEED) * 4, 0, 1))
+        PoseFunction<LocalSpacePose> idleWalkingPoseFunction = BlendPosesByBooleanFunction.builder(idleAnimationPlayer, walkingRunningPoseFunction)
+                .setBooleanDriver(FirstPersonDrivers.IS_MOVING)
+                .setFalseToTrueDuration(TimeSpan.ofSeconds(0.3f))
+                .setTrueToFalseDuration(TimeSpan.ofSeconds(0.5f))
+                .setBlendEasement(Easing.CUBIC_IN_OUT)
+                .setSkipEvaluationIfFullyBlended(false)
                 .build();
-        return idleWalkingBlendPoseFunction;
+
+        return idleWalkingPoseFunction;
     }
 
     public static final String CROUCHING_STANDING_STATE = "standing";
