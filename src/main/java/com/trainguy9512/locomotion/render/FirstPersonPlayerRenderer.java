@@ -127,8 +127,8 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                 itemPose,
                 nodeCollector,
                 combinedLight,
-                HumanoidArm.RIGHT,
-                !leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
+                side,
+                hand,
                 itemRenderType
         );
 
