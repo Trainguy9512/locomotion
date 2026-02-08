@@ -135,6 +135,26 @@ public record StateTransition(
         }
 
         /**
+         * Sets the predicate for this transition to be based on whether the provided boolean driver is true or not.
+         *
+         * @param driverKey             Driver key to use to get if the value is true or not.
+         */
+        public final <D extends Driver<Boolean>> Builder isTakenIfBooleanDriverTrue(DriverKey<D> driverKey) {
+            this.conditionPredicate = context -> context.getDriverValue(driverKey);
+            return this;
+        }
+
+        /**
+         * Sets the predicate for this transition to be based on whether the provided boolean driver is false or not.
+         *
+         * @param driverKey             Driver key to use to get if the value is false or not.
+         */
+        public final <D extends Driver<Boolean>> Builder isTakenIfBooleanDriverFalse(DriverKey<D> driverKey) {
+            this.conditionPredicate = context -> !context.getDriverValue(driverKey);
+            return this;
+        }
+
+        /**
          * Sets the transition timing properties for the state transition. Default is a single-tick linear transition.
          *
          * @param transition The {@link Transition} to use

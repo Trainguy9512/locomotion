@@ -62,6 +62,17 @@ public class FirstPersonMovement {
         return context.getDriverValue(FirstPersonDrivers.IS_MOVING);
     }
 
+    public static boolean isLanding(StateTransitionContext context) {
+        return context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+    }
+
+    public static boolean isSoftLanding(StateTransitionContext context) {
+        boolean isLanding = isLanding(context);
+        boolean fallDistanceLowEnough = context.timeElapsedInCurrentState().inSeconds() < 1f;
+        boolean currentTransitionNotFinished = context.currentStateWeight() != 1;
+        return isLanding && fallDistanceLowEnough && currentTransitionNotFinished;
+    }
+
     public static boolean isSprinting(DriverGetter context) {
         boolean isSprinting = context.getDriverValue(FirstPersonDrivers.IS_SPRINTING);
         boolean isCrouching = context.getDriverValue(FirstPersonDrivers.IS_CROUCHING);
@@ -333,11 +344,12 @@ public class FirstPersonMovement {
 
     public static PoseFunction<LocalSpacePose> constructWithFallingStateMachine(CachedPoseContainer cachedPoseContainer, PoseFunction<LocalSpacePose> standingPose) {
         PoseFunction<LocalSpacePose> jumpPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_JUMP).build();
-        PoseFunction<LocalSpacePose> fallingPoseFunction = BlendedSequencePlayerFunction.builder(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED)
-                .addEntry(0.5f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_UP)
-                .addEntry(-0f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_IN_PLACE)
-                .addEntry(-1f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_DOWN)
-                .build();
+//        PoseFunction<LocalSpacePose> fallingPoseFunction = BlendedSequencePlayerFunction.builder(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED)
+//                .addEntry(0.5f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_UP)
+//                .addEntry(-0f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_IN_PLACE)
+//                .addEntry(-1f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_DOWN)
+//                .build();
+        PoseFunction<LocalSpacePose> fallingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_IN_PLACE).build();
         PoseFunction<LocalSpacePose> landPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_LAND).build();
         PoseFunction<LocalSpacePose> softLandPoseFunction = BlendPosesFunction.builder(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build())
                 .addBlendInput(SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_LAND).setPlayRate(1f).build(), context -> 0.5f)
@@ -368,15 +380,13 @@ public class FirstPersonMovement {
                         .resetsPoseFunctionUponEntry(true)
                         // Move into the landing animation if the player is no longer falling
                         .addOutboundTransition(StateTransition.builder(FALLING_LAND_STATE)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND))
+                                .isTakenIfTrue(FirstPersonMovement::isLanding)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(50)
                                 .build())
                         // Move into the landing animation if the player is no longer falling, but only just began falling.
                         .addOutboundTransition(StateTransition.builder(FALLING_SOFT_LAND_STATE)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)
-                                        .and(StateTransition.CURRENT_TRANSITION_FINISHED.negate())
-                                )
+                                .isTakenIfTrue(FirstPersonMovement::isSoftLanding)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(60)
                                 .build())
