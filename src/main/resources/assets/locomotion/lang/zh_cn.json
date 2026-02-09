@@ -1,6 +1,6 @@
 {
   "locomotion.config.yacl_not_found.header": "未安装配置 API",
-  "locomotion.config.yacl_not_found.description": "Locomotion 使用配置库 \"YetAnotherConfigLib\" 来生成游戏内配置界面。它不是必需的依赖项，但如果您想在游戏中调整配置，则必须安装它。否则，您可以在 .minecraft/config/locomotion.json 中手动修改配置",
+  "locomotion.config.yacl_not_found.description": "Locomotion 使用 \"YetAnotherConfigLib\" 模组来生成游戏内的配置界面。它不是必需的前置模组，但是如果想在游戏中调整配置，那么必须要安装它。否则您可以在 .minecraft/config/locomotion.json 中手动修改配置",
   "locomotion.config.yacl_not_found.close": "关闭",
 
   "locomotion.config.title": "Locomotion 配置",
