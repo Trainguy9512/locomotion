@@ -35,8 +35,35 @@
   "locomotion.config.option.first_person_mining_speed.name": "挖掘动画速度倍率",
   "locomotion.config.option.first_person_mining_speed.description": "调整挖掘动画的播放速度。1 为正常速度，0.5 为一半速度，2 为两倍速度",
 
+  "locomotion.config.option.running_arm_swing_intensity.name": "奔跑摆臂强度",
+  "locomotion.config.option.running_arm_swing_intensity.description": "调整奔跑动画时的手臂摆动幅度。设为 0 时动画与行走相同，设为 1 时播放完整摆臂动画。",
+
   "locomotion.config.group.first_person_map.name": "地图物品",
   "locomotion.config.group.first_person_map.description": "地图物品的显示和动画设置。",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "地图移动动画强度",
-  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "控制手持地图物品时的移动动画强度。较低的强度有助于提高地图可读性。"
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "控制手持地图物品时的移动动画强度。较低的强度有助于提高地图可读性。",
+
+  "locomotion.config.group.first_person_arm_offset.name": "手臂位置偏移",
+  "locomotion.config.group.first_person_arm_offset.description": "调整第一人称手臂位置的设置。",
+  "locomotion.config.option.first_person_arm_offset_x.name": "手臂 X 轴偏移",
+  "locomotion.config.option.first_person_arm_offset_x.description": "手臂在 X（水平）轴上的偏移量。",
+  "locomotion.config.option.first_person_arm_offset_y.name": "手臂 Y 轴偏移",
+  "locomotion.config.option.first_person_arm_offset_y.description": "手臂在 Y（垂直）轴上的偏移量。",
+  "locomotion.config.option.first_person_arm_offset_z.name": "手臂 Z 轴偏移",
+  "locomotion.config.option.first_person_arm_offset_z.description": "手臂在 Z（深度）轴上的偏移量。",
+
+  "locomotion.config.category.block_entities.name": "方块实体",
+  "locomotion.config.category.block_entities.tooltip": "各种方块实体动画的设置",
+
+  "locomotion.config.group.individual_block_entity_toggles.name": "独立方块开关",
+  "locomotion.config.group.individual_block_entity_toggles.description": "每种方块实体的独立开关。",
+
+  "locomotion.config.group.block_entity_optimization.name": "优化",
+  "locomotion.config.group.block_entity_optimization.description": "影响性能的方块实体动画设置。",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.name": "姿态计算频率",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.description": "方块实体动画姿态的计算频率。“每 tick 一次”意味着每游戏刻计算一次并进行线性插值；“每一帧”意味着每帧计算且不插值。通常“每 tick 一次”性能更好，但动画相当于 20FPS 插值。",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.enum.calculate_once_per_tick": "每 tick 一次并插值",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.enum.calculate_every_frame": "每一帧",
+  "locomotion.config.option.block_entity_animation_distance.name": "动画距离",
+  "locomotion.config.option.block_entity_animation_distance.description": "玩家距离多远时播放动画。超出此范围将播放原版动画。"
 }
