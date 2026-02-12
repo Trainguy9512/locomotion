@@ -1,5 +1,5 @@
 {
-    "format_version": 6,
+    "format_version": 5,
     "joint_skeleton": "locomotion:entity/player/first_person",
     "length": 0.033,
     "time_markers": {},
@@ -44,16 +44,16 @@
         "arm_L_jnt": {
             "translation": {
                 "0.0": [
-                    0.0,
-                    0.0,
-                    0.0
+                    -0.167,
+                    -3.272,
+                    0.203
                 ]
             },
             "rotation": {
                 "0.0": [
-                    -115.929,
-                    -0.0,
-                    -0.0
+                    -119.366,
+                    1.298,
+                    0.697
                 ]
             },
             "scale": {
@@ -181,9 +181,9 @@
             },
             "rotation": {
                 "0.0": [
-                    -0.0,
                     0.0,
-                    0.0
+                    0.0,
+                    -0.0
                 ]
             },
             "scale": {
