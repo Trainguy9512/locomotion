@@ -4,7 +4,6 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonMap;
 import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
-import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -20,6 +19,7 @@ import java.util.Set;
 public class FirstPersonMovement {
 
     public static String ADDITIVE_CROUCH_POSE_CACHE = "additive_crouch_pose";
+    public static String FALLING_STANDING_POSE_CACHE = "falling_standing_pose";
     public static String MOVEMENT_WITHOUT_OVERRIDES_CACHE = "movement_without_overrides";
 
     public static PoseFunction<LocalSpacePose> constructWithMovementAnimations(PoseFunction<LocalSpacePose> inputPose, CachedPoseContainer cachedPoseContainer) {
@@ -62,8 +62,28 @@ public class FirstPersonMovement {
         return context.getDriverValue(FirstPersonDrivers.IS_MOVING);
     }
 
+    public static boolean isFallingAndShouldPlayTransition(StateTransitionContext context) {
+        if (context.timeElapsedInCurrentState().inSeconds() < 0.75f) {
+            return false;
+        }
+        return isFalling(context);
+    }
+
+    public static boolean isFalling(StateTransitionContext context) {
+        return !context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+    }
+
+    public static boolean shouldInterruptLandingAnimation(StateTransitionContext context) {
+        if (context.timeElapsedInCurrentState().in60FramesPerSecond() < 6) {
+            return false;
+        }
+        return isWalking(context);
+    }
+
     public static boolean isLanding(StateTransitionContext context) {
-        return context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+        boolean isGrounded = context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+        boolean isJumping = context.getDriverValue(FirstPersonDrivers.IS_JUMPING);
+        return isGrounded && !isJumping;
     }
 
     public static boolean isSoftLanding(StateTransitionContext context) {
@@ -109,6 +129,9 @@ public class FirstPersonMovement {
         PoseFunction<LocalSpacePose> pose;
         pose = constructWalkingStateMachine();
         pose = constructWithCrouchPose(cachedPoseContainer, pose);
+        cachedPoseContainer.register(FALLING_STANDING_POSE_CACHE, pose, true);
+        pose = cachedPoseContainer.getOrThrow(FALLING_STANDING_POSE_CACHE);
+
         pose = constructWithFallingStateMachine(cachedPoseContainer, pose);
         pose = constructWithUnderwaterStateMachine(pose);
         pose = constructWithMountStateMachine(pose);
@@ -195,6 +218,18 @@ public class FirstPersonMovement {
         return TimeSpan.ofTicks(walkDistance * Mth.PI);
     }
 
+    public static float getWalkingAnimationPlayRate(DriverGetter context) {
+        float walkSpeed = context.getDriverValue(FirstPersonDrivers.MODIFIED_WALK_SPEED);
+        float walkPlayRate = walkSpeed * Mth.PI;
+
+        boolean isGrounded = context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
+        if (isGrounded) {
+            return walkPlayRate;
+        } else {
+            return 0;
+        }
+    }
+
     public static PoseFunction<LocalSpacePose> constructWalkingStateMachine() {
         PoseFunction<LocalSpacePose> idleAnimationPlayer = BlendPosesFunction.builder(
                 SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build())
@@ -212,13 +247,24 @@ public class FirstPersonMovement {
 //                .addEntry(1f, FirstPersonAnimationSequences.GROUND_MOVEMENT_SPRINTING, 3.5f)
 //                .build();
 
-        PoseFunction<LocalSpacePose> walkingPoseFunction = SequenceEvaluatorFunction
+//        PoseFunction<LocalSpacePose> walkingPoseFunction = SequenceEvaluatorFunction
+//                .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING)
+//                .evaluatesPoseAt(FirstPersonMovement::getWalkingAnimationPosition)
+//                .build();
+//        PoseFunction<LocalSpacePose> sprintingPoseFunction = SequenceEvaluatorFunction
+//                .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_SPRINTING)
+//                .evaluatesPoseAt(FirstPersonMovement::getWalkingAnimationPosition)
+//                .build();
+
+        PoseFunction<LocalSpacePose> walkingPoseFunction = SequencePlayerFunction
                 .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING)
-                .evaluatesPoseAt(FirstPersonMovement::getWalkingAnimationPosition)
+                .setPlayRate(FirstPersonMovement::getWalkingAnimationPlayRate)
+                .setLooping(true)
                 .build();
-        PoseFunction<LocalSpacePose> sprintingPoseFunction = SequenceEvaluatorFunction
+        PoseFunction<LocalSpacePose> sprintingPoseFunction = SequencePlayerFunction
                 .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_SPRINTING)
-                .evaluatesPoseAt(FirstPersonMovement::getWalkingAnimationPosition)
+                .setPlayRate(FirstPersonMovement::getWalkingAnimationPlayRate)
+                .setLooping(true)
                 .build();
 
         sprintingPoseFunction = BlendPosesFunction.builder(walkingPoseFunction)
@@ -330,10 +376,22 @@ public class FirstPersonMovement {
         return inputWithAdditiveCrouchPose;
     }
 
+    public static PoseFunction<LocalSpacePose> makeAdditiveMovementPose(PoseFunction<LocalSpacePose> inputPose) {
+        PoseFunction<LocalSpacePose> basePose = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build();
+        return MakeDynamicAdditiveFunction.of(inputPose, basePose);
+    }
+
+    public static PoseFunction<LocalSpacePose> madeAdditiveWithFallingStandingPose(CachedPoseContainer cachedPoseContainer, PoseFunction<LocalSpacePose> inputPose) {
+        PoseFunction<LocalSpacePose> additivePose = makeAdditiveMovementPose(inputPose);
+        PoseFunction<LocalSpacePose> standingPose = cachedPoseContainer.getOrThrow(FALLING_STANDING_POSE_CACHE);
+        return ApplyAdditiveFunction.of(standingPose, additivePose);
+    }
+
     public static final String FALLING_STANDING_STATE = "standing";
     public static final String FALLING_STANDING_TO_FALLING_STATE = "standing_to_falling";
     public static final String FALLING_FALLING_STATE = "falling";
     public static final String FALLING_JUMP_STATE = "jump";
+    public static final String FALLING_JUMP_RUNNING_STATE = "jump_running";
     public static final String FALLING_LAND_STATE = "land";
     public static final String FALLING_SOFT_LAND_STATE = "soft_land";
 
@@ -344,22 +402,30 @@ public class FirstPersonMovement {
 
     public static PoseFunction<LocalSpacePose> constructWithFallingStateMachine(CachedPoseContainer cachedPoseContainer, PoseFunction<LocalSpacePose> standingPose) {
         PoseFunction<LocalSpacePose> jumpPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_JUMP).build();
+        PoseFunction<LocalSpacePose> jumpRunningPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_JUMP_RUNNING).build();
 //        PoseFunction<LocalSpacePose> fallingPoseFunction = BlendedSequencePlayerFunction.builder(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED)
 //                .addEntry(0.5f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_UP)
 //                .addEntry(-0f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_IN_PLACE)
 //                .addEntry(-1f, FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_DOWN)
 //                .build();
         PoseFunction<LocalSpacePose> fallingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_FALLING_IN_PLACE).build();
-        PoseFunction<LocalSpacePose> landPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_LAND).build();
+        PoseFunction<LocalSpacePose> landPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_LAND)
+                .build();
         PoseFunction<LocalSpacePose> softLandPoseFunction = BlendPosesFunction.builder(SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build())
                 .addBlendInput(SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_LAND).setPlayRate(1f).build(), context -> 0.5f)
                 .build();
-        PoseFunction<LocalSpacePose> standingToFallingPoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build();
+//        PoseFunction<LocalSpacePose> standingToFallingPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING_TO_FALLING).build();
+        PoseFunction<LocalSpacePose> standingToFallingPoseFunction = standingPose;
+
+        jumpPoseFunction = madeAdditiveWithFallingStandingPose(cachedPoseContainer, jumpPoseFunction);
+        landPoseFunction = madeAdditiveWithFallingStandingPose(cachedPoseContainer, landPoseFunction);
+        softLandPoseFunction = madeAdditiveWithFallingStandingPose(cachedPoseContainer, softLandPoseFunction);
+//        standingToFallingPoseFunction = madeAdditiveWithFallingStandingPose(cachedPoseContainer, standingToFallingPoseFunction);
 
         jumpPoseFunction = constructWithCrouchPose(cachedPoseContainer, jumpPoseFunction);
         landPoseFunction = constructWithCrouchPose(cachedPoseContainer, landPoseFunction);
         softLandPoseFunction = constructWithCrouchPose(cachedPoseContainer, softLandPoseFunction);
-        standingToFallingPoseFunction = constructWithCrouchPose(cachedPoseContainer, standingToFallingPoseFunction);
+//        standingToFallingPoseFunction = constructWithCrouchPose(cachedPoseContainer, standingToFallingPoseFunction);
 
         PoseFunction<LocalSpacePose> fallingStateMachine;
         fallingStateMachine = StateMachineFunction.builder(FirstPersonMovement::getFallingEntryState)
@@ -371,7 +437,7 @@ public class FirstPersonMovement {
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
                                 .isTakenIfTrue(StateTransition.ALWAYS_TRUE)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f))
+                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f))
                                         .setEasement(Easing.SINE_OUT)
                                         .build())
                                 .build())
@@ -390,6 +456,14 @@ public class FirstPersonMovement {
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(60)
                                 .build())
+                        // Move into the landing animation if the player is no longer falling, but only barely just began falling.
+//                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::isEvenSofterLanding)
+//                                .setTiming(Transition.builder(TimeSpan.ofTicks(9))
+//                                        .setEasement(Easing.Elastic.of(6f, true))
+//                                        .build())
+//                                .setPriority(70)
+//                                .build())
                         // Move into the landing animation if the player is no longer falling, but only just began falling.
                         .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
                                 .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)
@@ -399,26 +473,21 @@ public class FirstPersonMovement {
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_OUT).build())
                                 .setPriority(70)
                                 .build())
-                        // Transition to the jumping animation if the player is jumping and grounded.
-                        .addOutboundTransition(StateTransition.builder(FALLING_JUMP_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isJumping)
-                                .setTiming(Transition.SINGLE_TICK)
-                                .setPriority(80)
-                                .build())
                         .build())
                 .defineState(StateDefinition.builder(FALLING_JUMP_STATE, jumpPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         // Automatically move into the falling animation player
                         .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
-                                .isTakenOnAnimationFinished(1f)
-                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(19)).setEasement(Easing.CUBIC_OUT).build())
+                                .isTakenIfTrue(context -> context.timeElapsedInCurrentState().in60FramesPerSecond() > 4f)
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.CUBIC_OUT).build())
                                 .build())
-                        // If the player lands before it can move into the falling animation, go straight to the landing animation as long as the jump state is fully transitioned.
+                        .build())
+                .defineState(StateDefinition.builder(FALLING_JUMP_RUNNING_STATE, jumpRunningPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        // Automatically move into the falling animation player
                         .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
-                                .isTakenIfTrue(StateTransition.CURRENT_TRANSITION_FINISHED
-                                        .and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND))
-                                )
-                                .setTiming(Transition.SINGLE_TICK)
+                                .isTakenIfTrue(context -> context.timeElapsedInCurrentState().in60FramesPerSecond() > 10f)
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.CUBIC_OUT).build())
                                 .build())
                         .build())
                 .defineState(StateDefinition.builder(FALLING_LAND_STATE, landPoseFunction)
@@ -433,41 +502,74 @@ public class FirstPersonMovement {
                 ))
                         // If the falling animation is finishing and the player is not walking, play the idle animation.
                         .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
-                                .isTakenIfTrue(StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED.and(FirstPersonMovement::isNotWalking))
+                                .isTakenIfTrue(StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(1)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(50)
                                 .build())
                         // If the falling animation is finishing and the player is walking, play the walking animation.
-                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isWalking)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.5f)).setEasement(Easing.SINE_IN_OUT).build())
-                                .setPriority(60)
-                                .build())
-                        // Transition to the jumping animation if the player is jumping, but the landing animation has only just begun to play.
-                        .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isJumpingAndCanBypassJumpAnimation)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_OUT).build())
-                                .setPriority(70)
-                                .build())
+//                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::shouldInterruptLandingAnimation)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.5f)).setEasement(Easing.SINE_IN_OUT).build())
+//                                .setPriority(60)
+//                                .build())
+//                        // Transition to the jumping animation if the player is jumping, but the landing animation has only just begun to play.
+//                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::isJumpingAndCanBypassJumpAnimation)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.2f)).setEasement(Easing.SINE_OUT).build())
+//                                .setPriority(70)
+//                                .build())
                         .build())
                 .addStateAlias(StateAlias.builder(Set.of(
                                 FALLING_LAND_STATE,
                                 FALLING_SOFT_LAND_STATE,
                                 FALLING_STANDING_STATE
                         ))
-                        // Transition to the jumping animation if the player is jumping.
-                        .addOutboundTransition(StateTransition.builder(FALLING_JUMP_STATE)
-                                .isTakenIfTrue(FirstPersonMovement::isJumping)
-                                .setTiming(Transition.SINGLE_TICK)
+                        // Transition to the falling animation if the player is falling, and play the transition animation.
+                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_TO_FALLING_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isFallingAndShouldPlayTransition)
+                                .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10))
+                                        .setEasement(Easing.CUBIC_OUT)
+                                        .build())
                                 .setPriority(60)
                                 .build())
                         // Transition to the falling animation if the player is falling.
                         .addOutboundTransition(StateTransition.builder(FALLING_STANDING_TO_FALLING_STATE)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND).negate())
-                                .setTiming(Transition.builder(TimeSpan.ofTicks(2))
-                                        .setEasement(Easing.SINE_IN_OUT)
+                                .isTakenIfTrue(FirstPersonMovement::isFalling)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(1))
+                                        .setEasement(Easing.SINE_OUT)
                                         .build())
                                 .setPriority(50)
+                                .build())
+                        .build())
+                .addStateAlias(StateAlias.builder(Set.of(
+                                FALLING_LAND_STATE,
+                                FALLING_SOFT_LAND_STATE,
+                                FALLING_STANDING_STATE,
+                                FALLING_FALLING_STATE
+                        ))
+                        // Transition to the jumping animation if the player is jumping.
+                        .addOutboundTransition(StateTransition.builder(FALLING_JUMP_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isJumping)
+                                .setTiming(Transition.SINGLE_TICK)
+                                .setPriority(80)
+                                .build())
+                        // Transition to the jumping animation if the player is jumping and running.
+                        .addOutboundTransition(StateTransition.builder(FALLING_JUMP_RUNNING_STATE)
+                                .isTakenIfTrue(context -> isJumping(context) && isSprinting(context))
+                                .setTiming(Transition.SINGLE_TICK)
+                                .setPriority(90)
+                                .build())
+                        .build())
+                .addStateAlias(StateAlias.builder(Set.of(
+                                FALLING_JUMP_STATE,
+                                FALLING_JUMP_RUNNING_STATE
+                        ))
+                        // If the player lands before it can move into the falling animation, go straight to the landing animation as long as the jump state is fully transitioned.
+                        .addOutboundTransition(StateTransition.builder(FALLING_FALLING_STATE)
+                                .isTakenIfTrue(StateTransition.CURRENT_TRANSITION_FINISHED
+                                        .and(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND))
+                                )
+                                .setTiming(Transition.SINGLE_TICK)
                                 .build())
                         .build())
                 .build();
