@@ -35,8 +35,35 @@
   "locomotion.config.option.first_person_mining_speed.name": "Multiplicador de velocidad de animación de minería",
   "locomotion.config.option.first_person_mining_speed.description": "Ajusta la velocidad a la que se reproducen las animaciones de minería. 1 es la velocidad normal, 0.5 es la mitad de velocidad y 2 es el doble de velocidad.",
 
+  "locomotion.config.option.running_arm_swing_intensity.name": "Intensidad de balanceo de brazos al correr",
+  "locomotion.config.option.running_arm_swing_intensity.description": "Ajusta cuánto se balancean los brazos durante las animaciones de correr. Con un valor de 0, la animación será igual que la de caminar. Con un valor de 1, se reproducirá el balanceo completo de brazos en lugar de la animación de caminar",
+
   "locomotion.config.group.first_person_map.name": "Objetos de mapa",
   "locomotion.config.group.first_person_map.description": "Configuración de cómo se muestran y animan los objetos de mapa.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "Intensidad de animación de movimiento del mapa",
-  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controla la intensidad de las animaciones de movimiento al sostener un objeto de mapa. Una menor intensidad ayuda a mejorar la legibilidad del mapa."
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "Controla la intensidad de las animaciones de movimiento al sostener un objeto de mapa. Una menor intensidad ayuda a mejorar la legibilidad del mapa.",
+
+  "locomotion.config.group.first_person_arm_offset.name": "Desplazamiento de posición de brazos",
+  "locomotion.config.group.first_person_arm_offset.description": "Configuración para ajustar la posición de los brazos en primera persona",
+  "locomotion.config.option.first_person_arm_offset_x.name": "Desplazamiento X de brazos",
+  "locomotion.config.option.first_person_arm_offset_x.description": "Desplazamiento de brazos en el eje X (horizontal)",
+  "locomotion.config.option.first_person_arm_offset_y.name": "Desplazamiento Y de brazos",
+  "locomotion.config.option.first_person_arm_offset_y.description": "Desplazamiento de brazos en el eje Y (vertical)",
+  "locomotion.config.option.first_person_arm_offset_z.name": "Desplazamiento Z de brazos",
+  "locomotion.config.option.first_person_arm_offset_z.description": "Desplazamiento de brazos en el eje Z (profundidad)",
+
+  "locomotion.config.category.block_entities.name": "Entidades de bloque",
+  "locomotion.config.category.block_entities.tooltip": "Configuración de animaciones para varias entidades de bloque",
+
+  "locomotion.config.group.individual_block_entity_toggles.name": "Interruptores individuales de bloques",
+  "locomotion.config.group.individual_block_entity_toggles.description": "Activadores para cada tipo de entidad de bloque",
+
+  "locomotion.config.group.block_entity_optimization.name": "Optimización",
+  "locomotion.config.group.block_entity_optimization.description": "Configuración de animaciones de entidades de bloque que afectan al rendimiento.",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.name": "Frecuencia de cálculo de postura",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.description": "Define con qué frecuencia se calculan las posturas de las animaciones de las entidades de bloque. En \"una vez por tick\", la animación se calcula una vez por cada tick del juego y luego se interpola de forma lineal. En \"cada fotograma\", la postura se calcula en cada fotograma y no se interpola. Una vez por tick suele ser más eficiente, pero las animaciones interpoladas se ejecutan a 20 FPS.",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.enum.calculate_once_per_tick": "Una vez por tick e interpolado",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.enum.calculate_every_frame": "Cada fotograma",
+  "locomotion.config.option.block_entity_animation_distance.name": "Distancia de animación",
+  "locomotion.config.option.block_entity_animation_distance.description": "Define a qué distancia del jugador se reproducen las animaciones. Fuera de este rango, se usarán las animaciones Vanilla."
 }
