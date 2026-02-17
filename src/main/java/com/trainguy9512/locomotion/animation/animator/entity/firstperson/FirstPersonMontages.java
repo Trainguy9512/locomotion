@@ -167,20 +167,24 @@ public class FirstPersonMontages {
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
+            .makeAdditive(FirstPersonMontages::getCurrentMainHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration BUCKET_COLLECT_OFF_HAND_MONTAGE = BUCKET_COLLECT_MAIN_HAND_MONTAGE.makeBuilderCopy("bucket_collect_off_hand", FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BUCKET_COLLECT)
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
+            .makeAdditive(FirstPersonMontages::getCurrentOffHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration BUCKET_EMPTY_MAIN_HAND_MONTAGE = MontageConfiguration.builder("bucket_empty_main_hand", FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BUCKET_EMPTY)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
+            .makeAdditive(FirstPersonMontages::getCurrentMainHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration BUCKET_EMPTY_OFF_HAND_MONTAGE = BUCKET_EMPTY_MAIN_HAND_MONTAGE.makeBuilderCopy("bucket_empty_off_hand", FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BUCKET_EMPTY)
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
+            .makeAdditive(FirstPersonMontages::getCurrentOffHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration CROSSBOW_FIRE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("crossbow_fire_main_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
