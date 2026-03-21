@@ -6,9 +6,10 @@ Locomotion is a Minecraft: Java mod centered around giving the game's entities a
 
 ---------------------------------------------
 BACKPORT FOR MINECRAFT 1.20.1 -FORGE-
-BUILD WITH: gradlew clean chiseledBuildForge
-USE JAVA 21
 ---------------------------------------------
+>BUILD WITH: gradlew clean chiseledBuildForge
+>USE JAVA 21
+
 
 > **Warning!**
 > This project is still in heavy development! You are free to compile yourself and try it out, but keep in mind that there will be missing animations, placeholders, and debugging visuals that will not look correct in a normal gameplay context.
