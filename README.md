@@ -9,8 +9,8 @@ BACKPORT FOR MINECRAFT 1.20.1 -FORGE-
 ---------------------------------------------
 
 
-BUILD WITH: gradlew clean chiseledBuildForge
-USE JAVA 21
+-BUILD WITH: gradlew clean chiseledBuildForge
+-USE JAVA 21
 
 
 > **Warning!**
