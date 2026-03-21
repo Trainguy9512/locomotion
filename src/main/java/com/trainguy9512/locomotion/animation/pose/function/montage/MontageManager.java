@@ -53,7 +53,7 @@ public class MontageManager {
                 }
             }
         }
-        this.montageStack.addLast(MontageInstance.of(configuration, this.driverGetter));
+        this.montageStack.add(MontageInstance.of(configuration, this.driverGetter));
     }
 
     /**
@@ -215,12 +215,10 @@ public class MontageManager {
                     );
                 }
                 if (this.additiveSubtractionPose == null) {
-                    Identifier sequenceLocation = this.configuration.animationSequence();
-                    AnimationSequence sequence = LocomotionResources.getOrThrowAnimationSequence(sequenceLocation);
                     this.additiveSubtractionPose = AnimationSequence.samplePose(
                             jointSkeleton,
-                            sequenceLocation,
-                            this.configuration.startTimeOffset().interpolated(sequence.length(), this.configuration.additiveReferencePosePoint().getProgressThroughSequence()),
+                            this.configuration.animationSequence(),
+                            this.configuration.startTimeOffset(),
                             false
                     );
                     this.additiveSubtractionPose.invert();

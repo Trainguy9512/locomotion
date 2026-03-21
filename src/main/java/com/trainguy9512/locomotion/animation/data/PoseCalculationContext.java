@@ -10,7 +10,8 @@ import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import java.util.function.Function;
 
 public record PoseCalculationContext (
-        DriverGetter driverGetter,
+        @Deprecated
+        DriverGetter dataContainer,
         JointSkeleton jointSkeleton,
         MontageManager montageManager,
         float partialTicks,
@@ -18,7 +19,7 @@ public record PoseCalculationContext (
 ) implements DriverGetter {
 
     public <D, R extends Driver<D>> R getDriver(DriverKey<R> driverKey) {
-        return this.driverGetter.getDriver(driverKey);
+        return this.dataContainer.getDriver(driverKey);
     }
 
     @Override

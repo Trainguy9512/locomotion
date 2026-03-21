@@ -2,7 +2,6 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonGenericItems;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoses;
-import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendProfile;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
@@ -14,11 +13,19 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
+//? if >= 1.20.5 {
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.ChargedProjectiles;
+//?} else {
+/*import net.minecraft.world.item.CrossbowItem;*/
+//?}
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+//? if >= 1.21.0 {
 import net.minecraft.world.item.ItemUseAnimation;
-import net.minecraft.world.item.component.ChargedProjectiles;
+//?} else {
+import net.minecraft.world.item.UseAnim;
+//?}
 
 import java.util.Set;
 import java.util.function.Predicate;
@@ -99,7 +106,11 @@ public class FirstPersonTwoHandedActions {
                                 .isTakenIfTrue(
                                         StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.getUsingItemDriver(hand))
                                                 .and(context -> context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) == FirstPersonHandPoses.BOW)
+                                                //? if >= 1.21.0 {
                                                 .and(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() == ItemUseAnimation.BOW)
+                                                //?} else {
+                                                /*.and(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() == UseAnim.BOW)
+                                                *///?}
                                 )
                                 .bindToOnTransitionTaken(context -> {
                                     ItemStack projectileStack = context.getDriverValue(FirstPersonDrivers.PROJECTILE_ITEM);
@@ -119,7 +130,11 @@ public class FirstPersonTwoHandedActions {
                                         bowReleaseState
                                 ))
                         .addOutboundTransition(StateTransition.builder(TWO_HANDED_ACTION_NORMAL_STATE)
+                                //? if >= 1.21.0 {
                                 .isTakenIfTrue(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.BOW)
+                                //?} else {
+                                /*.isTakenIfTrue(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != UseAnim.BOW)
+                                *///?}
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
                                 .build())
                         .build()
@@ -148,9 +163,14 @@ public class FirstPersonTwoHandedActions {
             if (context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand)) != FirstPersonHandPoses.CROSSBOW) {
                 return false;
             }
+            //? if >= 1.21.0 {
             if (context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.CROSSBOW) {
+            //?} else {
+            /*if (context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != UseAnim.CROSSBOW) {
+            *///?}
                 return false;
             }
+            //? if >= 1.20.5 {
             ChargedProjectiles chargedProjectiles = context.getDriver(FirstPersonDrivers.getItemDriver(hand)).getCurrentValue().get(DataComponents.CHARGED_PROJECTILES);
             if (chargedProjectiles == null) {
                 return false;
@@ -159,6 +179,13 @@ public class FirstPersonTwoHandedActions {
                 return false;
             }
             return true;
+            //?} else {
+            /*ItemStack itemStack = context.getDriver(FirstPersonDrivers.getItemDriver(hand)).getCurrentValue();
+            if (!(itemStack.getItem() instanceof CrossbowItem)) {
+                return false;
+            }
+            return !CrossbowItem.isCharged(itemStack);*/
+            //?}
         };
 
         if (hand == InteractionHand.OFF_HAND) {
@@ -205,7 +232,11 @@ public class FirstPersonTwoHandedActions {
                                         crossbowFinishReloadState
                                 ))
                         .addOutboundTransition(StateTransition.builder(TWO_HANDED_ACTION_NORMAL_STATE)
+                                //? if >= 1.21.0 {
                                 .isTakenIfTrue(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != ItemUseAnimation.CROSSBOW)
+                                //?} else {
+                                /*.isTakenIfTrue(context -> context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation() != UseAnim.CROSSBOW)
+                                *///?}
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
                                 .bindToOnTransitionTaken(context -> {
                                 })
@@ -224,7 +255,7 @@ public class FirstPersonTwoHandedActions {
     public static final String TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_MAIN_HAND_STATE = "crossbow_finish_reload_main_hand";
     public static final String TWO_HANDED_ACTION_CROSSBOW_FINISH_RELOAD_OFF_HAND_STATE = "crossbow_finish_reload_off_hand";
 
-    private static String getTwoHandedEntryState(DriverGetter driverGetter) {
+    private static String getTwoHandedEntryState(PoseTickEvaluationContext context) {
         return TWO_HANDED_ACTION_NORMAL_STATE;
     }
 

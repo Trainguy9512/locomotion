@@ -53,11 +53,13 @@ public class FirstPersonAttackAnimations {
             30)
             .setDoesAnimationOffsetOffHand(true)
             .build());
+    //? if >= 1.21.0 {
     public static final Identifier MACE_SLAM = register(LocomotionMain.makeIdentifier("mace_slam"), AttackAnimationRule.builder(
             FirstPersonMontages.HAND_MACE_ATTACK_MONTAGE,
             context -> context.item().is(ItemTags.MACE_ENCHANTABLE),
             30)
             .build());
+    //?}
     public static final Identifier SWORD_MAIN = register(LocomotionMain.makeIdentifier("sword_main"), AttackAnimationRule.builder(
             MontageConfiguration.builder("hand_tool_sword_attack", FirstPersonAnimationSequences.HAND_TOOL_SWORD_ATTACK)
                     .playsInSlot(FirstPersonMontages.MAIN_HAND_ATTACK_SLOT)

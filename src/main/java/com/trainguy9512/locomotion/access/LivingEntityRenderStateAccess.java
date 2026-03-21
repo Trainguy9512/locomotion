@@ -9,6 +9,11 @@ public interface LivingEntityRenderStateAccess {
     void animationOverhaul$setInterpolatedAnimationPose(Pose interpolatedPose);
     Optional<Pose> animationOverhaul$getInterpolatedAnimationPose();
 
+    //? if >= 1.21.9 {
     void animationOverhaul$setEntityJointAnimator(EntityJointAnimator<?, ?> livingEntityJointAnimator);
     Optional<EntityJointAnimator<?, ?>> animationOverhaul$getEntityJointAnimator();
+    //?} else {
+    /*void animationOverhaul$setEntityJointAnimator(EntityJointAnimator<?> livingEntityJointAnimator);
+    Optional<EntityJointAnimator<?>> animationOverhaul$getEntityJointAnimator();*/
+    //?}
 }

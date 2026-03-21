@@ -15,7 +15,6 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -40,11 +39,6 @@ public class FirstPersonUseAnimations {
             FirstPersonMontages::getUseAnimationMontage,
             UseAnimationConditionContext::swingFromClient,
             0
-    ));
-    public static final Identifier PLACE_BLOCK = register(LocomotionMain.makeIdentifier("place_block"), UseAnimationRule.of(
-            FirstPersonMontages::getPlaceBlockAnimationMontage,
-            FirstPersonUseAnimations::shouldPlayPlaceBlock,
-            5
     ));
     public static final Identifier AXE_SCRAPE = register(LocomotionMain.makeIdentifier("axe_scrape"), UseAnimationRule.of(
             FirstPersonMontages::getAxeScrapeMontage,
@@ -127,12 +121,6 @@ public class FirstPersonUseAnimations {
         return context.currentItem.is(Items.SHEARS) && context.useAnimationType() == UseAnimationType.INTERACT_ENTITY;
     }
 
-    private static boolean shouldPlayPlaceBlock(UseAnimationConditionContext context) {
-        boolean isClientSwing = context.swingFromClient();
-        boolean itemIsBlockItem = context.currentItem().getItem() instanceof BlockItem;
-        return isClientSwing && itemIsBlockItem;
-    }
-
     /**
      * Registers a use animation rule that plays a specified montage upon a use animation being triggered if it meets a condition.
      * @param identifier            Name to give the use animation
@@ -191,6 +179,7 @@ public class FirstPersonUseAnimations {
     public static void playUseAnimationIfTriggered(DriverGetter driverContainer, MontageManager montageManager, InteractionHand hand) {
         // Scheduling the next use animation if triggered by the multiplayer game mode.
         TriggerDriver hasUsedItemDriver = driverContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand));
+        TriggerDriver hasAttackedDriver = driverContainer.getDriver(FirstPersonDrivers.HAS_ATTACKED);
 
         int swingTime = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_SWING_TIME);
         InteractionHand lastUsedHand = driverContainer.getDriverValue(FirstPersonDrivers.LAST_USED_HAND);
@@ -247,11 +236,19 @@ public class FirstPersonUseAnimations {
         }
     }
 
+    //? if >= 1.21.0 {
     public static void triggerUseAnimation(
             InteractionHand hand,
             UseAnimationType useAnimationType,
             InteractionResult.SwingSource swingSource
     ) {
+    //?} else {
+    /*public static void triggerUseAnimation(
+            InteractionHand hand,
+            UseAnimationType useAnimationType,
+            boolean swingFromClient
+    ) {
+    *///?}
         var optional = JointAnimatorDispatcher.getInstance().getFirstPersonPlayerDataContainer();
         if (optional.isEmpty()) {
             return;
@@ -261,7 +258,11 @@ public class FirstPersonUseAnimations {
         dataContainer.getDriver(FirstPersonDrivers.getHasUsedItemDriver(hand)).trigger();
         dataContainer.getDriver(FirstPersonDrivers.LAST_USE_TYPE).setValue(useAnimationType);
         dataContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(hand);
+        //? if >= 1.21.0 {
         dataContainer.getDriver(FirstPersonDrivers.LAST_USED_SWING_FROM_CLIENT).setValue(swingSource == InteractionResult.SwingSource.CLIENT);
+        //?} else {
+        /*dataContainer.getDriver(FirstPersonDrivers.LAST_USED_SWING_FROM_CLIENT).setValue(swingFromClient);
+        *///?}
     }
 
     public static void updateUseAnimationHitResults(AnimationDataContainer dataContainer) {

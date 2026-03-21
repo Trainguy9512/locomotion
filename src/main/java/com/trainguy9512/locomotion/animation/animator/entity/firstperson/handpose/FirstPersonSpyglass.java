@@ -3,7 +3,6 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonJointAnimator;
-import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
@@ -18,7 +17,11 @@ import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.world.InteractionHand;
+//? if >= 1.21.0 {
 import net.minecraft.world.item.ItemUseAnimation;
+//?} else {
+import net.minecraft.world.item.UseAnim;
+//?}
 import org.joml.Vector3f;
 
 public class FirstPersonSpyglass {
@@ -27,7 +30,7 @@ public class FirstPersonSpyglass {
     public static final String SPYGLASS_LOOKING_STATE = "looking";
     public static final String SPYGLASS_LOOKING_EXIT_STATE = "looking_exit";
 
-    private static String getSpyglassEntryState(DriverGetter driverGetter) {
+    private static String getSpyglassEntryState(PoseTickEvaluationContext context) {
         return SPYGLASS_IDLE_STATE;
     }
 
@@ -83,10 +86,17 @@ public class FirstPersonSpyglass {
     private static Vector3f getHiddenScale(PoseCalculationContext context) {
         for (InteractionHand hand : InteractionHand.values()) {
             if (context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand))) {
+                //? if >= 1.21.0 {
                 ItemUseAnimation itemUseAnimation = context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation();
                 if (itemUseAnimation == ItemUseAnimation.SPYGLASS) {
                     return new Vector3f(0);
                 }
+                //?} else {
+                /*UseAnim itemUseAnimation = context.getDriverValue(FirstPersonDrivers.getItemDriver(hand)).getUseAnimation();
+                if (itemUseAnimation == UseAnim.SPYGLASS) {
+                    return new Vector3f(0);
+                }
+                *///?}
             }
         }
         return new Vector3f(1);

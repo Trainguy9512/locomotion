@@ -2,7 +2,6 @@ package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpo
 
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
-import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
@@ -13,24 +12,30 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
+//? if >= 1.20.5 {
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
+//?}
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+//? if >= 1.21.0 {
 import net.minecraft.world.item.ItemUseAnimation;
+//?} else {
+import net.minecraft.world.item.UseAnim;
+//?}
 
 import java.util.Objects;
 import java.util.Set;
 
 public class FirstPersonHandPoseSwitching {
 
-    public static String getEntryHandPoseState(DriverGetter driverGetter, InteractionHand hand) {
+    public static String getEntryHandPoseState(PoseTickEvaluationContext context, InteractionHand hand) {
 //        if (hand == InteractionHand.OFF_HAND) {
 //            return FirstPersonHandPoses.getOrThrowFromIdentifier(FirstPersonHandPoses.EMPTY_OFF_HAND).getLowerStateIdentifier();
 //        }
 
-        Identifier handPoseIdentifier = driverGetter.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
+        Identifier handPoseIdentifier = context.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
         FirstPersonHandPoses.HandPoseDefinition definition = FirstPersonHandPoses.getOrThrowFromIdentifier(handPoseIdentifier);
         return definition.stateIdentifier();
     }
@@ -279,6 +284,7 @@ public class FirstPersonHandPoseSwitching {
         if (!itemPreviousTick.is(itemCurrentTick.getItem())) {
             return true;
         }
+        //? if >= 1.20.5 {
         for (TypedDataComponent<?> dataComponent : itemCurrentTick.getComponents()) {
             if (dataComponent.type() == DataComponents.DAMAGE) {
                 continue;
@@ -291,6 +297,9 @@ public class FirstPersonHandPoseSwitching {
             }
         }
         return false;
+        //?} else {
+        /*return !ItemStack.isSameItemSameTags(itemPreviousTick, itemCurrentTick);*/
+        //?}
     }
 
     private static boolean isNewItemEmpty(StateTransitionContext context, InteractionHand hand) {
@@ -315,6 +324,7 @@ public class FirstPersonHandPoseSwitching {
         }
         // Duct-tape solution for hand pose functions like consumables not being able to update the rendered item before the hard switch condition is updated.
         if (context.getDriver(FirstPersonDrivers.getUsingItemDriver(hand)).getPreviousValue()) {
+            //? if >= 1.21.0 {
             ItemUseAnimation useAnimation = context.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(hand)).getPreviousValue().getUseAnimation();
             if (useAnimation == ItemUseAnimation.EAT) {
                 return false;
@@ -322,6 +332,15 @@ public class FirstPersonHandPoseSwitching {
             if (useAnimation == ItemUseAnimation.DRINK) {
                 return false;
             }
+            //?} else {
+            /*UseAnim useAnimation = context.getDriver(FirstPersonDrivers.getItemCopyReferenceDriver(hand)).getPreviousValue().getUseAnimation();
+            if (useAnimation == UseAnim.EAT) {
+                return false;
+            }
+            if (useAnimation == UseAnim.DRINK) {
+                return false;
+            }
+            *///?}
         }
         if (hasItemChanged(context, hand)) {
             return true;

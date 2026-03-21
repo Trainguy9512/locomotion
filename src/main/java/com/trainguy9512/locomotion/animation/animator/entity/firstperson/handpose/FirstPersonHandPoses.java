@@ -14,12 +14,20 @@ import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.util.LocomotionMultiVersionWrappers;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
+//? if >= 1.20.5 {
 import net.minecraft.core.component.DataComponents;
+//?} else {
+/*import net.minecraft.world.item.MapItem;*/
+//?}
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+//? if >= 1.21.0 {
 import net.minecraft.world.item.ItemUseAnimation;
+//?} else {
+import net.minecraft.world.item.UseAnim;
+//?}
 import net.minecraft.world.item.ShieldItem;
 
 import java.util.*;
@@ -129,7 +137,11 @@ public class FirstPersonHandPoses {
             "bow",
             HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_BOW_POSE,
+            //? if >= 1.21.0 {
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.BOW,
+            //?} else {
+            /*itemStack -> itemStack.getUseAnimation() == UseAnim.BOW,
+            *///?}
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
@@ -138,7 +150,11 @@ public class FirstPersonHandPoses {
             "crossbow",
             HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_CROSSBOW_POSE,
+            //? if >= 1.21.0 {
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.CROSSBOW,
+            //?} else {
+            /*itemStack -> itemStack.getUseAnimation() == UseAnim.CROSSBOW,
+            *///?}
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_CROSSBOW_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
@@ -156,11 +172,16 @@ public class FirstPersonHandPoses {
             "brush",
             FirstPersonBrush::constructBrushPoseFunction,
             FirstPersonAnimationSequences.HAND_BRUSH_POSE,
+            //? if >= 1.21.0 {
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.BRUSH,
+            //?} else {
+            /*itemStack -> itemStack.getUseAnimation() == UseAnim.BRUSH,
+            *///?}
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
             .build());
+    //? if >= 1.21.0 {
     public static final Identifier MACE = register(LocomotionMain.makeIdentifier("mace"), HandPoseDefinition.builder(
             "mace",
             FirstPersonMace::handMacePoseFunction,
@@ -170,11 +191,16 @@ public class FirstPersonHandPoses {
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
             .build());
+    //?}
     public static final Identifier SPYGLASS = register(LocomotionMain.makeIdentifier("spyglass"), HandPoseDefinition.builder(
             "spyglass",
             FirstPersonSpyglass::handSpyglassPoseFunction,
             FirstPersonAnimationSequences.HAND_SPYGLASS_POSE,
+            //? if >= 1.21.0 {
             itemStack -> itemStack.getUseAnimation() == ItemUseAnimation.SPYGLASS,
+            //?} else {
+            /*itemStack -> itemStack.getUseAnimation() == UseAnim.SPYGLASS,
+            *///?}
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)
@@ -183,7 +209,11 @@ public class FirstPersonHandPoses {
             "map",
             HandPoseFunctionSupplier::constructOnlyWithMiningAnimation,
             FirstPersonAnimationSequences.HAND_MAP_SINGLE_HAND_POSE,
+            //? if >= 1.20.5 {
             itemStack -> itemStack.has(DataComponents.MAP_ID),
+            //?} else {
+            /*itemStack -> itemStack.getItem() instanceof MapItem,*/
+            //?}
             100)
             .setRaiseSequence(FirstPersonAnimationSequences.HAND_TOOL_RAISE)
             .setLowerSequence(FirstPersonAnimationSequences.HAND_TOOL_LOWER)

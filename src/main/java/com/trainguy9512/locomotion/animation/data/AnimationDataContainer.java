@@ -16,6 +16,9 @@ import com.trainguy9512.locomotion.resource.LocomotionResources;
 import com.trainguy9512.locomotion.animation.util.Interpolator;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import net.minecraft.client.model.Model;
+//? if < 1.21.0 {
+/*import net.minecraft.client.model.HierarchicalModel;*/
+//?}
 import net.minecraft.client.model.geom.ModelPart;
 
 import java.util.Map;
@@ -121,13 +124,27 @@ public class AnimationDataContainer implements DriverGetter {
         return pose.convertedToComponentSpace().convertedToModelPartSpace();
     }
 
+    //? if >= 1.21.0 {
     public <S> void setupAnimWithAnimationPose(Model<S> model, float partialTicks){
+    //?} else {
+    /*public void setupAnimWithAnimationPose(Model model, float partialTicks){
+    *///?}
+        //? if >= 1.21.0 {
         model.resetPose();
+        //?} else {
+        /*if (model instanceof HierarchicalModel<?> hierarchicalModel) {
+            hierarchicalModel.root().resetPose();
+        }*/
+        //?}
 
         ModelPartSpacePose pose = this.getInterpolatedAnimationPose(partialTicks);
         JointSkeleton jointSkeleton = this.getJointSkeleton();
 
+        //? if >= 1.21.0 {
         Function<String, ModelPart> partLookup = model.root().createPartLookup();
+        //?} else {
+        /*Function<String, ModelPart> partLookup = name -> null;*/
+        //?}
         jointSkeleton.getJoints().forEach(joint -> {
             String modelPartIdentifier = jointSkeleton.getJointConfiguration(joint).modelPartIdentifier();
             if (modelPartIdentifier != null) {

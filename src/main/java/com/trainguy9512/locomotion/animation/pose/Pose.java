@@ -94,7 +94,11 @@ public abstract class Pose {
         JointChannel localParentJointChannel = this.getJointChannel(parent);
 
         poseStack.pushPose();
+        //? if >= 1.21.0 {
         poseStack.mulPose(localParentJointChannel.getTransform());
+        //?} else {
+        /*poseStack.mulPoseMatrix(localParentJointChannel.getTransform());*/
+        //?}
 
         this.getJointSkeleton().getDirectChildrenOfJoint(parent).forEach(child -> this.convertChildrenJointsToComponentSpace(child, poseStack));
 

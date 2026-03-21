@@ -25,17 +25,12 @@ public class FirstPersonMontages {
         return hand == InteractionHand.MAIN_HAND ? MAIN_HAND_ATTACK_SLOT : OFF_HAND_ATTACK_SLOT;
     }
 
-    public static Identifier getCurrentHandPose(DriverGetter driverContainer, InteractionHand hand) {
-        Identifier handPose = driverContainer.getDriverValue(FirstPersonDrivers.getHandPoseDriver(hand));
-        return FirstPersonHandPoses.getOrThrowFromIdentifier(handPose).currentBasePoseSupplier().apply(driverContainer, hand);
-    }
-
-    public static Identifier getCurrentMainHandPose(DriverGetter driverContainer) {
-        return getCurrentHandPose(driverContainer, InteractionHand.MAIN_HAND);
-    }
-
-    public static Identifier getCurrentOffHandPose(DriverGetter driverContainer) {
-        return getCurrentHandPose(driverContainer, InteractionHand.OFF_HAND);
+    public static Identifier getBaseHandPose(DriverGetter driverContainer) {
+        Identifier handPose = driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_POSE);
+        if (handPose == FirstPersonHandPoses.GENERIC_ITEM) {
+            return FirstPersonGenericItems.getOrThrowFromIdentifier(driverContainer.getDriverValue(FirstPersonDrivers.MAIN_HAND_GENERIC_ITEM_POSE)).basePoseSequence();
+        }
+        return FirstPersonHandPoses.getOrThrowFromIdentifier(handPose).currentBasePoseSupplier().apply(driverContainer, InteractionHand.MAIN_HAND);
     }
 
 
@@ -52,7 +47,7 @@ public class FirstPersonMontages {
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(3))
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(40)).setEasement(Easing.SINE_IN_OUT).build())
-            .makeAdditive(FirstPersonMontages::getCurrentMainHandPose, SequenceReferencePoint.END)
+            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
             .build();
     public static final MontageConfiguration HAND_TOOL_ATTACK_AXE_MONTAGE = MontageConfiguration.builder("hand_tool_attack_axe", FirstPersonAnimationSequences.HAND_TOOL_AXE_ATTACK)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
@@ -88,29 +83,13 @@ public class FirstPersonMontages {
             .setCooldownDuration(TimeSpan.of60FramesPerSecond(5))
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(16)).setEasement(Easing.SINE_IN_OUT).build())
-            .makeAdditive(FirstPersonMontages::getCurrentMainHandPose, SequenceReferencePoint.END)
+            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration USE_OFF_HAND_MONTAGE = USE_MAIN_HAND_MONTAGE.makeBuilderCopy("hand_use_off_hand", USE_MAIN_HAND_MONTAGE.animationSequence())
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
-            .makeAdditive(FirstPersonMontages::getCurrentOffHandPose, SequenceReferencePoint.END)
+            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
             .build();
-
-    public static final MontageConfiguration PLACE_BLOCK_MAIN_HAND_MONTAGE = MontageConfiguration.builder("place_block_main_hand", FirstPersonAnimationSequences.HAND_GENERIC_ITEM_USE)
-            .playsInSlot(MAIN_HAND_ATTACK_SLOT)
-            .setCooldownDuration(TimeSpan.of60FramesPerSecond(5))
-            .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(3)).setEasement(Easing.SINE_OUT).build())
-            .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(16)).setEasement(Easing.SINE_IN_OUT).build())
-            .makeAdditive(FirstPersonMontages::getCurrentMainHandPose, SequenceReferencePoint.END)
-            .build();
-
-    public static final MontageConfiguration PLACE_BLOCK_OFF_HAND_MONTAGE = USE_MAIN_HAND_MONTAGE.makeBuilderCopy("place_block_off_hand", PLACE_BLOCK_MAIN_HAND_MONTAGE.animationSequence())
-            .playsInSlot(OFF_HAND_ATTACK_SLOT)
-            .makeAdditive(FirstPersonMontages::getCurrentOffHandPose, SequenceReferencePoint.END)
-            .build();
-
-
-
 
     public static final MontageConfiguration SHIELD_BLOCK_IMPACT_MONTAGE = MontageConfiguration.builder("shield_block_impact", FirstPersonAnimationSequences.HAND_SHIELD_IMPACT)
             .playsInSlot(SHIELD_BLOCK_SLOT)
@@ -167,24 +146,20 @@ public class FirstPersonMontages {
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
-            .makeAdditive(FirstPersonMontages::getCurrentMainHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration BUCKET_COLLECT_OFF_HAND_MONTAGE = BUCKET_COLLECT_MAIN_HAND_MONTAGE.makeBuilderCopy("bucket_collect_off_hand", FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BUCKET_COLLECT)
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
-            .makeAdditive(FirstPersonMontages::getCurrentOffHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration BUCKET_EMPTY_MAIN_HAND_MONTAGE = MontageConfiguration.builder("bucket_empty_main_hand", FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BUCKET_EMPTY)
             .playsInSlot(MAIN_HAND_ATTACK_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.of60FramesPerSecond(2)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.of60FramesPerSecond(10)).setEasement(Easing.SINE_IN_OUT).build())
-            .makeAdditive(FirstPersonMontages::getCurrentMainHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration BUCKET_EMPTY_OFF_HAND_MONTAGE = BUCKET_EMPTY_MAIN_HAND_MONTAGE.makeBuilderCopy("bucket_empty_off_hand", FirstPersonAnimationSequences.HAND_GENERIC_ITEM_BUCKET_EMPTY)
             .playsInSlot(OFF_HAND_ATTACK_SLOT)
-            .makeAdditive(FirstPersonMontages::getCurrentOffHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration CROSSBOW_FIRE_MAIN_HAND_MONTAGE = MontageConfiguration.builder("crossbow_fire_main_hand", FirstPersonAnimationSequences.HAND_CROSSBOW_FIRE)
@@ -218,13 +193,6 @@ public class FirstPersonMontages {
         return switch (hand) {
             case MAIN_HAND -> USE_MAIN_HAND_MONTAGE;
             case OFF_HAND -> USE_OFF_HAND_MONTAGE;
-        };
-    }
-
-    public static MontageConfiguration getPlaceBlockAnimationMontage(InteractionHand hand) {
-        return switch (hand) {
-            case MAIN_HAND -> PLACE_BLOCK_MAIN_HAND_MONTAGE;
-            case OFF_HAND -> PLACE_BLOCK_OFF_HAND_MONTAGE;
         };
     }
 

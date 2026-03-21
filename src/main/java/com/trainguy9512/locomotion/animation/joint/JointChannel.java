@@ -26,7 +26,11 @@ public final class JointChannel {
     }
 
     public static JointChannel ofPartPose(PartPose partPose){
+        //? if >= 1.21.0 {
         return ofTranslationRotationScaleEuler(new Vector3f(partPose.x(), partPose.y(), partPose.z()), new Vector3f(partPose.xRot(), partPose.yRot(), partPose.zRot()), new Vector3f(partPose.xScale(), partPose.yScale(), partPose.zScale()), true);
+        //?} else {
+        /*return ofTranslationRotationScaleEuler(new Vector3f(partPose.x, partPose.y, partPose.z), new Vector3f(partPose.xRot, partPose.yRot, partPose.zRot), new Vector3f(1, 1, 1), true);*/
+        //?}
     }
 
     public static JointChannel ofTranslationRotationScaleEuler(Vector3f translation, Vector3f rotationEuler, Vector3f scale, boolean visibility){
@@ -200,7 +204,11 @@ public final class JointChannel {
 
     public void transformPoseStack(PoseStack poseStack, float transformMultiplier) {
         Matrix4f matrix4f = new Matrix4f(this.transform);
+        //? if >= 1.21.0 {
         poseStack.mulPose(matrix4f.setTranslation(this.getTranslation().div(new Vector3f(transformMultiplier))));
+        //?} else {
+        /*poseStack.mulPoseMatrix(matrix4f.setTranslation(this.getTranslation().div(new Vector3f(transformMultiplier))));*/
+        //?}
 
         //Vector3f translation = this.getTranslation();
         //poseStack.translate(translation.x() / transformMultiplier, (translation.y() / transformMultiplier), (translation.z() / transformMultiplier));

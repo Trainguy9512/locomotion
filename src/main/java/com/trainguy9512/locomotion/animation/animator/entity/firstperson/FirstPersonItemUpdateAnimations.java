@@ -8,7 +8,11 @@ import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfig
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
+//? if >= 1.20.5 {
 import net.minecraft.core.component.DataComponents;
+//?} else {
+/*import net.minecraft.world.item.CrossbowItem;*/
+//?}
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
@@ -41,12 +45,21 @@ public class FirstPersonItemUpdateAnimations {
     ));
 
     private static boolean shouldPlayCrossbowFire(ItemUpdateAnimationConditionContext context) {
+        //? if >= 1.20.5 {
         boolean bothItemsAreCrossbows = context.bothItemsMeetPredicate(itemStack -> itemStack.has(DataComponents.CHARGED_PROJECTILES));
         if (!bothItemsAreCrossbows) {
             return false;
         }
         boolean currentCrossbowHasCharge = !context.currentItem.get(DataComponents.CHARGED_PROJECTILES).isEmpty();
         boolean previousCrossbowHasCharge = !context.previousItem.get(DataComponents.CHARGED_PROJECTILES).isEmpty();
+        //?} else {
+        /*boolean bothItemsAreCrossbows = context.bothItemsMeetPredicate(itemStack -> itemStack.getItem() instanceof CrossbowItem);
+        if (!bothItemsAreCrossbows) {
+            return false;
+        }
+        boolean currentCrossbowHasCharge = CrossbowItem.isCharged(context.currentItem);
+        boolean previousCrossbowHasCharge = CrossbowItem.isCharged(context.previousItem);*/
+        //?}
         return !currentCrossbowHasCharge && previousCrossbowHasCharge;
     }
 

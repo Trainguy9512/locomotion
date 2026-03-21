@@ -71,8 +71,9 @@ public class BlendPosesFunction implements PoseFunction<LocalSpacePose> {
             }
         }));
         if (!blendAnimationPlayers.isEmpty()) {
-            return blendAnimationPlayers.getLast().isPresent() ?
-                    blendAnimationPlayers.getLast() :
+            Optional<PoseFunction<?>> last = blendAnimationPlayers.get(blendAnimationPlayers.size() - 1);
+            return last.isPresent() ?
+                    last :
                     this.basePoseFunction.searchDownChainForMostRelevant(findCondition);
         } else {
             return this.basePoseFunction.searchDownChainForMostRelevant(findCondition);

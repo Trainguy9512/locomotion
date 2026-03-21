@@ -1,7 +1,6 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.*;
-import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
@@ -245,7 +244,7 @@ public class FirstPersonShield {
     public static final String SHIELD_DISABLED_STATE = "disabled";
     public static final String SHIELD_DISABLED_OUT_STATE = "disabled_out";
 
-    private static String getShieldEntryState(DriverGetter driverGetter) {
+    private static String getShieldEntryState(PoseTickEvaluationContext context) {
         return SHIELD_LOWERED_STATE;
     }
 

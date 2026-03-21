@@ -13,10 +13,16 @@ import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
+//? if >= 1.20.5 {
 import net.minecraft.core.component.DataComponents;
+//?}
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+//? if >= 1.21.0 {
 import net.minecraft.world.item.ItemUseAnimation;
+//?} else {
+import net.minecraft.world.item.UseAnim;
+//?}
 
 import java.util.Objects;
 import java.util.Set;
@@ -124,18 +130,28 @@ public class FirstPersonDrinking {
 
     public static void updateConsumptionSpeed(PoseTickEvaluationContext context, InteractionHand hand) {
         ItemStack item = context.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
+        //? if >= 1.20.5 {
         if (!item.has(DataComponents.CONSUMABLE)) {
             return;
         }
         float speed = Objects.requireNonNull(item.get(DataComponents.CONSUMABLE)).consumeSeconds();
         speed = 1f / Math.max(speed, 0.1f);
         context.getDriver(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED).setValue(speed);
+        //?} else {
+        /*float consumeSeconds = item.getUseDuration() / 20f;
+        float speed = 1f / Math.max(consumeSeconds, 0.1f);
+        context.getDriver(FirstPersonDrivers.ITEM_CONSUMPTION_SPEED).setValue(speed);*/
+        //?}
     }
 
     private static boolean isDrinking(StateTransitionContext context, InteractionHand hand) {
         if (!context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand))) {
             return false;
         }
+        //? if >= 1.21.0 {
         return context.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand)).getUseAnimation() == ItemUseAnimation.DRINK;
+        //?} else {
+        /*return context.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand)).getUseAnimation() == UseAnim.DRINK;
+        *///?}
     }
 }

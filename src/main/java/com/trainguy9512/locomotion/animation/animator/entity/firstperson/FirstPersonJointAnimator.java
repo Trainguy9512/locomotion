@@ -8,7 +8,6 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpos
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonSpyglass;
 import com.trainguy9512.locomotion.animation.data.*;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
-import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
@@ -20,14 +19,21 @@ import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
+//? if >= 1.21.9 {
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+//?}
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
+//? if >= 1.21.0 {
 import net.minecraft.world.item.ItemUseAnimation;
+//?} else {
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.CrossbowItem;
+//?}
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +42,11 @@ import org.joml.Vector3f;
 
 import java.util.Set;
 
+//? if >= 1.21.9 {
 public class FirstPersonJointAnimator implements LivingEntityJointAnimator<LocalPlayer, AvatarRenderState> {
+//?} else {
+/*public class FirstPersonJointAnimator implements LivingEntityJointAnimator<LocalPlayer> {*/
+//?}
 
     private static final Logger LOGGER = LogManager.getLogger("Locomotion/FPJointAnimator");
 
@@ -89,23 +99,15 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             .defineForJoint(LEFT_ARM_JOINT, 1f)
             .build();
 
-    public static String getArmJoint(HumanoidArm arm) {
-        return switch (arm) {
-            case LEFT -> LEFT_ARM_JOINT;
-            case RIGHT -> RIGHT_ARM_JOINT;
-        };
-    }
-
-    public static String getItemJoint(HumanoidArm arm) {
-        return switch (arm) {
-            case LEFT -> LEFT_ITEM_JOINT;
-            case RIGHT -> RIGHT_ITEM_JOINT;
-        };
-    }
-
+    //? if >= 1.21.9 {
     @Override
     public void postProcessModelParts(EntityModel<AvatarRenderState> entityModel, AvatarRenderState entityRenderState) {
     }
+    //?} else {
+    /*@Override
+    public void postProcessModelParts(EntityModel<LocalPlayer> entityModel, LocalPlayer entityRenderState) {
+    }*/
+    //?}
 
     @Override
     public Identifier getJointSkeleton() {
@@ -173,24 +175,24 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         pose = MirrorFunction.of(pose, context -> Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT);
 
 
-//         Movement direction offset
-        pose = JointTransformerFunction.localOrParentSpaceBuilder(pose, ARM_BUFFER_JOINT)
+        // Movement direction offset
+//        pose = JointTransformerFunction.localOrParentSpaceBuilder(pose, ARM_BUFFER_JOINT)
 //                        .setTranslation(
-//                                context -> context.getDriverValue(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET).mul(1.5f, new Vector3f()),
+//                                context -> context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.MOVEMENT_DIRECTION_OFFSET, context.partialTicks()).mul(1.5f, new Vector3f()),
 //                                JointChannel.TransformType.ADD,
 //                                JointChannel.TransformSpace.COMPONENT
 //                        )
-                        .setRotationEuler(
-                                context -> {
-                                    Vector3f main_rotation = context.getDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING);
-                                    float z_rotation = context.getDriverValue(FirstPersonDrivers.CAMERA_Z_ROTATION_DAMPING);
-                                    return new Vector3f(main_rotation.x, main_rotation.y, z_rotation).mul(-0.15f, -0.15f, -0.08f, new Vector3f());
-                                },
-                                JointChannel.TransformType.ADD,
-                                JointChannel.TransformSpace.COMPONENT
-                        )
-                        .setWeight(interpolationContext -> LocomotionMain.CONFIG.data().firstPersonPlayer.enableCameraRotationDamping ? 1f : 0f)
-                        .build();
+//                        .setRotationEuler(
+//                                context -> {
+//                                    Vector3f main_rotation = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_ROTATION_DAMPING, context.partialTicks());
+//                                    float z_rotation = context.driverContainer().getInterpolatedDriverValue(FirstPersonDrivers.CAMERA_Z_ROTATION_DAMPING, context.partialTicks());
+//                                    return new Vector3f(main_rotation.x, main_rotation.y, z_rotation).mul(-0.15f, -0.15f, -0.08f, new Vector3f());
+//                                },
+//                                JointChannel.TransformType.ADD,
+//                                JointChannel.TransformSpace.COMPONENT
+//                        )
+//                        .setWeight(interpolationContext -> LocomotionMain.CONFIG.data().firstPersonPlayer.enableCameraRotationDamping ? 1f : 0f)
+//                        .build();
 
         // Scaling the whole arms based on whether a spyglass is being used or not.
         pose = FirstPersonSpyglass.getHiddenArmsSpyglassPose(pose);
@@ -208,7 +210,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         //? if >= 1.21.5 {
         driverContainer.getDriver(FirstPersonDrivers.HOTBAR_SLOT).setValue(player.getInventory().getSelectedSlot());
         //?} else {
-        /*driverContainer.getDriver(HOTBAR_SLOT).setValue(dataReference.getInventory().selected);*/
+        /*driverContainer.getDriver(FirstPersonDrivers.HOTBAR_SLOT).setValue(player.getInventory().selected);*/
         //?}
 
         //? if >= 1.21.11 {
@@ -228,10 +230,18 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         driverContainer.getDriver(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED).setValue((float) (player.getY() - player.yo));
 
         driverContainer.getDriver(FirstPersonDrivers.IS_IN_RIPTIDE).setValue(player.isAutoSpinAttack());
+        //? if >= 1.21.0 {
         driverContainer.getDriver(FirstPersonDrivers.IS_MOVING).setValue(player.input.keyPresses.forward() || player.input.keyPresses.backward() || player.input.keyPresses.left() || player.input.keyPresses.right());
+        //?} else {
+        /*driverContainer.getDriver(FirstPersonDrivers.IS_MOVING).setValue(player.input.up || player.input.down || player.input.left || player.input.right);*/
+        //?}
         driverContainer.getDriver(FirstPersonDrivers.IS_SPRINTING).setValue(player.isSprinting());
         driverContainer.getDriver(FirstPersonDrivers.IS_ON_GROUND).setValue(player.onGround());
+        //? if >= 1.21.0 {
         driverContainer.getDriver(FirstPersonDrivers.IS_JUMPING).setValue(player.input.keyPresses.jump());
+        //?} else {
+        /*driverContainer.getDriver(FirstPersonDrivers.IS_JUMPING).setValue(player.input.jumping);*/
+        //?}
         driverContainer.getDriver(FirstPersonDrivers.IS_CROUCHING).setValue(player.isCrouching());
         driverContainer.getDriver(FirstPersonDrivers.IS_UNDERWATER).setValue(player.isUnderWater() || (player.isInWater() && !player.onGround()));
         driverContainer.getDriver(FirstPersonDrivers.IS_PASSENGER).setValue(player.isPassenger());
@@ -280,7 +290,9 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 && !player.onGround()
                 && !player.onClimbable()
                 && !player.isInWater()
+                //? if >= 1.21.0 {
                 && !player.isMobilityRestricted()
+                //?}
                 && !player.isPassenger()
                 && !player.isSprinting();
 
@@ -319,8 +331,16 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 montageManager.interruptMontagesInSlot(FirstPersonMontages.getAttackSlot(hand), Transition.builder(TimeSpan.ofSeconds(0.1f)).setEasement(Easing.SINE_IN_OUT).build());
                 driverContainer.getDriver(FirstPersonDrivers.LAST_USED_HAND).setValue(hand);
                 driverContainer.getDriver(FirstPersonDrivers.PROJECTILE_ITEM).setValue(dataReference.getProjectile(itemInHand));
+                //? if >= 1.21.0 {
                 if (itemInHand.getUseAnimation() == ItemUseAnimation.CROSSBOW) {
+                //?} else {
+                /*if (itemInHand.getUseAnimation() == UseAnim.CROSSBOW) {
+                *///?}
+                    //? if >= 1.21.0 {
                     float chargeTime = EnchantmentHelper.modifyCrossbowChargingTime(itemInHand, dataReference, 1.25f);
+                    //?} else {
+                    /*float chargeTime = CrossbowItem.getChargeDuration(itemInHand) / 20.0f;*/
+                    //?}
                     float chargeSpeedMultiplier = 1.25f / chargeTime;
                     driverContainer.getDriver(FirstPersonDrivers.CROSSBOW_RELOAD_SPEED).setValue(chargeSpeedMultiplier);
                 }
@@ -328,7 +348,11 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
 
             // Is item on cooldown
             ItemStack renderedItem = driverContainer.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand));
+            //? if >= 1.21.0 {
             boolean isItemOnCooldown = dataReference.getCooldowns().isOnCooldown(renderedItem);
+            //?} else {
+            /*boolean isItemOnCooldown = dataReference.getCooldowns().isOnCooldown(renderedItem.getItem());*/
+            //?}
             driverContainer.getDriver(FirstPersonDrivers.getItemOnCooldownDriver(hand)).setValue(isItemOnCooldown);
 
         }

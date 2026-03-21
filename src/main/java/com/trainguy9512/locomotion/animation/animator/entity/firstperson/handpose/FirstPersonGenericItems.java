@@ -4,6 +4,7 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import com.trainguy9512.locomotion.animation.data.DriverGetter;
+import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
@@ -11,6 +12,9 @@ import com.trainguy9512.locomotion.render.ItemRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+//? if < 1.21.0 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
@@ -38,7 +42,7 @@ public class FirstPersonGenericItems {
                     FirstPersonAnimationSequences.HAND_GENERIC_ITEM_FIXED_ITEM_POSE,
                     itemStack -> true,
                     0)
-            .setItemRenderType(ItemRenderType.ON_SHELF)
+            .setItemRenderType(ItemRenderType.FIXED)
             .build());
     public static final Identifier ROD = register(LocomotionMain.makeIdentifier("rod"), GenericItemPoseDefinition.builder(
             FirstPersonAnimationSequences.HAND_GENERIC_ITEM_ROD_POSE,
@@ -78,7 +82,9 @@ public class FirstPersonGenericItems {
             Items.BONE,
             Items.STICK,
             Items.BLAZE_ROD,
+            //? if >= 1.21.0 {
             Items.BREEZE_ROD,
+            //?}
             Items.POINTED_DRIPSTONE,
             Items.BAMBOO,
             Items.DEBUG_STICK,
@@ -114,9 +120,11 @@ public class FirstPersonGenericItems {
     );
 
     public static final List<TagKey<Item>> BLOCK_ITEM_TAG_OVERRIDES = List.of(
+            //? if >= 1.21.0 {
             ItemTags.COPPER_CHESTS,
             ItemTags.SHULKER_BOXES,
             ItemTags.SKULLS,
+            //?}
             ItemTags.BEDS
     );
 
@@ -134,7 +142,7 @@ public class FirstPersonGenericItems {
                 return true;
             }
         }
-        Identifier identifier = BuiltInRegistries.ITEM.getKey(itemStack.getItem());
+        Identifier identifier = getItemIdentifier(itemStack.getItem());
         Identifier modelLocation = Identifier.fromNamespaceAndPath(identifier.getNamespace(), "models/item/" + identifier.getPath() + ".json");
         return Minecraft.getInstance().getResourceManager().getResource(modelLocation).isEmpty();
     }
@@ -147,6 +155,15 @@ public class FirstPersonGenericItems {
         Identifier currentGenericItemPose = dataContainer.getDriverValue(FirstPersonDrivers.getGenericItemPoseDriver(hand));
         GenericItemPoseDefinition definition = FirstPersonGenericItems.getOrThrowFromIdentifier(currentGenericItemPose);
         return definition.basePoseSequence();
+    }
+
+    private static Identifier getItemIdentifier(Item item) {
+        //? if >= 1.21.0 {
+        return BuiltInRegistries.ITEM.getKey(item);
+        //?} else {
+        /*ResourceLocation key = BuiltInRegistries.ITEM.getKey(item);
+        return new Identifier(key.getNamespace(), key.getPath());*/
+        //?}
     }
 
     public record GenericItemPoseDefinition(

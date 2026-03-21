@@ -16,6 +16,9 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+//? if < 1.21.0 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -130,7 +133,12 @@ public class JointAnimatorDispatcher {
         if (potentialJointAnimator.isPresent()) {
             BlockEntityJointAnimator<T> jointAnimator = potentialJointAnimator.get();
             AnimationDataContainer dataContainer = AnimationDataContainer.of(jointAnimator);
+            //? if >= 1.21.0 {
             dataContainer.getDriver(BLOCK_ENTITY_TYPE_DRIVER).setValue(BlockEntityType.getKey(type));
+            //?} else {
+            /*ResourceLocation key = BlockEntityType.getKey(type);
+            dataContainer.getDriver(BLOCK_ENTITY_TYPE_DRIVER).setValue(new Identifier(key.getNamespace(), key.getPath()));*/
+            //?}
             return Optional.of(dataContainer);
         }
         return Optional.empty();
@@ -147,11 +155,24 @@ public class JointAnimatorDispatcher {
     private static boolean positionIsWithinCameraRadius(BlockPos blockPos) {
         BlockPos cameraBlockPos = Objects.requireNonNull(Minecraft.getInstance().getCameraEntity()).blockPosition();
         int radius = LocomotionMain.CONFIG.data().blockEntities.evaluationDistance;
+        //? if >= 1.21.0 {
         return cameraBlockPos.distChessboard(blockPos) < radius;
+        //?} else {
+        /*int dx = Math.abs(cameraBlockPos.getX() - blockPos.getX());
+        int dy = Math.abs(cameraBlockPos.getY() - blockPos.getY());
+        int dz = Math.abs(cameraBlockPos.getZ() - blockPos.getZ());
+        return Math.max(Math.max(dx, dy), dz) < radius;*/
+        //?}
     }
 
     private static boolean blockEntityIsEnabledInConfig(BlockEntityType<?> type) {
-        Identifier typeIdentifier = BlockEntityType.getKey(type);
+        Identifier typeIdentifier;
+        //? if >= 1.21.0 {
+        typeIdentifier = BlockEntityType.getKey(type);
+        //?} else {
+        /*ResourceLocation key = BlockEntityType.getKey(type);
+        typeIdentifier = new Identifier(key.getNamespace(), key.getPath());*/
+        //?}
         assert typeIdentifier != null;
         return LocomotionMain.CONFIG.data().blockEntities.enabledBlockEntities.getOrDefault(typeIdentifier.toString(), true);
     }
@@ -178,7 +199,14 @@ public class JointAnimatorDispatcher {
             if (this.blockEntityAnimationDataContainerStorage.containsKey(packedBlockPos)) {
 
                 AnimationDataContainer dataContainer = this.blockEntityAnimationDataContainerStorage.get(packedBlockPos);
-                if (dataContainer.getDriverValue(BLOCK_ENTITY_TYPE_DRIVER) == BlockEntityType.getKey(type)) {
+                Identifier typeIdentifier;
+                //? if >= 1.21.0 {
+                typeIdentifier = BlockEntityType.getKey(type);
+                //?} else {
+                /*ResourceLocation key = BlockEntityType.getKey(type);
+                typeIdentifier = new Identifier(key.getNamespace(), key.getPath());*/
+                //?}
+                if (dataContainer.getDriverValue(BLOCK_ENTITY_TYPE_DRIVER).equals(typeIdentifier)) {
                     // If the block is within range and its type matches the requested type, return it.
                     return Optional.of(dataContainer);
                 } else {

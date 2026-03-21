@@ -1,3 +1,4 @@
+//? if >= 1.21.11 {
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
 
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonAnimationSequences;
@@ -5,11 +6,19 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPe
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonMontages;
 import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
-import com.trainguy9512.locomotion.animation.pose.function.*;
+import com.trainguy9512.locomotion.animation.pose.function.ApplyAdditiveFunction;
+import com.trainguy9512.locomotion.animation.pose.function.MakeDynamicAdditiveFunction;
+import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
+import com.trainguy9512.locomotion.animation.pose.function.SequenceEvaluatorFunction;
+import com.trainguy9512.locomotion.animation.pose.function.SequencePlayerFunction;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageSlotFunction;
-import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateAlias;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateDefinition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateMachineFunction;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransition;
+import com.trainguy9512.locomotion.animation.pose.function.statemachine.StateTransitionContext;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
@@ -213,3 +222,28 @@ public class FirstPersonSpear {
     }
 
 }
+//?} else {
+/*package com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose;
+
+import com.trainguy9512.locomotion.animation.data.DriverGetter;
+import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
+import com.trainguy9512.locomotion.animation.pose.function.PoseFunction;
+import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
+import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
+
+public class FirstPersonSpear {
+
+    public static PoseFunction<LocalSpacePose> constructSpearPoseFunction(
+            CachedPoseContainer cachedPoseContainer,
+            InteractionHand hand,
+            PoseFunction<LocalSpacePose> miningPoseFunction
+    ) {
+        return miningPoseFunction;
+    }
+
+    public static void extractSpearData(LocalPlayer player, DriverGetter driverContainer, MontageManager montageManager) {
+    }
+}
+*///?}

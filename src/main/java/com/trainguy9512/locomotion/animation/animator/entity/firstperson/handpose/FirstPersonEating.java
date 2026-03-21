@@ -14,7 +14,11 @@ import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Transition;
 import net.minecraft.world.InteractionHand;
+//? if >= 1.21.0 {
 import net.minecraft.world.item.ItemUseAnimation;
+//?} else {
+import net.minecraft.world.item.UseAnim;
+//?}
 
 import java.util.Set;
 
@@ -81,6 +85,10 @@ public class FirstPersonEating {
         if (!context.getDriverValue(FirstPersonDrivers.getUsingItemDriver(hand))) {
             return false;
         }
+        //? if >= 1.21.0 {
         return context.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand)).getUseAnimation() == ItemUseAnimation.EAT;
+        //?} else {
+        /*return context.getDriverValue(FirstPersonDrivers.getRenderedItemDriver(hand)).getUseAnimation() == UseAnim.EAT;
+        *///?}
     }
 }
