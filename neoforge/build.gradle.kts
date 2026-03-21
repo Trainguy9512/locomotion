@@ -2,8 +2,8 @@
 
 plugins {
     id("dev.architectury.loom")
-    id("architectury-plugin")
     id("com.github.johnrengelman.shadow")
+    id("architectury-plugin")
 }
 
 val loader = prop("loom.platform")!!
@@ -20,6 +20,7 @@ base {
 architectury {
     platformSetupLoomIde()
     neoForge()
+    compileOnly()
 }
 
 loom {
@@ -71,6 +72,7 @@ configurations {
 }
 
 repositories {
+    maven { url = uri("${rootDir}/.local-maven") }
     maven("https://maven.parchmentmc.org/")
     maven("https://maven.neoforged.net/releases/")
 

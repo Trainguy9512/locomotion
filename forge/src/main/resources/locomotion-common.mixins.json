@@ -1,0 +1,27 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.trainguy9512.locomotion.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "locomotion-common.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+    "debug.MixinDefaultPlayerSkin",
+    "game.MixinLevelChunk",
+    "game.MixinMinecraft",
+    "game.MixinMultiPlayerGameMode",
+    "item.MixinItemTransform",
+    "render.MixinBlockRenderDispatcher",
+    "render.MixinEntityRenderDispatcher",
+    "render.MixinFishingHookRenderer",
+    "render.MixinGameRenderer",
+    "render.MixinItemInHandRenderer",
+    "render.MixinModelPart",
+    "render.block_entity.MixinChestRenderer",
+    "render.block_entity.MixinShulkerBoxRenderer"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

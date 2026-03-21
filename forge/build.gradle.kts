@@ -2,8 +2,8 @@
 
 plugins {
     id("dev.architectury.loom")
-    id("architectury-plugin")
     id("com.github.johnrengelman.shadow")
+    id("architectury-plugin")
 }
 
 val loader = prop("loom.platform")!!
@@ -77,6 +77,7 @@ configurations {
 }
 
 repositories {
+    maven { url = uri("${rootDir}/.local-maven") }
     maven("https://maven.parchmentmc.org/")
     maven("https://maven.minecraftforge.net")
 }
@@ -90,16 +91,19 @@ dependencies {
     forge("net.minecraftforge:forge:$minecraft-${versionProp("forge_loader")}")
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
-    shadowBundle(project(common.path, "transformProductionForge")) { isTransitive = false }
+    shadowBundle(project(common.path, "namedElements")) { isTransitive = false }
 }
 
 tasks.processResources {
-    applyProperties(project, listOf("META-INF/mods.toml", "${prop("mod.id")}-forge.mixin.json", "pack.mcmeta"))
+    applyProperties(project, listOf("META-INF/mods.toml", "${prop("mod.id")}-forge.mixins.json", "${prop("mod.id")}-common.mixins.json", "pack.mcmeta"))
 }
 
 tasks.shadowJar {
     configurations = listOf(shadowBundle)
     archiveClassifier = "dev-shadow"
+    // Relocate the Identifier shim to avoid conflicting with Forge's net.minecraft package
+    relocate("net.minecraft.resources.Identifier", "com.trainguy9512.locomotion.shim.Identifier")
+    exclude("net/minecraft/client/gui/components/debug/**")
 }
 
 tasks.remapJar {

@@ -1,9 +1,11 @@
 @file:Suppress("UnstableApiUsage")
 
+import java.util.jar.JarFile
+
 plugins {
     id("dev.architectury.loom")
-    id("architectury-plugin")
     id("com.github.johnrengelman.shadow")
+    id("architectury-plugin")
 }
 
 val loader = prop("loom.platform")!!
@@ -20,6 +22,7 @@ base {
 architectury {
     platformSetupLoomIde()
     fabric()
+    compileOnly()
 }
 
 loom {
@@ -40,6 +43,10 @@ loom {
             runDir("$runDir/client")
             source(sourceSets["main"])
             programArgs("--username=Dev")
+            val quickPlayWorld = System.getenv("LOCOMOTION_QUICKPLAY_WORLD")
+            if (!quickPlayWorld.isNullOrBlank()) {
+                programArgs("--quickPlaySingleplayer", quickPlayWorld)
+            }
         }
         named("server") {
             server()
@@ -78,7 +85,20 @@ configurations {
     get("developmentFabric").extendsFrom(commonBundle)
 }
 
+configurations.named("runtimeClasspath") {
+    withDependencies {
+        removeIf { it.group == "dev.architectury" && it.name == "architectury-transformer" }
+    }
+}
+
+configurations.matching { it.name == "architecturyTransformerRuntimeClasspath" }.all {
+    withDependencies {
+        removeIf { it.group == "dev.architectury" && it.name == "architectury-transformer" }
+    }
+}
+
 repositories {
+    maven { url = uri("${rootDir}/.local-maven") }
     maven("https://maven.parchmentmc.org/")
 
     maven("https://maven.terraformersmc.com/")
@@ -100,7 +120,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${versionProp("fabric_loader")}")
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
-    shadowBundle(project(common.path, "transformProductionFabric")) { isTransitive = false }
+    shadowBundle(project(common.path, "namedElements")) { isTransitive = false }
 
     // Mod implementations
     modImplementation("net.fabricmc.fabric-api:fabric-api:${versionProp("fabric_api_version")}")
@@ -113,6 +133,13 @@ dependencies {
     runtimeOnly("org.antlr:antlr4-runtime:4.13.1")
     runtimeOnly("io.github.douira:glsl-transformer:2.0.1")
     runtimeOnly("org.anarres:jcpp:1.4.14")
+
+    runtimeOnly(files("${rootDir}/.local-maven/dev/architectury/architectury-transformer/5.2.87/architectury-transformer-5.2.87.jar"))
+    runtimeOnly(files("${rootDir}/.local-maven/dev/architectury/architectury-transformer/5.2.87/architectury-transformer-5.2.87-runtime.jar"))
+
+    add("architecturyTransformerRuntimeClasspath", files("${rootDir}/.local-maven/dev/architectury/architectury-transformer/5.2.87/architectury-transformer-5.2.87.jar"))
+    add("architecturyTransformerRuntimeClasspath", files("${rootDir}/.local-maven/dev/architectury/architectury-transformer/5.2.87/architectury-transformer-5.2.87-runtime.jar"))
+
 }
 
 tasks.processResources {
@@ -154,6 +181,28 @@ tasks.register<Copy>("buildAndCollect") {
     from(tasks.remapJar.get().archiveFile, tasks.remapSourcesJar.get().archiveFile)
     into(rootProject.layout.buildDirectory.file("libs/${prop("mod.version")}/$loader"))
     dependsOn("build")
+}
+
+tasks.register("verifyFabricJar") {
+    group = "verification"
+    description = "Verifies the remapped Fabric jar contains required common assets and mixin metadata."
+    dependsOn("setupChiseledBuild")
+    dependsOn(tasks.remapJar)
+    doLast {
+        val jarFile = tasks.remapJar.get().archiveFile.get().asFile
+        val requiredEntries = listOf(
+            "fabric.mod.json",
+            "${prop("mod.id")}-common.mixins.json",
+            "${prop("mod.id")}-common.refmap.json",
+            "com/trainguy9512/locomotion/LocomotionMain.class"
+        )
+        JarFile(jarFile).use { jar ->
+            val missing = requiredEntries.filter { jar.getEntry(it) == null }
+            if (missing.isNotEmpty()) {
+                error("Missing required entries in ${jarFile.name}: ${missing.joinToString(", ")}")
+            }
+        }
+    }
 }
 
 fabricApi {
