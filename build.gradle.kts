@@ -12,14 +12,20 @@ base {
 	archivesName.set("${prop("mod.id")}-common")
 }
 
-architectury.common(stonecutter.tree.branches.mapNotNull {
-	if (stonecutter.current.project !in it) null
-	else it.project.prop("loom.platform")
-})
+architectury {
+	common(stonecutter.tree.branches.mapNotNull {
+		if (stonecutter.current.project !in it) null
+		else it.project.prop("loom.platform")
+	})
+}
 
 loom {
 	silentMojangMappingsLicense()
 	accessWidenerPath = rootProject.file("src/main/resources/${prop("mod.id")}.accesswidener")
+	mixin {
+		useLegacyMixinAp.set(true)
+		add(sourceSets["main"], "${prop("mod.id")}-common.refmap.json")
+	}
 
 	decompilers {
 		get("vineflower").apply { // Adds names to lambdas - useful for mixins
@@ -29,7 +35,9 @@ loom {
 }
 
 repositories {
+	maven { url = uri("${rootDir}/.local-maven") }
 	maven("https://maven.parchmentmc.org/")
+	maven("https://repo.spongepowered.org/maven")
 
 	maven("https://maven.terraformersmc.com/")
 	maven("https://maven.isxander.dev/releases")
@@ -47,10 +55,13 @@ dependencies {
 		parchment("org.parchmentmc.data:parchment-${versionProp("parchment_minecraft_version")}:${versionProp("parchment_mappings_version")}@zip")
 //		mappings("dev.lambdaurora:${versionProp("yalmm")}")
 	})
-	modImplementation("net.fabricmc:fabric-loader:${versionProp("fabric_loader")}")
+	annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
-	// Mod implementations
-	modCompileOnly("dev.isxander:yet-another-config-lib:${versionProp("yacl_version")}-fabric")
+	val platform = prop("loom.platform") ?: "fabric"
+	if (platform != "forge" && platform != "neoforge") {
+		modImplementation("net.fabricmc:fabric-loader:${versionProp("fabric_loader")}")
+		modCompileOnly("dev.isxander:yet-another-config-lib:${versionProp("yacl_version")}-fabric")
+	}
 }
 
 tasks.processResources {
