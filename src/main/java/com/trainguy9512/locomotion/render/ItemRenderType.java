@@ -6,16 +6,21 @@ import net.minecraft.world.item.ItemDisplayContext;
 public enum ItemRenderType {
     THIRD_PERSON_ITEM,
     MIRRORED_THIRD_PERSON_ITEM,
+    BLOCK_STATE,
     MAP,
-    ON_SHELF;
+    FIXED;
 
     public boolean isMirrored() {
         return this == MIRRORED_THIRD_PERSON_ITEM;
     }
 
     public ItemDisplayContext getItemDisplayContext(HumanoidArm side) {
-        if (this == ON_SHELF) {
+        if (this == FIXED) {
+            //? if >= 1.21.0 {
             return ItemDisplayContext.ON_SHELF;
+            //?} else {
+            return ItemDisplayContext.NONE;
+            //?}
         }
         return side == HumanoidArm.RIGHT ? ItemDisplayContext.THIRD_PERSON_RIGHT_HAND : ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
     }

@@ -8,6 +8,10 @@ import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
 import com.trainguy9512.locomotion.resource.json.GsonConfiguration;
 import net.minecraft.resources.Identifier;
+//? if < 1.21.0 {
+/*import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.profiling.ProfilerFiller;*/
+//?}
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -63,10 +67,11 @@ public class LocomotionResources implements PreparableReloadListener {
         }
     }
 
+    //? if >= 1.21.0 {
     @Override
-    public CompletableFuture<Void> reload(SharedState sharedState, Executor exectutor, PreparationBarrier barrier, Executor applyExectutor) {
-        CompletableFuture<Map<Identifier, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(sharedState.resourceManager(), exectutor);
-        CompletableFuture<Map<Identifier, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(sharedState.resourceManager(), exectutor);
+    public CompletableFuture<Void> reload(SharedState sharedState, Executor executor, PreparationBarrier barrier, Executor applyExecutor) {
+        CompletableFuture<Map<Identifier, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(sharedState.resourceManager(), executor);
+        CompletableFuture<Map<Identifier, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(sharedState.resourceManager(), executor);
 
         return CompletableFuture.allOf(loadedJointSkeletons, loadedAnimationSequences)
                 .thenCompose(barrier::wait)
@@ -77,8 +82,26 @@ public class LocomotionResources implements PreparableReloadListener {
                     ANIMATION_SEQUENCES.putAll(loadedAnimationSequences.join());
                     ANIMATION_SEQUENCES.replaceAll((Identifier, animationSequence) -> animationSequence.getBaked());
                     LOGGER.info("Cleared and replaced Locomotion resource data.");
-                }));
+                }, applyExecutor));
     }
+    //?} else {
+    /*@Override
+    public CompletableFuture<Void> reload(PreparationBarrier barrier, ResourceManager manager, ProfilerFiller prepProfiler, ProfilerFiller applyProfiler, Executor backgroundExecutor, Executor gameExecutor) {
+        CompletableFuture<Map<Identifier, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(manager, backgroundExecutor);
+        CompletableFuture<Map<Identifier, AnimationSequence>> loadedAnimationSequences = loadAnimationSequences(manager, backgroundExecutor);
+
+        return CompletableFuture.allOf(loadedJointSkeletons, loadedAnimationSequences)
+                .thenCompose(barrier::wait)
+                .thenCompose(voided -> CompletableFuture.runAsync(() -> {
+                    JOINT_SKELETONS.clear();
+                    JOINT_SKELETONS.putAll(loadedJointSkeletons.join());
+                    ANIMATION_SEQUENCES.clear();
+                    ANIMATION_SEQUENCES.putAll(loadedAnimationSequences.join());
+                    ANIMATION_SEQUENCES.replaceAll((Identifier, animationSequence) -> animationSequence.getBaked());
+                    LOGGER.info("Cleared and replaced Locomotion resource data.");
+                }, gameExecutor));
+    }*/
+    //?}
 
 //    public static CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier barrier, ResourceManager manager, Executor backgroundExecutor, Executor gameExecutor) {
 //        CompletableFuture<Map<Identifier, JointSkeleton>> loadedJointSkeletons = loadJointSkeletons(manager, backgroundExecutor);
@@ -118,10 +141,10 @@ public class LocomotionResources implements PreparableReloadListener {
 
     private static <D> CompletableFuture<Map<Identifier, D>> loadJsonResources(ResourceManager manager, Executor backgroundExecutor, Class<D> type, String pathToListFrom, Consumer<Identifier> onSuccessfullyLoaded) {
         return CompletableFuture.supplyAsync(() -> {
+            Map<Identifier, D> deserializedResources = Maps.newHashMap();
+            //? if >= 1.21.0 {
             Predicate<Identifier> isAssetJson = Identifier -> Identifier.getPath().endsWith(".json");
             Map<Identifier, Resource> foundResources = manager.listResources(pathToListFrom, isAssetJson);
-
-            Map<Identifier, D> deserializedResources = Maps.newHashMap();
             foundResources.forEach((Identifier, resource) -> {
                 try {
                     try (BufferedReader reader = resource.openAsReader()) {
@@ -139,6 +162,28 @@ public class LocomotionResources implements PreparableReloadListener {
                     throw new RuntimeException(exception);
                 }
             });
+            //?} else {
+            /*Predicate<ResourceLocation> isAssetJson = location -> location.getPath().endsWith(".json");
+            Map<ResourceLocation, Resource> foundResources = manager.listResources(pathToListFrom, isAssetJson);
+            foundResources.forEach((resourceLocation, resource) -> {
+                Identifier identifier = new Identifier(resourceLocation.getNamespace(), resourceLocation.getPath());
+                try {
+                    try (BufferedReader reader = resource.openAsReader()) {
+                        JsonElement jsonElement = GsonHelper.fromJson(GsonConfiguration.getInstance(), reader, JsonElement.class);
+                        D deserializedAsset = GsonConfiguration.getInstance().fromJson(jsonElement, type);
+                        deserializedResources.put(identifier, deserializedAsset);
+                        onSuccessfullyLoaded.accept(identifier);
+                    } catch (JsonParseException exception) {
+                        LOGGER.warn("Skipping loading of JSON asset {} of type {} due to a JSON parsing error:", identifier, type.getSimpleName());
+                        LOGGER.warn("--- {}", exception.getMessage());
+                    }
+                } catch (IOException exception) {
+                    LOGGER.error("Encountered error while reading asset {} of type {}:", identifier, type.getSimpleName());
+                    LOGGER.error("--- {}", exception.getMessage());
+                    throw new RuntimeException(exception);
+                }
+            });*/
+            //?}
             return deserializedResources;
         }, backgroundExecutor);
     }

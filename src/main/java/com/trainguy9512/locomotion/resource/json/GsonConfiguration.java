@@ -1,6 +1,9 @@
 package com.trainguy9512.locomotion.resource.json;
 
 import com.google.gson.*;
+//? if >= 1.21.0 {
+import com.google.gson.Strictness;
+//?}
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.joint.skeleton.JointSkeleton;
 import com.trainguy9512.locomotion.animation.sequence.AnimationSequence;
@@ -17,7 +20,9 @@ public class GsonConfiguration {
 
     private static Gson createInternal() {
         return new GsonBuilder()
+                //? if >= 1.21.0 {
                 .setStrictness(Strictness.STRICT)
+                //?}
                 .setPrettyPrinting()
                 .registerTypeAdapter(Vector3f.class, vector3fDeserializer())
                 .registerTypeAdapter(Quaternionf.class, quaternionDeserializer())

@@ -5,7 +5,9 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.access.FirstPersonPlayerRendererGetter;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorRegistry;
+//? if >= 1.21.0 {
 import net.minecraft.client.DeltaTracker;
+//?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Final;
@@ -23,6 +25,7 @@ public abstract class MixinGameRenderer {
     /**
      * Computes and saves the interpolated animation pose prior to rendering.
      */
+    //? if >= 1.21.0 {
     @Inject(
             method = "renderLevel",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;extractCamera(F)V")
@@ -37,6 +40,21 @@ public abstract class MixinGameRenderer {
                     ));
         }
     }
+    //?} else {
+    /*@Inject(
+            method = "renderLevel",
+            at = @At("HEAD")
+    )
+    private void computePosePriorToRendering(float partialTicks, long nanoTime, PoseStack poseStack, CallbackInfo ci){
+        if (LocomotionMain.CONFIG.data().firstPersonPlayer.enableRenderer) {
+            JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
+            jointAnimatorDispatcher.getFirstPersonPlayerDataContainer().ifPresent(dataContainer ->
+                    JointAnimatorRegistry.getFirstPersonPlayerJointAnimator().ifPresent(
+                            jointAnimator -> jointAnimatorDispatcher.calculateInterpolatedFirstPersonPlayerPose(dataContainer, partialTicks)
+                    ));
+        }
+    }*/
+    //?}
 
     /**
      * Transform the camera pose stack based on the first person player's camera joint, prior to bobHurt and bobView.

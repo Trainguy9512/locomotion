@@ -7,6 +7,9 @@ import com.trainguy9512.locomotion.animation.util.Interpolator;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
 import com.trainguy9512.locomotion.animation.util.Timeline;
 import net.minecraft.resources.Identifier;
+//? if < 1.21.0 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -45,7 +48,14 @@ public class AnimationSequenceDeserializer implements JsonDeserializer<Animation
         var potentialIdentifier = Identifier.read(sequenceJsonObject.get(JOINT_SKELETON_KEY).getAsString()).result();
         Identifier jointSkeletonLocation;
         if (potentialIdentifier.isPresent()) {
-            jointSkeletonLocation = potentialIdentifier.get().withPath(string -> "skeletons/" + string + ".json");
+            Identifier baseIdentifier;
+            //? if >= 1.21.0 {
+            baseIdentifier = potentialIdentifier.get();
+            //?} else {
+            /*ResourceLocation baseLocation = potentialIdentifier.get();
+            baseIdentifier = new Identifier(baseLocation.getNamespace(), baseLocation.getPath());*/
+            //?}
+            jointSkeletonLocation = Identifier.fromNamespaceAndPath(baseIdentifier.getNamespace(), "skeletons/" + baseIdentifier.getPath() + ".json");
         } else {
             throw new JsonParseException("Joint skeleton resource location " + sequenceJsonObject.get(JOINT_SKELETON_KEY).getAsString() + " is invalid.");
         }
@@ -124,4 +134,3 @@ public class AnimationSequenceDeserializer implements JsonDeserializer<Animation
         return timeline;
     }
 }
-

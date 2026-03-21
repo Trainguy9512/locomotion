@@ -1,3 +1,4 @@
+//? if >= 1.21.9 {
 package com.trainguy9512.locomotion.mixin.debug;
 
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -33,3 +34,13 @@ public abstract class MixinDefaultPlayerSkin {
         cir.setReturnValue(create("entity/player/wide/steve", PlayerModelType.WIDE));
     }
 }
+//?} else {
+/*package com.trainguy9512.locomotion.mixin.debug;
+
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(DefaultPlayerSkin.class)
+public abstract class MixinDefaultPlayerSkin {
+}
+*///?}

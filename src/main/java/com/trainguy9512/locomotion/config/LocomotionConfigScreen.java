@@ -9,6 +9,9 @@ import dev.isxander.yacl3.impl.controller.TickBoxControllerBuilderImpl;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+//? if < 1.21.0 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.text.DecimalFormat;
@@ -242,7 +245,13 @@ public class LocomotionConfigScreen {
                         .build());
 
         for (BlockEntityType<?> blockEntityType : JointAnimatorRegistry.getRegisteredBlockEntities()) {
-            Identifier blockEntityTypeIdentifier = BlockEntityType.getKey(blockEntityType);
+            Identifier blockEntityTypeIdentifier;
+            //? if >= 1.21.0 {
+            blockEntityTypeIdentifier = BlockEntityType.getKey(blockEntityType);
+            //?} else {
+            /*ResourceLocation key = BlockEntityType.getKey(blockEntityType);
+            blockEntityTypeIdentifier = new Identifier(key.getNamespace(), key.getPath());*/
+            //?}
             assert blockEntityTypeIdentifier != null;
             blockTogglesBuilder.option(Option.<Boolean>createBuilder()
                     .name(Component.translatable("block." + blockEntityTypeIdentifier.toLanguageKey()))

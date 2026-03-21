@@ -95,6 +95,7 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerUseItemAnimation(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        //? if >= 1.21.0 {
         if (cir.getReturnValue() instanceof InteractionResult.Success success) {
             FirstPersonUseAnimations.triggerUseAnimation(
                     hand,
@@ -102,6 +103,15 @@ public class MixinMultiPlayerGameMode {
                     success.swingSource()
             );
         }
+        //?} else {
+        /*if (cir.getReturnValue().consumesAction()) {
+            FirstPersonUseAnimations.triggerUseAnimation(
+                    hand,
+                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM,
+                    true
+            );
+        }
+        *///?}
     }
 
     @Inject(
@@ -109,6 +119,7 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerUseItemOnAnimation(LocalPlayer player, InteractionHand hand, BlockHitResult result, CallbackInfoReturnable<InteractionResult> cir) {
+        //? if >= 1.21.0 {
         if (cir.getReturnValue() instanceof InteractionResult.Success success) {
             FirstPersonUseAnimations.triggerUseAnimation(
                     hand,
@@ -116,6 +127,15 @@ public class MixinMultiPlayerGameMode {
                     success.swingSource()
             );
         }
+        //?} else {
+        /*if (cir.getReturnValue().consumesAction()) {
+            FirstPersonUseAnimations.triggerUseAnimation(
+                    hand,
+                    FirstPersonUseAnimations.UseAnimationType.USE_ITEM_ON_BLOCK,
+                    true
+            );
+        }
+        *///?}
     }
 
     @Inject(
@@ -123,6 +143,7 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerInteractAtAnimation(Player player, Entity target, EntityHitResult ray, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        //? if >= 1.21.0 {
         if (cir.getReturnValue() instanceof InteractionResult.Success success) {
             FirstPersonUseAnimations.triggerUseAnimation(
                     hand,
@@ -130,6 +151,15 @@ public class MixinMultiPlayerGameMode {
                     success.swingSource()
             );
         }
+        //?} else {
+        /*if (cir.getReturnValue().consumesAction()) {
+            FirstPersonUseAnimations.triggerUseAnimation(
+                    hand,
+                    FirstPersonUseAnimations.UseAnimationType.INTERACT_AT_ENTITY,
+                    true
+            );
+        }
+        *///?}
     }
 
     @Inject(
@@ -137,6 +167,7 @@ public class MixinMultiPlayerGameMode {
             at = @At("RETURN")
     )
     public void triggerInteractAnimation(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        //? if >= 1.21.0 {
         if (cir.getReturnValue() instanceof InteractionResult.Success success) {
             FirstPersonUseAnimations.triggerUseAnimation(
                     hand,
@@ -144,5 +175,14 @@ public class MixinMultiPlayerGameMode {
                     success.swingSource()
             );
         }
+        //?} else {
+        /*if (cir.getReturnValue().consumesAction()) {
+            FirstPersonUseAnimations.triggerUseAnimation(
+                    hand,
+                    FirstPersonUseAnimations.UseAnimationType.INTERACT_ENTITY,
+                    true
+            );
+        }
+        *///?}
     }
 }

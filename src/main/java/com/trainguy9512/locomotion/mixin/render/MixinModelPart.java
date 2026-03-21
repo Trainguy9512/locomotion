@@ -37,7 +37,11 @@ public class MixinModelPart implements MatrixModelPart {
     @Inject(method = "translateAndRotate", at = @At("HEAD"), cancellable = true)
     public void multiplyPoseStackWithMatrix(PoseStack poseStack, CallbackInfo ci){
         if(this.locomotion$matrix4f != null){
+            //? if >= 1.21.0 {
             poseStack.mulPose(this.locomotion$matrix4f.setTranslation(this.locomotion$matrix4f.getTranslation(new Vector3f()).div(16f)));
+            //?} else {
+            /*poseStack.mulPoseMatrix(this.locomotion$matrix4f.setTranslation(this.locomotion$matrix4f.getTranslation(new Vector3f()).div(16f)));*/
+            //?}
             ci.cancel();
         }
     }

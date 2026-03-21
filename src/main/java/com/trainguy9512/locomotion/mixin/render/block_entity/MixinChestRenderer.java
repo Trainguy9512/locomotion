@@ -1,3 +1,4 @@
+//? if >= 1.21.9 {
 package com.trainguy9512.locomotion.mixin.render.block_entity;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -51,3 +52,13 @@ public class MixinChestRenderer {
         }
     }
 }
+//?} else {
+/*package com.trainguy9512.locomotion.mixin.render.block_entity;
+
+import net.minecraft.client.renderer.blockentity.ChestRenderer;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(ChestRenderer.class)
+public class MixinChestRenderer {
+}
+*///?}

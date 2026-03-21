@@ -1,6 +1,6 @@
+//? if >= 1.21.0 {
 package com.trainguy9512.locomotion.mixin.item.property;
 
-import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.FirstPersonDrivers;
 import com.trainguy9512.locomotion.render.FirstPersonPlayerRenderer;
@@ -8,7 +8,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.properties.numeric.CrossbowPull;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.ItemOwner;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,3 +37,13 @@ public class MixinCrossbowPull {
         }
     }
 }
+//?} else {
+/*package com.trainguy9512.locomotion.mixin.item.property;
+
+import net.minecraft.client.renderer.item.ItemProperties;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(ItemProperties.class)
+public class MixinCrossbowPull {
+}
+*///?}

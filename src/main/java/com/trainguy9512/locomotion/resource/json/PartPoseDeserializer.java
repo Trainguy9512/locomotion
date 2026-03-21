@@ -42,6 +42,7 @@ public class PartPoseDeserializer implements JsonDeserializer<PartPose> {
                 Vector3f.class,
                 DEFAULT_SCALE
         );
+        //? if >= 1.21.0 {
         return new PartPose(
                 translation.x(),
                 translation.y(),
@@ -53,5 +54,15 @@ public class PartPoseDeserializer implements JsonDeserializer<PartPose> {
                 scale.y(),
                 scale.z()
         );
+        //?} else {
+        /*return PartPose.offsetAndRotation(
+                translation.x(),
+                translation.y(),
+                translation.z(),
+                rotation.x(),
+                rotation.y(),
+                rotation.z()
+        );*/
+        //?}
     }
 }

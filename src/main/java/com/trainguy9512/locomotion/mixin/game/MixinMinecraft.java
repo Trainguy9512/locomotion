@@ -26,9 +26,9 @@ public abstract class MixinMinecraft {
 
     @Shadow private volatile boolean pause;
 
-    @Shadow protected abstract boolean isLevelRunningNormally();
-
+    //? if >= 1.21 {
     @Shadow public abstract CompletableFuture<Void> delayTextureReload();
+    //?}
 
     @Shadow @Nullable public LocalPlayer player;
 

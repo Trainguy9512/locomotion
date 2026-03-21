@@ -1,13 +1,13 @@
+//? if >= 1.21.9 {
 package com.trainguy9512.locomotion.mixin.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.trainguy9512.locomotion.access.FirstPersonSingleBlockRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
@@ -26,8 +26,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-import java.util.function.Supplier;
-
 
 @Mixin(BlockRenderDispatcher.class)
 public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlockRenderer {
@@ -35,8 +33,6 @@ public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlo
     @Shadow public abstract BlockStateModel getBlockModel(BlockState arg);
 
     @Shadow @Final private BlockColors blockColors;
-
-//    @Shadow @Final private Supplier<SpecialBlockModelRenderer> specialBlockModelRenderer;
 
     @Unique
     public void locomotion$submitSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight) {
@@ -102,7 +98,26 @@ public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlo
                 1.0f,
                 new int[]{combinedLight, combinedLight, combinedLight, combinedLight},
                 OverlayTexture.NO_OVERLAY
-//                true
         ));
     }
 }
+//?} else {
+/*package com.trainguy9512.locomotion.mixin.render;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.trainguy9512.locomotion.access.FirstPersonSingleBlockRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(BlockRenderDispatcher.class)
+public abstract class MixinBlockRenderDispatcher implements FirstPersonSingleBlockRenderer {
+
+    @Override
+    public void locomotion$renderSingleBlockWithEmission(BlockState blockState, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight) {
+        ((BlockRenderDispatcher)(Object) this).renderSingleBlock(blockState, poseStack, bufferSource, combinedLight, OverlayTexture.NO_OVERLAY);
+    }
+}
+*///?}

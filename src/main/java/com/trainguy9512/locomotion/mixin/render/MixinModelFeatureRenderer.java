@@ -1,11 +1,10 @@
+//? if >= 1.21.9 {
 package com.trainguy9512.locomotion.mixin.render;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
-import com.trainguy9512.locomotion.animation.pose.Pose;
 import com.trainguy9512.locomotion.render.LocomotionWrappedRenderState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
@@ -13,7 +12,6 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.Optional;
 
@@ -31,7 +29,7 @@ public class MixinModelFeatureRenderer<S> {
             if (potentialDataContainer.isPresent()) {
                 AnimationDataContainer dataContainer = potentialDataContainer.get();
                 float partialTicks = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
-                Pose pose = dataContainer.computePose(partialTicks);
+                dataContainer.computePose(partialTicks);
                 dataContainer.setupAnimWithAnimationPose(instance, partialTicks);
             }
         } else {
@@ -40,3 +38,13 @@ public class MixinModelFeatureRenderer<S> {
     }
 
 }
+//?} else {
+/*package com.trainguy9512.locomotion.mixin.render;
+
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(RenderLayer.class)
+public abstract class MixinModelFeatureRenderer<S> {
+}
+*///?}
