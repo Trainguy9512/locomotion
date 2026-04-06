@@ -1,6 +1,5 @@
 package com.trainguy9512.locomotion.animation.animator.entity.firstperson;
 
-import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonGenericItems;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonHandPoses;
 import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.pose.function.SequenceReferencePoint;
@@ -18,6 +17,7 @@ public class FirstPersonMontages {
     public static final String MAIN_HAND_ATTACK_SLOT = "main_hand_attack";
     public static final String OFF_HAND_ATTACK_SLOT = "off_hand_attack";
 
+    public static final String FALLING_LAND_SLOT = "falling_land";
     public static final String SHIELD_BLOCK_SLOT = "shield_block";
     public static final String SPEAR_CHARGE_SLOT = "spear_charge";
 
@@ -110,6 +110,22 @@ public class FirstPersonMontages {
             .build();
 
 
+
+    public static final MontageConfiguration GROUND_MOVEMENT_LAND_MONTAGE = MontageConfiguration.builder("ground_movement_land", FirstPersonAnimationSequences.GROUND_MOVEMENT_LAND)
+            .playsInSlot(FALLING_LAND_SLOT)
+            .setTransitionIn(Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.SINE_IN_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.ofSeconds(0.5f)).setEasement(Easing.SINE_IN_OUT).build())
+            .setStartTimeOffset(TimeSpan.ofTicks(1))
+//            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
+            .build();
+
+    public static final MontageConfiguration GROUND_MOVEMENT_SOFT_LAND_MONTAGE = MontageConfiguration.builder("ground_movement_soft_land", FirstPersonAnimationSequences.GROUND_MOVEMENT_LAND)
+            .playsInSlot(FALLING_LAND_SLOT)
+            .setTransitionIn(Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.SINE_IN_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.ofSeconds(0.5f)).setEasement(Easing.SINE_IN_OUT).build())
+            .setStartTimeOffset(TimeSpan.ofTicks(1))
+            .setBlendIntensity(0.5f)
+            .build();
 
 
     public static final MontageConfiguration SHIELD_BLOCK_IMPACT_MONTAGE = MontageConfiguration.builder("shield_block_impact", FirstPersonAnimationSequences.HAND_SHIELD_IMPACT)

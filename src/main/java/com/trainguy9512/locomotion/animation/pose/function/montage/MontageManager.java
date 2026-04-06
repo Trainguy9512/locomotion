@@ -187,16 +187,6 @@ public class MontageManager {
             }
         }
 
-        private boolean getWeightIsFull(float partialTicks) {
-            float interpolatedTimeElapsed = this.ticksElapsed.getInterpolatedValue(partialTicks);
-            if (interpolatedTimeElapsed > this.configuration.startTimeOffset().inTicks() + this.configuration.transitionIn().duration().inTicks()) {
-                if (interpolatedTimeElapsed < this.tickLength - (this.configuration.transitionOut().duration().inTicks() * this.configuration.transitionOutCrossfadeWeight())) {
-                    return !this.hasBeenInterrupted;
-                }
-            }
-            return false;
-        }
-
         private LocalSpacePose getPose(JointSkeleton jointSkeleton, float partialTicks) {
             LocalSpacePose pose = AnimationSequence.samplePose(
                     jointSkeleton,
@@ -232,10 +222,20 @@ public class MontageManager {
             return pose;
         }
 
+        private boolean getWeightIsFull(float partialTicks) {
+            if (this.configuration.blendIntensity() != 1) {
+                return false;
+            }
+            if (!isInEntranceTransition(partialTicks) && !isInExitTransition(partialTicks)) {
+                return !this.hasBeenInterrupted;
+            }
+            return false;
+        }
+
         private boolean isInEntranceTransition(float partialTicks) {
             float elapsedTicksInterpolated = this.ticksElapsed.getInterpolatedValue(partialTicks);
             float entranceTransitionEndTime = this.configuration.startTimeOffset().inTicks() + this.configuration.transitionIn().duration().inTicks();
-            return elapsedTicksInterpolated < entranceTransitionEndTime;
+            return elapsedTicksInterpolated <= entranceTransitionEndTime;
         }
 
         private boolean isInExitTransition(float partialTicks) {
@@ -246,7 +246,7 @@ public class MontageManager {
 
         private float getWeight(float partialTicks) {
             if (this.getWeightIsFull(partialTicks)) {
-                return 1;
+                return this.configuration.blendIntensity();
             }
             float elapsedTicksInterpolated = this.ticksElapsed.getInterpolatedValue(partialTicks);
 
@@ -266,7 +266,7 @@ public class MontageManager {
 //            if (this.hasBeenInterrupted) {
 //                weight *= (1 - Math.min((elapsedTicksInterpolated - this.interruptTick) / this.interruptTransition.duration().inTicks(), 1));
 //            }
-            return weight;
+            return weight * this.configuration.blendIntensity();
         }
 
         private float getInterruptWeight(float partialTicks) {

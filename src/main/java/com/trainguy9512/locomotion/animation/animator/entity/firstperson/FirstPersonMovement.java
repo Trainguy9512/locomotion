@@ -5,10 +5,13 @@ import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpose.FirstPersonMap;
 import com.trainguy9512.locomotion.animation.data.DriverGetter;
 import com.trainguy9512.locomotion.animation.data.PoseCalculationContext;
+import com.trainguy9512.locomotion.animation.data.PoseTickEvaluationContext;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
+import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
+import com.trainguy9512.locomotion.animation.pose.function.montage.MontageSlotFunction;
 import com.trainguy9512.locomotion.animation.pose.function.statemachine.*;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
@@ -460,6 +463,9 @@ public class FirstPersonMovement {
         softLandPoseFunction = constructWithCrouchPose(cachedPoseContainer, softLandPoseFunction);
 //        standingToFallingPoseFunction = constructWithCrouchPose(cachedPoseContainer, standingToFallingPoseFunction);
 
+        MontageConfiguration landMontage = FirstPersonMontages.GROUND_MOVEMENT_LAND_MONTAGE;
+        MontageConfiguration softLandMontage = FirstPersonMontages.GROUND_MOVEMENT_LAND_MONTAGE;
+
         PoseFunction<LocalSpacePose> fallingStateMachine;
         fallingStateMachine = StateMachineFunction.builder(FirstPersonMovement::getFallingEntryState)
                 .resetsUponRelevant(true)
@@ -478,13 +484,13 @@ public class FirstPersonMovement {
                 .defineState(StateDefinition.builder(FALLING_FALLING_STATE, fallingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         // Move into the landing animation if the player is no longer falling
-                        .addOutboundTransition(StateTransition.builder(FALLING_FALLING_LONG_STATE)
-                                .isTakenIfTrue(context -> true)
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(1))
-                                        .setEasement(Easing.CUBIC_IN_OUT)
-                                        .build())
-                                .setPriority(50)
-                                .build())
+//                        .addOutboundTransition(StateTransition.builder(FALLING_FALLING_LONG_STATE)
+//                                .isTakenIfTrue(context -> true)
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(1))
+//                                        .setEasement(Easing.CUBIC_IN_OUT)
+//                                        .build())
+//                                .setPriority(50)
+//                                .build())
                         .build())
                 .defineState(StateDefinition.builder(FALLING_FALLING_LONG_STATE, fallingLongPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
@@ -505,10 +511,10 @@ public class FirstPersonMovement {
                                 .setTiming(Transition.builder(TimeSpan.of60FramesPerSecond(20)).setEasement(Easing.CUBIC_OUT).build())
                                 .build())
                         .build())
-                .defineState(StateDefinition.builder(FALLING_LAND_STATE, landPoseFunction)
+                .defineState(StateDefinition.builder(FALLING_LAND_STATE, fallingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
-                .defineState(StateDefinition.builder(FALLING_SOFT_LAND_STATE, softLandPoseFunction)
+                .defineState(StateDefinition.builder(FALLING_SOFT_LAND_STATE, fallingPoseFunction)
                         .resetsPoseFunctionUponEntry(true)
                         .build())
                 .addStateAlias(StateAlias.builder(Set.of(
@@ -518,7 +524,9 @@ public class FirstPersonMovement {
                         // If the falling animation is finishing and the player is not walking, play the idle animation.
                         .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
                                 .isTakenIfTrue(StateTransition.MOST_RELEVANT_ANIMATION_PLAYER_HAS_FINISHED)
+                                .isTakenIfTrue(StateTransition.ALWAYS_TRUE)
                                 .setTiming(Transition.builder(TimeSpan.ofSeconds(1)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(4)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(50)
                                 .build())
                         // If the falling animation is finishing and the player is walking, play the walking animation.
@@ -595,28 +603,44 @@ public class FirstPersonMovement {
                         // If the player lands before it can move into the falling animation, go straight to the landing animation as long as the jump state is fully transitioned.
 
                         // Move into the landing animation if the player is no longer falling
-                        .addOutboundTransition(StateTransition.builder(FALLING_LAND_STATE)
+                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isLanding)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(50)
                                 .build())
                         // Move into the landing animation if the player is no longer falling, but only just began falling.
-                        .addOutboundTransition(StateTransition.builder(FALLING_SOFT_LAND_STATE)
+                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isSoftLanding)
                                 .setTiming(Transition.SINGLE_TICK)
                                 .setPriority(60)
                                 .build())
                         // Move into the landing animation if the player is no longer falling, but only just began falling.
-                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
-                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)
-                                        .and(StateTransition.CURRENT_TRANSITION_FINISHED.negate())
-                                        .and(StateTransition.takeIfTimeInStateLessThan(TimeSpan.ofSeconds(0.1f)))
-                                )
-                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_OUT).build())
-                                .setPriority(70)
-                                .build())
+//                        .addOutboundTransition(StateTransition.builder(FALLING_STANDING_STATE)
+//                                .isTakenIfTrue(StateTransition.takeIfBooleanDriverTrue(FirstPersonDrivers.IS_ON_GROUND)
+//                                        .and(StateTransition.CURRENT_TRANSITION_FINISHED.negate())
+//                                        .and(StateTransition.takeIfTimeInStateLessThan(TimeSpan.ofSeconds(0.1f)))
+//                                )
+//                                .setTiming(Transition.builder(TimeSpan.ofSeconds(0.4f)).setEasement(Easing.CUBIC_OUT).build())
+//                                .setPriority(70)
+//                                .build())
+//                        // Move into the landing animation if the player is no longer falling
+//                        .addOutboundTransition(StateTransition.builder(FALLING_LAND_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::isLanding)
+//                                .setTiming(Transition.SINGLE_TICK)
+//                                .setPriority(50)
+//                                .bindToOnTransitionTaken(context -> context.montageManager().playMontage(landMontage))
+//                                .build())
+//                        // Move into the landing animation if the player is no longer falling, but only just began falling.
+//                        .addOutboundTransition(StateTransition.builder(FALLING_SOFT_LAND_STATE)
+//                                .isTakenIfTrue(FirstPersonMovement::isSoftLanding)
+//                                .setTiming(Transition.SINGLE_TICK)
+//                                .bindToOnTransitionTaken(context -> context.montageManager().playMontage(softLandMontage))
+//                                .setPriority(60)
+//                                .build())
                         .build())
                 .build();
+
+        fallingStateMachine = MontageSlotFunction.of(fallingStateMachine, FirstPersonMontages.FALLING_LAND_SLOT, false);
 
         return fallingStateMachine;
     }
