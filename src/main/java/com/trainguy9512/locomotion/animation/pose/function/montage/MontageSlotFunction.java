@@ -9,10 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public record MontageSlotFunction(PoseFunction<LocalSpacePose> input, String slot) implements PoseFunction<LocalSpacePose> {
+public record MontageSlotFunction(PoseFunction<LocalSpacePose> input, String slot, boolean blocksEvaluation) implements PoseFunction<LocalSpacePose> {
+
+    public static MontageSlotFunction of(PoseFunction<LocalSpacePose> inputPose, String slot, boolean blocksEvaluation) {
+        return new MontageSlotFunction(inputPose, slot, blocksEvaluation);
+    }
 
     public static MontageSlotFunction of(PoseFunction<LocalSpacePose> inputPose, String slot) {
-        return new MontageSlotFunction(inputPose, slot);
+        return new MontageSlotFunction(inputPose, slot, true);
     }
 
     @Override
@@ -22,7 +26,7 @@ public record MontageSlotFunction(PoseFunction<LocalSpacePose> input, String slo
 
     @Override
     public void tick(PoseTickEvaluationContext context) {
-        if (!context.montageManager().areAnyMontagesInSlotFullyOverriding(this.slot)) {
+        if (!context.montageManager().areAnyMontagesInSlotFullyOverriding(this.slot) || !blocksEvaluation) {
             this.input.tick(context);
         }
     }

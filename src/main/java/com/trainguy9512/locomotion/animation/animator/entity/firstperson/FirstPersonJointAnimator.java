@@ -13,6 +13,7 @@ import com.trainguy9512.locomotion.animation.joint.skeleton.BlendMask;
 import com.trainguy9512.locomotion.animation.pose.LocalSpacePose;
 import com.trainguy9512.locomotion.animation.pose.function.*;
 import com.trainguy9512.locomotion.animation.pose.function.cache.CachedPoseContainer;
+import com.trainguy9512.locomotion.animation.pose.function.montage.MontageConfiguration;
 import com.trainguy9512.locomotion.animation.pose.function.montage.MontageManager;
 import com.trainguy9512.locomotion.animation.util.Easing;
 import com.trainguy9512.locomotion.animation.util.TimeSpan;
@@ -203,6 +204,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
     public void extractAnimationData(LocalPlayer player, DriverGetter driverContainer, MontageManager montageManager){
 
         this.extractMovementPoseData(player, driverContainer);
+        this.handleGroundMovementMontages(player, driverContainer, montageManager);
         this.extractItemData(player, driverContainer);
 
         //? if >= 1.21.5 {
@@ -226,6 +228,7 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
         driverContainer.getDriver(FirstPersonDrivers.WALK_DISTANCE).setValue(player.walkAnimation.position());
         driverContainer.getDriver(FirstPersonDrivers.HORIZONTAL_MOVEMENT_SPEED).setValue(new Vector3f((float) (player.getX() - player.xo), 0.0f, (float) (player.getZ() - player.zo)).length());
         driverContainer.getDriver(FirstPersonDrivers.VERTICAL_MOVEMENT_SPEED).setValue((float) (player.getY() - player.yo));
+        driverContainer.getDriver(FirstPersonDrivers.FALL_DISTANCE).setValue((float) player.fallDistance);
 
         driverContainer.getDriver(FirstPersonDrivers.IS_IN_RIPTIDE).setValue(player.isAutoSpinAttack());
         driverContainer.getDriver(FirstPersonDrivers.IS_MOVING).setValue(player.input.keyPresses.forward() || player.input.keyPresses.backward() || player.input.keyPresses.left() || player.input.keyPresses.right());
@@ -243,6 +246,27 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
                 && !driverContainer.getDriverValue(FirstPersonDrivers.IS_USING_OFF_HAND_ITEM)
                 && !player.isAutoSpinAttack();
         driverContainer.getDriver(FirstPersonDrivers.IS_SWIMMING_UNDERWATER).setValue(isSwimmingUnderwater);
+    }
+
+    public void handleGroundMovementMontages(LocalPlayer player, DriverGetter driverContainer, MontageManager montageManager) {
+        // If the player is on the ground now and was not on the ground last tick, play the land montage.
+        if (!driverContainer.getDriver(FirstPersonDrivers.IS_ON_GROUND).getPreviousValue() && driverContainer.getDriver(FirstPersonDrivers.IS_ON_GROUND).getCurrentValue()) {
+            // If the player has only been falling for a short period of time, play the soft land.
+            MontageConfiguration landMontage = FirstPersonMontages.GROUND_MOVEMENT_LAND_MONTAGE;
+            float fallDistance = driverContainer.getDriver(FirstPersonDrivers.FALL_DISTANCE).getPreviousValue();
+            float fallMontageBlendIntensity = Math.clamp(fallDistance / 3f, 0.3f, 1f);
+            float fallMontagePlayRate = 1 - Math.clamp(fallDistance / 15f, 0f, 0.7f);
+            landMontage = landMontage.makeBuilderCopy(landMontage.identifier(), landMontage.animationSequence())
+                    .setBlendIntensity(fallMontageBlendIntensity)
+                    .setPlayRate(d -> fallMontagePlayRate)
+                    .build();
+            montageManager.playMontage(landMontage);
+        }
+
+        // If the player is jumping, cancel the montages.
+        if (driverContainer.getDriverValue(FirstPersonDrivers.IS_JUMPING)) {
+            montageManager.interruptMontagesInSlot(FirstPersonMontages.FALLING_LAND_SLOT, Transition.SINGLE_TICK);
+        }
     }
 
     public void extractItemData(LocalPlayer player, DriverGetter driverContainer) {

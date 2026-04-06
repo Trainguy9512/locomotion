@@ -34,6 +34,7 @@ import java.util.function.Function;
  *                                          animation and then add it to the start frame of the provided additive base pose resource location.
  * @param additiveBasePoseProvider          Base pose provider added back to the additive animation.
  * @param additiveReferencePosePoint        Point in the animation sequence to use as the reference pose.
+ * @param blendIntensity             The weight in which this montage is blended into the base pose. Default is 1.
  */
 public record MontageConfiguration(
         String identifier,
@@ -49,7 +50,8 @@ public record MontageConfiguration(
         TimeSpan cooldownDuration,
         boolean isAdditive,
         Function<DriverGetter, Identifier> additiveBasePoseProvider,
-        SequenceReferencePoint additiveReferencePosePoint
+        SequenceReferencePoint additiveReferencePosePoint,
+        float blendIntensity
 ) {
 
     public static Builder builder(String identifier, Identifier animationSequence) {
@@ -99,6 +101,7 @@ public record MontageConfiguration(
         private boolean isAdditive;
         private Function<DriverGetter, Identifier> additiveBasePoseProvider;
         private SequenceReferencePoint additiveReferencePosePoint;
+        private float blendIntensity;
 
 
         private Builder(String identifier, Identifier animationSequence) {
@@ -116,6 +119,7 @@ public record MontageConfiguration(
             this.isAdditive = false;
             this.additiveBasePoseProvider = null;
             this.additiveReferencePosePoint = SequenceReferencePoint.BEGINNING;
+            this.blendIntensity = 1;
         }
 
         /**
@@ -244,6 +248,15 @@ public record MontageConfiguration(
             return this;
         }
 
+        /**
+         * Sets the blend intensity for this montage. 0 means the montage does not get blended into the pose function, 0.5 means the
+         * montage is only blended halfway, and 1 means the montage is blended as normal.
+         */
+        public Builder setBlendIntensity(float blendIntensity) {
+            this.blendIntensity = blendIntensity;
+            return this;
+        }
+
         public MontageConfiguration build() {
             return new MontageConfiguration(
                     this.identifier,
@@ -259,7 +272,8 @@ public record MontageConfiguration(
                     this.cooldownDuration,
                     this.isAdditive,
                     this.additiveBasePoseProvider,
-                    this.additiveReferencePosePoint
+                    this.additiveReferencePosePoint,
+                    this.blendIntensity
             );
         }
     }
