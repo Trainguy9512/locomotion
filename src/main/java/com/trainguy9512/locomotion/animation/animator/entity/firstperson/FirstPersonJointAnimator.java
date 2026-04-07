@@ -254,8 +254,8 @@ public class FirstPersonJointAnimator implements LivingEntityJointAnimator<Local
             // If the player has only been falling for a short period of time, play the soft land.
             MontageConfiguration landMontage = FirstPersonMontages.GROUND_MOVEMENT_LAND_MONTAGE;
             float fallDistance = driverContainer.getDriver(FirstPersonDrivers.FALL_DISTANCE).getPreviousValue();
-            float fallMontageBlendIntensity = Math.clamp(fallDistance / 3f, 0.3f, 1f);
-            float fallMontagePlayRate = 1 - Math.clamp(fallDistance / 15f, 0f, 0.7f);
+            float fallMontageBlendIntensity = Math.clamp(fallDistance / 3f, 0.4f, 1.1f);
+            float fallMontagePlayRate = 1 - Math.clamp(fallDistance / 15f, 0f, 0.1f);
             landMontage = landMontage.makeBuilderCopy(landMontage.identifier(), landMontage.animationSequence())
                     .setBlendIntensity(fallMontageBlendIntensity)
                     .setPlayRate(d -> fallMontagePlayRate)
