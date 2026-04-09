@@ -574,13 +574,13 @@ public class FirstPersonMovement {
                         // Transition to the jumping animation if the player is jumping.
                         .addOutboundTransition(StateTransition.builder(FALLING_JUMP_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isJumping)
-                                .setTiming(Transition.SINGLE_TICK)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(2)).setEasement(Easing.CUBIC_OUT).build())
                                 .setPriority(80)
                                 .build())
                         // Transition to the jumping animation if the player is jumping and running.
                         .addOutboundTransition(StateTransition.builder(FALLING_JUMP_RUNNING_STATE)
                                 .isTakenIfTrue(context -> isJumping(context) && isSprinting(context))
-                                .setTiming(Transition.SINGLE_TICK)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(2)).setEasement(Easing.CUBIC_OUT).build())
                                 .setPriority(90)
                                 .build())
                         .build())

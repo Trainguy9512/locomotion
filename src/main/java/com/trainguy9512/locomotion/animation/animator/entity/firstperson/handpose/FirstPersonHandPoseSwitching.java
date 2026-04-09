@@ -214,7 +214,7 @@ public class FirstPersonHandPoseSwitching {
         FirstPersonHandPoses.HandPoseDefinition emptyHandPose = FirstPersonHandPoses.getOrThrowFromIdentifier(FirstPersonHandPoses.getEmptyHandPose(hand));
 
         PoseFunction<LocalSpacePose> useLastItemPoseFunction;
-        useLastItemPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_TOOL_USE).isAdditive(true, SequenceReferencePoint.END).build();
+        useLastItemPoseFunction = SequencePlayerFunction.builder(FirstPersonAnimationSequences.HAND_GENERIC_ITEM_USE).isAdditive(true, SequenceReferencePoint.END).build();
         useLastItemPoseFunction = ApplyAdditiveFunction.of(emptyHandPose.constructBasePoseFunction(hand), useLastItemPoseFunction);
 
         PoseFunction<LocalSpacePose> dropLastItemPoseFunction;
