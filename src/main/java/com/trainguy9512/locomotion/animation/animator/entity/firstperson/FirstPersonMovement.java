@@ -53,6 +53,16 @@ public class FirstPersonMovement {
         return cacheWithOverridesMasked;
     }
 
+    public static PoseFunction<LocalSpacePose> constructWithIdleAnimation(PoseFunction<LocalSpacePose> inputPose) {
+        PoseFunction<LocalSpacePose> idleAnimation = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_IDLE).setLooping(true).build();
+        return ApplyAdditiveFunction.of(
+                inputPose,
+                MakeDynamicAdditiveFunction.of(
+                        SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build(),
+                        idleAnimation
+                ));
+    }
+
     public static boolean isJumpingAndCanBypassJumpAnimation(StateTransitionContext context) {
         return isJumping(context) && context.timeElapsedInCurrentState().in60FramesPerSecond() < 12;
     }
@@ -64,7 +74,7 @@ public class FirstPersonMovement {
         return isJumping && !isGrounded && wasJustGrounded;
     }
 
-    public static boolean isWalking(StateTransitionContext context) {
+    public static boolean isWalking(DriverGetter context) {
         return context.getDriverValue(FirstPersonDrivers.IS_MOVING);
     }
 
@@ -139,6 +149,7 @@ public class FirstPersonMovement {
         pose = cachedPoseContainer.getOrThrow(FALLING_STANDING_POSE_CACHE);
 
         pose = constructWithFallingStateMachine(cachedPoseContainer, pose);
+        pose = constructWithIdleAnimation(pose);
         pose = constructWithUnderwaterStateMachine(pose);
         pose = constructWithMountStateMachine(pose);
 
@@ -211,12 +222,15 @@ public class FirstPersonMovement {
     public static final String WALKING_IDLE_STATE = "idle";
     public static final String WALKING_WALKING_STATE = "walking";
     public static final String WALKING_SPRINTING_STATE = "sprinting";
-    public static final String WALKING_STOPPING_STATE = "stopping";
 
     private static String getWalkingEntryState(DriverGetter dataContainer) {
-        boolean isMoving = dataContainer.getDriverValue(FirstPersonDrivers.IS_MOVING);
-        return WALKING_WALKING_STATE;
-//        return isMoving ? WALKING_WALKING_STATE : WALKING_IDLE_STATE;
+        if (isWalking(dataContainer)) {
+            if (isSprinting(dataContainer)) {
+                return WALKING_SPRINTING_STATE;
+            }
+            return WALKING_WALKING_STATE;
+        }
+        return WALKING_IDLE_STATE;
     }
 
     public static TimeSpan getWalkingAnimationPosition(PoseCalculationContext context) {
@@ -225,8 +239,8 @@ public class FirstPersonMovement {
     }
 
     public static float getWalkingAnimationPlayRate(DriverGetter context) {
-        float walkSpeed = context.getDriverValue(FirstPersonDrivers.MODIFIED_WALK_SPEED);
-        float walkPlayRate = walkSpeed * Mth.PI;
+        float walkPlayRate = context.getDriverValue(FirstPersonDrivers.MODIFIED_WALK_SPEED);
+        walkPlayRate *= Mth.PI;
 
         boolean isGrounded = context.getDriverValue(FirstPersonDrivers.IS_ON_GROUND);
         if (isGrounded) {
@@ -262,37 +276,75 @@ public class FirstPersonMovement {
 //                .evaluatesPoseAt(FirstPersonMovement::getWalkingAnimationPosition)
 //                .build();
 
-        PoseFunction<LocalSpacePose> walkingPoseFunction = SequencePlayerFunction
-                .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING)
-                .setPlayRate(FirstPersonMovement::getWalkingAnimationPlayRate)
-                .setLooping(true)
+        PoseFunction<LocalSpacePose> idlePoseFunction = SequenceEvaluatorFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE).build();
+        idlePoseFunction = MontageSlotFunction.of(idlePoseFunction, FirstPersonMontages.WALK_TO_STOP_SLOT);
+        PoseFunction<LocalSpacePose> walkingPoseFunction = BlendedSequencePlayerFunction.builder(FirstPersonMovement::getWalkingAnimationPlayRate)
+                .addEntry(0, FirstPersonAnimationSequences.GROUND_MOVEMENT_POSE, 0)
+                .addEntry(Mth.PI, FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING, Mth.PI)
+                .addEntry(Mth.TWO_PI, FirstPersonAnimationSequences.GROUND_MOVEMENT_WALKING, Mth.TWO_PI)
                 .build();
         PoseFunction<LocalSpacePose> sprintingPoseFunction = SequencePlayerFunction
                 .builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_SPRINTING)
                 .setPlayRate(FirstPersonMovement::getWalkingAnimationPlayRate)
                 .setLooping(true)
                 .build();
-
         sprintingPoseFunction = BlendPosesFunction.builder(walkingPoseFunction)
                 .addBlendInput(sprintingPoseFunction, context -> LocomotionMain.CONFIG.data().firstPersonPlayer.runningArmSwingIntensity)
                 .build();
 
-        PoseFunction<LocalSpacePose> walkingRunningPoseFunction = BlendPosesByBooleanFunction.builder(walkingPoseFunction, sprintingPoseFunction)
-                .setPredicate(FirstPersonMovement::isSprinting)
-                .setFalseToTrueDuration(TimeSpan.ofSeconds(0.6f))
-                .setTrueToFalseDuration(TimeSpan.ofSeconds(0.6f))
-                .setBlendEasement(Easing.CUBIC_IN_OUT)
+        PoseFunction<LocalSpacePose> walkingStateMachine;
+        walkingStateMachine = StateMachineFunction.builder(FirstPersonMovement::getWalkingEntryState)
+                .resetsUponRelevant(true)
+                .defineState(StateDefinition.builder(WALKING_IDLE_STATE, idlePoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isWalking)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(4)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setPriority(50)
+                                .setCanInterruptOtherTransitions(false)
+                                .build())
+                        .addOutboundTransition(StateTransition.builder(WALKING_SPRINTING_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isSprinting)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(4)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setPriority(60)
+                                .setCanInterruptOtherTransitions(false)
+                                .build())
+                        .build())
+                .defineState(StateDefinition.builder(WALKING_WALKING_STATE, walkingPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(WALKING_SPRINTING_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isSprinting)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(4)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setPriority(50)
+                                .setCanInterruptOtherTransitions(false)
+                                .build())
+                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(4)).setEasement(Easing.SINE_IN_OUT).build())
+                                .bindToOnTransitionTaken(context -> context.montageManager().playMontage(FirstPersonMontages.WALK_TO_STOP_MONTAGE))
+                                .setPriority(60)
+                                .build())
+                        .build())
+                .defineState(StateDefinition.builder(WALKING_SPRINTING_STATE, sprintingPoseFunction)
+                        .resetsPoseFunctionUponEntry(true)
+                        .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isNotSprinting)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(4)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setPriority(50)
+                                .setCanInterruptOtherTransitions(false)
+                                .build())
+                        .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
+                                .isTakenIfTrue(FirstPersonMovement::isNotWalking)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(4)).setEasement(Easing.SINE_IN_OUT).build())
+                                .bindToOnTransitionTaken(context -> context.montageManager().playMontage(FirstPersonMontages.WALK_TO_STOP_MONTAGE))
+                                .setPriority(80)
+                                .build())
+                        .build())
                 .build();
 
-        PoseFunction<LocalSpacePose> idleWalkingPoseFunction = BlendPosesByBooleanFunction.builder(idleAnimationPlayer, walkingRunningPoseFunction)
-                .setBooleanDriver(FirstPersonDrivers.IS_MOVING)
-                .setFalseToTrueDuration(TimeSpan.ofSeconds(0.3f))
-                .setTrueToFalseDuration(TimeSpan.ofSeconds(0.5f))
-                .setBlendEasement(Easing.CUBIC_IN_OUT)
-                .setSkipEvaluationIfFullyBlended(false)
-                .build();
 
-        return idleWalkingPoseFunction;
+
+        return walkingStateMachine;
     }
 
     public static final String CROUCHING_STANDING_STATE = "standing";

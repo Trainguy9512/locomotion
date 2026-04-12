@@ -17,6 +17,7 @@ public class FirstPersonMontages {
     public static final String MAIN_HAND_ATTACK_SLOT = "main_hand_attack";
     public static final String OFF_HAND_ATTACK_SLOT = "off_hand_attack";
 
+    public static final String WALK_TO_STOP_SLOT = "walk_to_stop";
     public static final String FALLING_LAND_SLOT = "falling_land";
     public static final String SHIELD_BLOCK_SLOT = "shield_block";
     public static final String SPEAR_CHARGE_SLOT = "spear_charge";
@@ -110,6 +111,17 @@ public class FirstPersonMontages {
             .build();
 
 
+
+
+
+
+    public static final MontageConfiguration WALK_TO_STOP_MONTAGE = MontageConfiguration.builder("walk_to_stop", FirstPersonAnimationSequences.GROUND_MOVEMENT_WALK_TO_STOP)
+            .playsInSlot(WALK_TO_STOP_SLOT)
+            .setTransitionIn(Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.SINE_IN_OUT).build())
+            .setTransitionOut(Transition.builder(TimeSpan.ofSeconds(0.01f)).setEasement(Easing.SINE_IN_OUT).build())
+            .setStartTimeOffset(TimeSpan.ofTicks(4))
+//            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
+            .build();
 
     public static final MontageConfiguration GROUND_MOVEMENT_LAND_MONTAGE = MontageConfiguration.builder("ground_movement_land", FirstPersonAnimationSequences.GROUND_MOVEMENT_LAND)
             .playsInSlot(FALLING_LAND_SLOT)
