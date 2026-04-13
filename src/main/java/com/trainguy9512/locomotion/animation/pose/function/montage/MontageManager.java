@@ -219,6 +219,9 @@ public class MontageManager {
                 pose.multiply(this.additiveSubtractionPose, JointChannel.TransformSpace.COMPONENT);
                 pose.multiply(this.additiveBasePose, JointChannel.TransformSpace.COMPONENT);
             }
+            if (this.configuration.isMirrored()) {
+                pose = pose.mirrored();
+            }
             return pose;
         }
 

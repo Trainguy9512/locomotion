@@ -2,7 +2,14 @@
     "format_version": 6,
     "joint_skeleton": "locomotion:entity/player/first_person",
     "length": 2.0,
-    "time_markers": {},
+    "time_markers": {
+        "swing_left": [
+            0.2
+        ],
+        "swing_right": [
+            1.2
+        ]
+    },
     "custom_attributes": {
         "crossbow_pull_property": {
             "0.0": 0.0
@@ -1981,7 +1988,7 @@
             },
             "rotation": {
                 "0.0": [
-                    0.0,
+                    -0.0,
                     0.0,
                     -0.0
                 ]
@@ -2009,7 +2016,7 @@
                 "0.0": [
                     0.0,
                     0.0,
-                    0.0
+                    -0.0
                 ]
             },
             "scale": {
