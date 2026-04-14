@@ -99,6 +99,7 @@ public class FirstPersonAnimationSequences {
     public static final Identifier GROUND_MOVEMENT_WALKING = makeIdentifier("ground_movement/walking");
     public static final Identifier GROUND_MOVEMENT_SPRINTING = makeIdentifier("ground_movement/sprinting");
     public static final Identifier GROUND_MOVEMENT_WALK_TO_STOP = makeIdentifier("ground_movement/walk_to_stop");
+    public static final Identifier GROUND_MOVEMENT_RUN_TO_STOP = makeIdentifier("ground_movement/run_to_stop");
     public static final Identifier GROUND_MOVEMENT_JUMP = makeIdentifier("ground_movement/jump");
     public static final Identifier GROUND_MOVEMENT_JUMP_RUNNING = GROUND_MOVEMENT_JUMP;//makeIdentifier("ground_movement/jump_running");
     public static final Identifier GROUND_MOVEMENT_WALKING_TO_FALLING = makeIdentifier("ground_movement/walking_to_falling");

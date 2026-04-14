@@ -34,7 +34,8 @@ import java.util.function.Function;
  *                                          animation and then add it to the start frame of the provided additive base pose resource location.
  * @param additiveBasePoseProvider          Base pose provider added back to the additive animation.
  * @param additiveReferencePosePoint        Point in the animation sequence to use as the reference pose.
- * @param blendIntensity             The weight in which this montage is blended into the base pose. Default is 1.
+ * @param blendIntensity                    The weight in which this montage is blended into the base pose. Default is 1.
+ * @param isMirrored                        Should the animation be mirrored?
  */
 public record MontageConfiguration(
         String identifier,
@@ -51,7 +52,8 @@ public record MontageConfiguration(
         boolean isAdditive,
         Function<DriverGetter, Identifier> additiveBasePoseProvider,
         SequenceReferencePoint additiveReferencePosePoint,
-        float blendIntensity
+        float blendIntensity,
+        boolean isMirrored
 ) {
 
     public static Builder builder(String identifier, Identifier animationSequence) {
@@ -102,6 +104,7 @@ public record MontageConfiguration(
         private Function<DriverGetter, Identifier> additiveBasePoseProvider;
         private SequenceReferencePoint additiveReferencePosePoint;
         private float blendIntensity;
+        private boolean isMirrored;
 
 
         private Builder(String identifier, Identifier animationSequence) {
@@ -120,6 +123,7 @@ public record MontageConfiguration(
             this.additiveBasePoseProvider = null;
             this.additiveReferencePosePoint = SequenceReferencePoint.BEGINNING;
             this.blendIntensity = 1;
+            this.isMirrored = false;
         }
 
         /**
@@ -257,6 +261,14 @@ public record MontageConfiguration(
             return this;
         }
 
+        /**
+         * Sets whether the animation in the montage should be mirrored or not
+         */
+        public Builder setIsMirrored(boolean isMirrored) {
+            this.isMirrored = isMirrored;
+            return this;
+        }
+
         public MontageConfiguration build() {
             return new MontageConfiguration(
                     this.identifier,
@@ -273,7 +285,8 @@ public record MontageConfiguration(
                     this.isAdditive,
                     this.additiveBasePoseProvider,
                     this.additiveReferencePosePoint,
-                    this.blendIntensity
+                    this.blendIntensity,
+                    this.isMirrored
             );
         }
     }
