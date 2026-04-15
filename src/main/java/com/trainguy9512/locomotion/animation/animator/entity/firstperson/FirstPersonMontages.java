@@ -120,12 +120,12 @@ public class FirstPersonMontages {
             .playsInSlot(WALK_TO_STOP_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.SINE_IN_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.ofSeconds(0.01f)).setEasement(Easing.SINE_IN_OUT).build())
-            .setStartTimeOffset(TimeSpan.ofTicks(4))
+            .setStartTimeOffset(TimeSpan.ofTicks(1))
 //            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
             .build();
 
     public static final MontageConfiguration RUN_TO_STOP_MONTAGE = MontageConfiguration.builder("run_to_stop", FirstPersonAnimationSequences.GROUND_MOVEMENT_RUN_TO_STOP)
-            .playsInSlot(RUN_TO_STOP_SLOT)
+            .playsInSlot(WALK_TO_STOP_SLOT)
             .setTransitionIn(Transition.builder(TimeSpan.ofTicks(3)).setEasement(Easing.SINE_OUT).build())
             .setTransitionOut(Transition.builder(TimeSpan.ofSeconds(0.5f)).setEasement(Easing.SINE_IN_OUT).build())
 //            .makeAdditive(FirstPersonMontages::getBaseHandPose, SequenceReferencePoint.END)
