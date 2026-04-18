@@ -222,8 +222,6 @@ public class FirstPersonMovement {
     public static final String WALKING_IDLE_STATE = "idle";
     public static final String WALKING_WALKING_STATE = "walking";
     public static final String WALKING_SPRINTING_STATE = "sprinting";
-    public static final String SPRINT_TO_STOP_A = "sprint_to_stop_a";
-    public static final String SPRINT_TO_STOP_B = "sprint_to_stop_b";
 
     private static String getWalkingEntryState(DriverGetter dataContainer) {
         if (isWalking(dataContainer)) {
@@ -265,9 +263,9 @@ public class FirstPersonMovement {
         context.montageManager().playMontage(montage);
     }
 
-    public static void cancelRunToStopAnimations(PoseTickEvaluationContext context) {
-//        context.montageManager().interruptMontagesInSlot(FirstPersonMontages.RUN_TO_STOP_SLOT, Transition.builder(TimeSpan.ofTicks(2)).build());
-    }
+//    public static void cancelRunToStopAnimations(PoseTickEvaluationContext context) {
+////        context.montageManager().interruptMontagesInSlot(FirstPersonMontages.RUN_TO_STOP_SLOT, Transition.builder(TimeSpan.ofTicks(2)).build());
+//    }
 
     public static PoseFunction<LocalSpacePose> constructWalkingStateMachine() {
         PoseFunction<LocalSpacePose> idleAnimationPlayer = BlendPosesFunction.builder(
@@ -297,12 +295,6 @@ public class FirstPersonMovement {
 
 
         idlePoseFunction = MontageSlotFunction.of(idlePoseFunction, FirstPersonMontages.WALK_TO_STOP_SLOT, false);
-//        idlePoseFunction = MontageSlotFunction.of(idlePoseFunction, FirstPersonMontages.RUN_TO_STOP_SLOT, false);
-//        walkingPoseFunction = MontageSlotFunction.of(walkingPoseFunction, FirstPersonMontages.RUN_TO_STOP_SLOT, false);
-
-        PoseFunction<LocalSpacePose> sprintToStopAPose = SequencePlayerFunction.builder(FirstPersonAnimationSequences.GROUND_MOVEMENT_RUN_TO_STOP).build();
-        PoseFunction<LocalSpacePose> sprintToStopBPose = MirrorFunction.of(sprintToStopAPose);
-
 
         PoseFunction<LocalSpacePose> walkingStateMachine;
         walkingStateMachine = StateMachineFunction.builder(FirstPersonMovement::getWalkingEntryState)
@@ -317,9 +309,8 @@ public class FirstPersonMovement {
                                 .build())
                         .addOutboundTransition(StateTransition.builder(WALKING_SPRINTING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isSprinting)
-                                .setTiming(Transition.builder(TimeSpan.ofTicks(3)).setEasement(Easing.SINE_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(10)).setEasement(Easing.SINE_OUT).build())
                                 .bindToOnTransitionTaken(context -> context.getDriver(FirstPersonDrivers.LAST_ARM_SWING_WAS_LEFT).setValue(false))
-                                .bindToOnTransitionTaken(FirstPersonMovement::cancelRunToStopAnimations)
                                 .setPriority(60)
                                 .setCanInterruptOtherTransitions(false)
                                 .build())
@@ -328,9 +319,8 @@ public class FirstPersonMovement {
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(WALKING_SPRINTING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isSprinting)
-                                .setTiming(Transition.builder(TimeSpan.ofTicks(4)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(10)).setEasement(Easing.SINE_IN_OUT).build())
                                 .bindToOnTransitionTaken(context -> context.getDriver(FirstPersonDrivers.LAST_ARM_SWING_WAS_LEFT).setValue(false))
-                                .bindToOnTransitionTaken(FirstPersonMovement::cancelRunToStopAnimations)
                                 .setPriority(50)
                                 .setCanInterruptOtherTransitions(false)
                                 .build())
@@ -345,23 +335,17 @@ public class FirstPersonMovement {
                         .resetsPoseFunctionUponEntry(true)
                         .addOutboundTransition(StateTransition.builder(WALKING_WALKING_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNotSprinting)
-                                .setTiming(Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.SINE_IN_OUT).build())
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(8)).setEasement(Easing.SINE_IN_OUT).build())
                                 .setPriority(50)
                                 .setCanInterruptOtherTransitions(false)
-//                                .bindToOnTransitionTaken(FirstPersonMovement::playRunToStopMontage)
+                                .bindToOnTransitionTaken(FirstPersonMovement::playRunToStopMontage)
                                 .build())
                         .addOutboundTransition(StateTransition.builder(WALKING_IDLE_STATE)
                                 .isTakenIfTrue(FirstPersonMovement::isNotWalking)
-                                .setTiming(Transition.builder(TimeSpan.ofTicks(1)).setEasement(Easing.SINE_IN_OUT).build())
-//                                .bindToOnTransitionTaken(FirstPersonMovement::playRunToStopMontage)
+                                .setTiming(Transition.builder(TimeSpan.ofTicks(8)).setEasement(Easing.SINE_IN_OUT).build())
+                                .bindToOnTransitionTaken(FirstPersonMovement::playRunToStopMontage)
                                 .setPriority(80)
                                 .build())
-                        .build())
-                .defineState(StateDefinition.builder(SPRINT_TO_STOP_A, sprintToStopAPose)
-                        .resetsPoseFunctionUponEntry(true)
-                        .build())
-                .defineState(StateDefinition.builder(SPRINT_TO_STOP_B, sprintToStopBPose)
-                        .resetsPoseFunctionUponEntry(true)
                         .build())
                 .build();
 
