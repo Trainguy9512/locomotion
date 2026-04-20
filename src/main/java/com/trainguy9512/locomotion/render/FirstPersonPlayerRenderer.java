@@ -10,6 +10,8 @@ import com.trainguy9512.locomotion.animation.animator.entity.firstperson.handpos
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.joint.JointChannel;
 import com.trainguy9512.locomotion.animation.pose.ModelPartSpacePose;
+import com.trainguy9512.locomotion.event.FirstPersonRenderEvents;
+import com.trainguy9512.locomotion.event.LocomotionEventBus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
@@ -137,6 +139,13 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
     }
 
     public void render(float partialTicks, PoseStack poseStack, SubmitNodeCollector nodeCollector, LocalPlayer player, int combinedLight) {
+        FirstPersonRenderEvents.BeforeFirstPersonRender beforeEvent = new FirstPersonRenderEvents.BeforeFirstPersonRender(
+                player, poseStack, nodeCollector, combinedLight, partialTicks
+        );
+
+        if (LocomotionEventBus.getInstance().fireBeforeFirstPersonRender(beforeEvent)) {
+            return;
+        }
 
         CURRENT_PARTIAL_TICKS = partialTicks;
         JointAnimatorDispatcher jointAnimatorDispatcher = JointAnimatorDispatcher.getInstance();
@@ -238,6 +247,11 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                 )
         );
 
+        FirstPersonRenderEvents.AfterFirstPersonRender afterEvent = new FirstPersonRenderEvents.AfterFirstPersonRender(
+                player, poseStack, nodeCollector, combinedLight, partialTicks
+        );
+        LocomotionEventBus.getInstance().fireAfterFirstPersonRender(afterEvent);
+
         this.minecraft.gameRenderer.getFeatureRenderDispatcher().renderAllFeatures();
         this.minecraft.renderBuffers().bufferSource().endBatch();
     }
@@ -274,6 +288,16 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             SubmitNodeCollector nodeCollector,
             int combinedLight
     ) {
+        boolean leftHanded = this.minecraft.options.mainHand().get() == HumanoidArm.LEFT;
+        InteractionHand hand = (arm == HumanoidArm.RIGHT) != leftHanded ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+
+        FirstPersonRenderEvents.BeforeArmRender beforeEvent = new FirstPersonRenderEvents.BeforeArmRender(
+                abstractClientPlayer, arm, hand, poseStack, nodeCollector, combinedLight, CURRENT_PARTIAL_TICKS
+        );
+
+        if (LocomotionEventBus.getInstance().fireBeforeArmRender(beforeEvent)) {
+            return;
+        }
 
         // Skin data changed in 1.21.9
         PlayerSkin skin = abstractClientPlayer.getSkin();
@@ -303,6 +327,11 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                 null
         );
 
+        FirstPersonRenderEvents.AfterArmRender afterEvent = new FirstPersonRenderEvents.AfterArmRender(
+                abstractClientPlayer, arm, hand, poseStack, nodeCollector, combinedLight, CURRENT_PARTIAL_TICKS
+        );
+        LocomotionEventBus.getInstance().fireAfterArmRender(afterEvent);
+
         poseStack.popPose();
     }
 
@@ -318,6 +347,19 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
             ItemRenderType renderType
     ) {
         if (!itemStack.isEmpty()) {
+            if (!(entity instanceof AbstractClientPlayer player)) {
+                return;
+            }
+
+            FirstPersonRenderEvents.BeforeItemRender beforeEvent = new FirstPersonRenderEvents.BeforeItemRender(
+                    player, itemStack, poseStack, nodeCollector,
+                    combinedLight, side, hand, renderType
+            );
+
+            if (LocomotionEventBus.getInstance().fireBeforeItemRender(beforeEvent)) {
+                return;
+            }
+
             IS_RENDERING_LOCOMOTION_FIRST_PERSON = true;
             CURRENT_ITEM_INTERACTION_HAND = hand;
 
@@ -343,6 +385,13 @@ public class FirstPersonPlayerRenderer implements RenderLayerParent<AvatarRender
                     /*this.itemRenderer.renderStatic(entity, itemStackToRender, displayContext, side == HumanoidArm.LEFT, poseStack, buffer, entity.level(), combinedLight, OverlayTexture.NO_OVERLAY, entity.getId() + displayContext.ordinal());*/
                 }
             }
+
+            FirstPersonRenderEvents.AfterItemRender afterEvent = new FirstPersonRenderEvents.AfterItemRender(
+                    (AbstractClientPlayer) entity, itemStack, poseStack, nodeCollector,
+                    combinedLight, side, hand, renderType
+            );
+            LocomotionEventBus.getInstance().fireAfterItemRender(afterEvent);
+
             SHOULD_FLIP_ITEM_TRANSFORM = false;
             IS_RENDERING_LOCOMOTION_FIRST_PERSON = false;
             poseStack.popPose();
