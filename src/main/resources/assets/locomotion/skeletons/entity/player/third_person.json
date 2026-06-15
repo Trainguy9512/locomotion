@@ -12,14 +12,14 @@
             "model_part_identifier": "left_arm",
             "reference_pose": {
                 "translation": [
-                    5.0,
-                    -6.0,
-                    0.0
+                    6.173,
+                    -7.546,
+                    1.113
                 ],
                 "rotation": [
-                    -0.0,
-                    0.0,
-                    0.0
+                    -41.255,
+                    -20.157,
+                    -51.597
                 ],
                 "scale": [
                     1.0,
@@ -55,14 +55,14 @@
             "model_part_identifier": "right_arm",
             "reference_pose": {
                 "translation": [
-                    -5.0,
-                    -6.0,
-                    -0.0
+                    -5.066,
+                    -5.019,
+                    -0.302
                 ],
                 "rotation": [
-                    -0.0,
-                    -0.0,
-                    0.0
+                    -7.129,
+                    8.276,
+                    5.374
                 ],
                 "scale": [
                     1.0,
@@ -144,14 +144,14 @@
             "model_part_identifier": null,
             "reference_pose": {
                 "translation": [
-                    0.0,
-                    8.0,
-                    -0.0
+                    -0.053,
+                    6.222,
+                    0.422
                 ],
                 "rotation": [
-                    -0.0,
-                    0.0,
-                    -0.0
+                    8.059,
+                    10.552,
+                    7.948
                 ],
                 "scale": [
                     1.0,
@@ -230,12 +230,12 @@
                 "translation": [
                     -0.0,
                     -8.0,
-                    -0.0
+                    0.0
                 ],
                 "rotation": [
-                    0.0,
-                    -0.0,
-                    -0.0
+                    -9.799,
+                    -31.978,
+                    -4.553
                 ],
                 "scale": [
                     1.0,
@@ -312,18 +312,18 @@
             "model_part_identifier": "left_leg",
             "reference_pose": {
                 "translation": [
-                    1.9,
-                    12.0,
-                    -0.0
+                    2.045,
+                    10.578,
+                    -0.079
                 ],
                 "rotation": [
-                    0.0,
-                    0.0,
-                    -0.0
+                    4.637,
+                    3.34,
+                    5.581
                 ],
                 "scale": [
                     1.0,
-                    1.0,
+                    1.119,
                     1.0
                 ],
                 "visibility": true
@@ -355,18 +355,18 @@
             "model_part_identifier": "right_leg",
             "reference_pose": {
                 "translation": [
-                    -1.9,
-                    12.0,
-                    0.0
+                    -2.349,
+                    9.901,
+                    1.321
                 ],
                 "rotation": [
-                    0.0,
-                    0.0,
-                    -0.0
+                    9.652,
+                    13.887,
+                    24.334
                 ],
                 "scale": [
                     1.0,
-                    1.0,
+                    1.272,
                     1.0
                 ],
                 "visibility": true
