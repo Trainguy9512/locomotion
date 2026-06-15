@@ -1,14 +1,10 @@
 package com.trainguy9512.locomotion.mixin.render;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
-import com.trainguy9512.locomotion.access.LivingEntityRenderStateAccess;
-import com.trainguy9512.locomotion.animation.animator.JointAnimatorRegistry;
+import com.trainguy9512.locomotion.access.EntityRenderStateAccess;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator;
 import com.trainguy9512.locomotion.animation.pose.Pose;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -48,22 +44,24 @@ public abstract class MixinLivingEntityRenderer<S extends EntityRenderState, R e
 //        );
     }
 
+//    @SuppressWarnings("unchecked")
+//    @Redirect(
+//            method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",
+//            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;setupAnim(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;)V"))
+//    private void redirectSetupAnim(EntityModel<S> entityModel, S livingEntityRenderState){
+//        // Unchecked cast, but I can make assumptions given this is always called after extractRenderState within the same renderer class.
+//        Optional<Pose> animationPoseOptional = ((EntityRenderStateAccess)livingEntityRenderState).animationOverhaul$getInterpolatedAnimationPose();
+//        Optional<EntityJointAnimator<?, ?>> entityJointAnimatorOptional = ((EntityRenderStateAccess)livingEntityRenderState).animationOverhaul$getEntityJointAnimator();
+//
+//        animationPoseOptional.ifPresentOrElse(
+//                animationPose -> entityJointAnimatorOptional.ifPresent(jointAnimator -> {
+//                    EntityJointAnimator<?, S> entityJointAnimator = (EntityJointAnimator<?, S>) jointAnimator;
+//                    JointAnimatorDispatcher.getInstance().setupAnimWithAnimationPose(entityModel, livingEntityRenderState, animationPose, entityJointAnimator);
+//                }),
+//                () -> entityModel.setupAnim(livingEntityRenderState)
+//        );
+//    }
     /*
-    @SuppressWarnings("unchecked")
-    @Redirect(method = "render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;setupAnim(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;)V"))
-    private void redirectSetupAnim(EntityModel<S> entityModel, S livingEntityRenderState){
-        // Unchecked cast, but I can make assumptions given this is always called after extractRenderState within the same renderer class.
-        Optional<Pose> animationPoseOptional = ((LivingEntityRenderStateAccess)livingEntityRenderState).animationOverhaul$getInterpolatedAnimationPose();
-        Optional<EntityJointAnimator<?, ?>> entityJointAnimatorOptional = ((LivingEntityRenderStateAccess)livingEntityRenderState).animationOverhaul$getEntityJointAnimator();
-
-        animationPoseOptional.ifPresentOrElse(
-                animationPose -> entityJointAnimatorOptional.ifPresent(jointAnimator -> {
-                    EntityJointAnimator<?, S> entityJointAnimator = (EntityJointAnimator<?, S>) jointAnimator;
-                    JointAnimatorDispatcher.getInstance().setupAnimWithAnimationPose(entityModel, livingEntityRenderState, animationPose, entityJointAnimator);
-                }),
-                () -> entityModel.setupAnim(livingEntityRenderState)
-        );
-    }
 
 
 

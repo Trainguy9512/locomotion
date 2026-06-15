@@ -28,7 +28,7 @@ import java.util.function.Function;
 public class JointAnimatorDispatcher {
     private static final JointAnimatorDispatcher INSTANCE = new JointAnimatorDispatcher();
 
-    private final WeakHashMap<UUID, AnimationDataContainer> entityAnimationDataContainerStorage;
+    private final HashMap<UUID, AnimationDataContainer> entityAnimationDataContainerStorage;
     private final HashMap<Long, AnimationDataContainer> blockEntityAnimationDataContainerStorage;
     private AnimationDataContainer firstPersonPlayerDataContainer;
     private ModelPartSpacePose interpolatedFirstPersonPlayerPose;
@@ -37,7 +37,7 @@ public class JointAnimatorDispatcher {
     private static DriverKey<VariableDriver<Identifier>> ENTITY_TYPE_DRIVER = DriverKey.of("entity_type", () -> VariableDriver.ofConstant(() -> Identifier.withDefaultNamespace("none")));
 
     public JointAnimatorDispatcher() {
-        this.entityAnimationDataContainerStorage = new WeakHashMap<>();
+        this.entityAnimationDataContainerStorage = Maps.newHashMap();
         this.blockEntityAnimationDataContainerStorage = Maps.newHashMap();
     }
 
@@ -55,20 +55,20 @@ public class JointAnimatorDispatcher {
     }
 
     public <T extends Entity, B extends BlockEntity> void tick(Iterable<T> entitiesForRendering) {
-//        this.tickEntityJointAnimators(entitiesForRendering);
+        this.tickEntityJointAnimators(entitiesForRendering);
         this.tickFirstPersonPlayerJointAnimator();
         this.flushBlockEntityDataContainersOutsideRadius();
     }
 
-//    public <T extends Entity> void tickEntityJointAnimators(Iterable<T> entitiesForRendering) {
-//        entitiesForRendering.forEach(entity ->
-//                JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(
-//                        jointAnimator -> this.getEntityAnimationDataContainer(entity).ifPresent(
-//                                dataContainer -> this.tickJointAnimator(jointAnimator, entity, dataContainer)
-//                        )
-//                )
-//        );
-//    }
+    public <T extends Entity> void tickEntityJointAnimators(Iterable<T> entitiesForRendering) {
+        entitiesForRendering.forEach(entity ->
+                JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(
+                        jointAnimator -> this.getEntityAnimationDataContainer(entity).ifPresent(
+                                dataContainer -> this.tickJointAnimator(jointAnimator, entity, dataContainer)
+                        )
+                )
+        );
+    }
 
     @SuppressWarnings("unchecked")
     public <T extends BlockEntity> void tickBlockEntityJointAnimator(Level level, BlockPos blockPos, BlockState blockState, T blockEntity) {
@@ -111,15 +111,15 @@ public class JointAnimatorDispatcher {
         dataContainer.postTick();
     }
 
-//    public <T extends Entity> Optional<AnimationDataContainer> getEntityAnimationDataContainer(T entity){
-//        UUID uuid = entity.getUUID();
-//        if(!this.entityAnimationDataContainerStorage.containsKey(uuid)){
-//            JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(jointAnimator ->
-//                    this.entityAnimationDataContainerStorage.put(uuid, this.createDataContainer(jointAnimator))
-//            );
-//        }
-//        return Optional.ofNullable(this.entityAnimationDataContainerStorage.get(uuid));
-//    }
+    public <T extends Entity> Optional<AnimationDataContainer> getEntityAnimationDataContainer(T entity){
+        UUID uuid = entity.getUUID();
+        if(!this.entityAnimationDataContainerStorage.containsKey(uuid)){
+            JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(jointAnimator ->
+                    this.entityAnimationDataContainerStorage.put(uuid, AnimationDataContainer.of(jointAnimator))
+            );
+        }
+        return Optional.ofNullable(this.entityAnimationDataContainerStorage.get(uuid));
+    }
 
 
 

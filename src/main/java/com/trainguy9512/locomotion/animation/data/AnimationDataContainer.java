@@ -125,17 +125,6 @@ public class AnimationDataContainer implements DriverGetter {
         model.resetPose();
 
         ModelPartSpacePose pose = this.getInterpolatedAnimationPose(partialTicks);
-        JointSkeleton jointSkeleton = this.getJointSkeleton();
-
-        Function<String, ModelPart> partLookup = model.root().createPartLookup();
-        jointSkeleton.getJoints().forEach(joint -> {
-            String modelPartIdentifier = jointSkeleton.getJointConfiguration(joint).modelPartIdentifier();
-            if (modelPartIdentifier != null) {
-                ModelPart modelPart = partLookup.apply(modelPartIdentifier);
-                if (modelPart != null) {
-                    ((MatrixModelPart)(Object) modelPart).locomotion$setMatrix(pose.getJointChannel(joint).getTransform());
-                }
-            }
-        });
+        pose.setupAnimOnModel(model);
     }
 }

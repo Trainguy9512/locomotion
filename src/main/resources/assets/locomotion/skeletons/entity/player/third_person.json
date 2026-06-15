@@ -1,0 +1,602 @@
+{
+    "format_version": 6,
+    "root_joint": "root_jnt",
+    "custom_attributes": {},
+    "joints": {
+        "arm_L_jnt": {
+            "children": [
+                "sleeve_L_jnt"
+            ],
+            "mirror_joint": "arm_R_jnt",
+            "model_part_space_parent": null,
+            "model_part_identifier": "left_arm",
+            "reference_pose": {
+                "translation": [
+                    5.0,
+                    -6.0,
+                    0.0
+                ],
+                "rotation": [
+                    -0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "arm_R_jnt": {
+            "children": [
+                "sleeve_R_jnt"
+            ],
+            "mirror_joint": "arm_L_jnt",
+            "model_part_space_parent": null,
+            "model_part_identifier": "right_arm",
+            "reference_pose": {
+                "translation": [
+                    -5.0,
+                    -6.0,
+                    -0.0
+                ],
+                "rotation": [
+                    -0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "body_jnt": {
+            "children": [
+                "jacket_jnt"
+            ],
+            "mirror_joint": null,
+            "model_part_space_parent": null,
+            "model_part_identifier": "body",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -8.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "body_pivot_jnt": {
+            "children": [
+                "body_jnt",
+                "arm_R_jnt",
+                "arm_L_jnt",
+                "head_jnt"
+            ],
+            "mirror_joint": null,
+            "model_part_space_parent": null,
+            "model_part_identifier": null,
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    8.0,
+                    -0.0
+                ],
+                "rotation": [
+                    -0.0,
+                    0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "hat_jnt": {
+            "children": [],
+            "mirror_joint": null,
+            "model_part_space_parent": null,
+            "model_part_identifier": "hat",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "head_jnt": {
+            "children": [
+                "hat_jnt"
+            ],
+            "mirror_joint": null,
+            "model_part_space_parent": null,
+            "model_part_identifier": "head",
+            "reference_pose": {
+                "translation": [
+                    -0.0,
+                    -8.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "jacket_jnt": {
+            "children": [],
+            "mirror_joint": null,
+            "model_part_space_parent": null,
+            "model_part_identifier": "jacket",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "leg_L_jnt": {
+            "children": [
+                "pants_L_jnt"
+            ],
+            "mirror_joint": "leg_R_jnt",
+            "model_part_space_parent": null,
+            "model_part_identifier": "left_leg",
+            "reference_pose": {
+                "translation": [
+                    1.9,
+                    12.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "leg_R_jnt": {
+            "children": [
+                "pants_R_jnt"
+            ],
+            "mirror_joint": "leg_L_jnt",
+            "model_part_space_parent": null,
+            "model_part_identifier": "right_leg",
+            "reference_pose": {
+                "translation": [
+                    -1.9,
+                    12.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "pants_L_jnt": {
+            "children": [],
+            "mirror_joint": "pants_R_jnt",
+            "model_part_space_parent": null,
+            "model_part_identifier": "left_pants",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "pants_R_jnt": {
+            "children": [],
+            "mirror_joint": "pants_L_jnt",
+            "model_part_space_parent": null,
+            "model_part_identifier": "right_pants",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "root_jnt": {
+            "children": [
+                "leg_L_jnt",
+                "leg_R_jnt",
+                "body_pivot_jnt"
+            ],
+            "mirror_joint": null,
+            "model_part_space_parent": null,
+            "model_part_identifier": "root",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "sleeve_L_jnt": {
+            "children": [],
+            "mirror_joint": "sleeve_R_jnt",
+            "model_part_space_parent": null,
+            "model_part_identifier": "left_sleeve",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        "sleeve_R_jnt": {
+            "children": [],
+            "mirror_joint": "sleeve_L_jnt",
+            "model_part_space_parent": null,
+            "model_part_identifier": "right_sleeve",
+            "reference_pose": {
+                "translation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "visibility": true
+            },
+            "model_part_offset": {
+                "translation": [
+                    0,
+                    0,
+                    0
+                ],
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        }
+    }
+}

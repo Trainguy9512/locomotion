@@ -1,31 +1,32 @@
 package com.trainguy9512.locomotion.mixin.render;
 
-import com.trainguy9512.locomotion.access.LivingEntityRenderStateAccess;
+import com.trainguy9512.locomotion.access.EntityRenderStateAccess;
 import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator;
+import com.trainguy9512.locomotion.animation.pose.ModelPartSpacePose;
 import com.trainguy9512.locomotion.animation.pose.Pose;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Optional;
 
-@Mixin(LivingEntityRenderState.class)
-public class MixinLivingEntityRenderState implements LivingEntityRenderStateAccess {
+@Mixin(EntityRenderState.class)
+public class MixinEntityRenderState implements EntityRenderStateAccess {
 
     @Unique
-    private Pose interpolatedPose;
+    private ModelPartSpacePose interpolatedPose;
 
     @Unique
     private EntityJointAnimator<?, ?> entityJointAnimator;
 
     @Unique
     @Override
-    public void animationOverhaul$setInterpolatedAnimationPose(Pose interpolatedPose) {
+    public void animationOverhaul$setInterpolatedAnimationPose(ModelPartSpacePose interpolatedPose) {
         this.interpolatedPose = interpolatedPose;
     }
 
     @Override
-    public Optional<Pose> animationOverhaul$getInterpolatedAnimationPose() {
+    public Optional<ModelPartSpacePose> animationOverhaul$getInterpolatedAnimationPose() {
         return Optional.ofNullable(this.interpolatedPose);
     }
 
