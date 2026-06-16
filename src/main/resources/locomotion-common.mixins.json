@@ -23,6 +23,7 @@
     "render.MixinFishingHookRenderer",
     "render.MixinGameRenderer",
     "render.MixinItemInHandRenderer",
+    "render.MixinLivingEntityRenderer",
     "render.MixinModelFeatureRenderer",
     "render.MixinModelPart",
     "render.block_entity.MixinChestRenderer",

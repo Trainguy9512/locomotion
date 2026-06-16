@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.trainguy9512.locomotion.LocomotionMain;
 import com.trainguy9512.locomotion.access.MatrixModelPart;
 import com.trainguy9512.locomotion.animation.animator.block_entity.BlockEntityJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator;
 import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.driver.DriverKey;
 import com.trainguy9512.locomotion.animation.driver.VariableDriver;
@@ -61,13 +62,17 @@ public class JointAnimatorDispatcher {
     }
 
     public <T extends Entity> void tickEntityJointAnimators(Iterable<T> entitiesForRendering) {
-        entitiesForRendering.forEach(entity ->
-                JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(
-                        jointAnimator -> this.getEntityAnimationDataContainer(entity).ifPresent(
-                                dataContainer -> this.tickJointAnimator(jointAnimator, entity, dataContainer)
-                        )
-                )
-        );
+        for (T entity : entitiesForRendering) {
+            Optional<EntityJointAnimator<T, ?>> potentialJointAnimator = JointAnimatorRegistry.getThirdPersonJointAnimator(entity);
+            if (potentialJointAnimator.isPresent()) {
+                EntityJointAnimator<T, ?> jointAnimator = potentialJointAnimator.get();
+                Optional<AnimationDataContainer> potentialDataContainer = this.getEntityAnimationDataContainer(entity);
+                if (potentialDataContainer.isPresent()) {
+                    AnimationDataContainer dataContainer = potentialDataContainer.get();
+                    this.tickJointAnimator(jointAnimator, entity, dataContainer);
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -114,9 +119,10 @@ public class JointAnimatorDispatcher {
     public <T extends Entity> Optional<AnimationDataContainer> getEntityAnimationDataContainer(T entity){
         UUID uuid = entity.getUUID();
         if(!this.entityAnimationDataContainerStorage.containsKey(uuid)){
-            JointAnimatorRegistry.getThirdPersonJointAnimator(entity).ifPresent(jointAnimator ->
-                    this.entityAnimationDataContainerStorage.put(uuid, AnimationDataContainer.of(jointAnimator))
-            );
+            if (JointAnimatorRegistry.getThirdPersonJointAnimator(entity).isPresent()) {
+                EntityJointAnimator<?, ?> jointAnimator = JointAnimatorRegistry.getThirdPersonJointAnimator(entity).get();
+                this.entityAnimationDataContainerStorage.put(uuid, AnimationDataContainer.of(jointAnimator));
+            }
         }
         return Optional.ofNullable(this.entityAnimationDataContainerStorage.get(uuid));
     }

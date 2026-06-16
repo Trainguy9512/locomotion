@@ -7,19 +7,19 @@
             "children": [
                 "sleeve_L_jnt"
             ],
-            "mirror_joint": "arm_R_jnt",
+            "mirror_joint": "skel:arm_R_jnt",
             "model_part_space_parent": null,
             "model_part_identifier": "left_arm",
             "reference_pose": {
                 "translation": [
-                    6.173,
-                    -7.546,
-                    1.113
+                    5.397,
+                    -5.455,
+                    -1.913
                 ],
                 "rotation": [
-                    -41.255,
-                    -20.157,
-                    -51.597
+                    -9.286,
+                    -22.897,
+                    -13.227
                 ],
                 "scale": [
                     1.0,
@@ -50,19 +50,19 @@
             "children": [
                 "sleeve_R_jnt"
             ],
-            "mirror_joint": "arm_L_jnt",
+            "mirror_joint": "skel:arm_L_jnt",
             "model_part_space_parent": null,
             "model_part_identifier": "right_arm",
             "reference_pose": {
                 "translation": [
-                    -5.066,
-                    -5.019,
-                    -0.302
+                    -5.217,
+                    -6.077,
+                    0.484
                 ],
                 "rotation": [
-                    -7.129,
-                    8.276,
-                    5.374
+                    12.953,
+                    18.143,
+                    44.536
                 ],
                 "scale": [
                     1.0,
@@ -144,14 +144,14 @@
             "model_part_identifier": null,
             "reference_pose": {
                 "translation": [
-                    -0.053,
-                    6.222,
-                    0.422
+                    0.0,
+                    8.0,
+                    -0.0
                 ],
                 "rotation": [
-                    8.059,
-                    10.552,
-                    7.948
+                    -8.319,
+                    16.492,
+                    -5.004
                 ],
                 "scale": [
                     1.0,
@@ -181,7 +181,7 @@
         "hat_jnt": {
             "children": [],
             "mirror_joint": null,
-            "model_part_space_parent": null,
+            "model_part_space_parent": "head_jnt",
             "model_part_identifier": "hat",
             "reference_pose": {
                 "translation": [
@@ -230,12 +230,12 @@
                 "translation": [
                     -0.0,
                     -8.0,
-                    0.0
+                    -0.0
                 ],
                 "rotation": [
-                    -9.799,
-                    -31.978,
-                    -4.553
+                    19.921,
+                    14.114,
+                    14.701
                 ],
                 "scale": [
                     1.0,
@@ -307,23 +307,23 @@
             "children": [
                 "pants_L_jnt"
             ],
-            "mirror_joint": "leg_R_jnt",
+            "mirror_joint": "skel:leg_R_jnt",
             "model_part_space_parent": null,
             "model_part_identifier": "left_leg",
             "reference_pose": {
                 "translation": [
-                    2.045,
-                    10.578,
-                    -0.079
+                    2.337,
+                    11.641,
+                    -1.064
                 ],
                 "rotation": [
-                    4.637,
-                    3.34,
-                    5.581
+                    5.247,
+                    -1.262,
+                    -2.103
                 ],
                 "scale": [
                     1.0,
-                    1.119,
+                    1.035,
                     1.0
                 ],
                 "visibility": true
@@ -350,23 +350,23 @@
             "children": [
                 "pants_R_jnt"
             ],
-            "mirror_joint": "leg_L_jnt",
+            "mirror_joint": "skel:leg_L_jnt",
             "model_part_space_parent": null,
             "model_part_identifier": "right_leg",
             "reference_pose": {
                 "translation": [
-                    -2.349,
-                    9.901,
-                    1.321
+                    -1.56,
+                    11.815,
+                    -0.31
                 ],
                 "rotation": [
-                    9.652,
-                    13.887,
-                    24.334
+                    25.277,
+                    12.289,
+                    21.287
                 ],
                 "scale": [
                     1.0,
-                    1.272,
+                    1.16,
                     1.0
                 ],
                 "visibility": true
@@ -391,8 +391,8 @@
         },
         "pants_L_jnt": {
             "children": [],
-            "mirror_joint": "pants_R_jnt",
-            "model_part_space_parent": null,
+            "mirror_joint": "skel:pants_R_jnt",
+            "model_part_space_parent": "leg_L_jnt",
             "model_part_identifier": "left_pants",
             "reference_pose": {
                 "translation": [
@@ -432,8 +432,8 @@
         },
         "pants_R_jnt": {
             "children": [],
-            "mirror_joint": "pants_L_jnt",
-            "model_part_space_parent": null,
+            "mirror_joint": "skel:pants_L_jnt",
+            "model_part_space_parent": "leg_R_jnt",
             "model_part_identifier": "right_pants",
             "reference_pose": {
                 "translation": [
@@ -518,8 +518,8 @@
         },
         "sleeve_L_jnt": {
             "children": [],
-            "mirror_joint": "sleeve_R_jnt",
-            "model_part_space_parent": null,
+            "mirror_joint": "skel:sleeve_R_jnt",
+            "model_part_space_parent": "arm_L_jnt",
             "model_part_identifier": "left_sleeve",
             "reference_pose": {
                 "translation": [
@@ -559,8 +559,8 @@
         },
         "sleeve_R_jnt": {
             "children": [],
-            "mirror_joint": "sleeve_L_jnt",
-            "model_part_space_parent": null,
+            "mirror_joint": "skel:sleeve_L_jnt",
+            "model_part_space_parent": "arm_R_jnt",
             "model_part_identifier": "right_sleeve",
             "reference_pose": {
                 "translation": [
