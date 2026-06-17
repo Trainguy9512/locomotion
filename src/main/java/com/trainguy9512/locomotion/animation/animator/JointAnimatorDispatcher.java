@@ -110,7 +110,7 @@ public class JointAnimatorDispatcher {
         dataContainer.preTick();
         jointAnimator.extractAnimationData(dataReference, dataContainer, dataContainer.getMontageManager());
         dataContainer.tick();
-        if(jointAnimator.getPoseCalulationFrequency() == JointAnimator.PoseCalculationFrequency.CALCULATE_ONCE_PER_TICK){
+        if (jointAnimator.getPoseCalulationFrequency() == JointAnimator.PoseCalculationFrequency.CALCULATE_ONCE_PER_TICK) {
             dataContainer.getDriver(dataContainer.getPerTickCalculatedPoseDriverKey()).setValue(dataContainer.computePose(1));
         }
         dataContainer.postTick();

@@ -82,6 +82,13 @@ public abstract class Pose {
         return this.customAttributes.get(customAttributeName);
     }
 
+    public float getCustomAttributeValueOrDefault(String customAttributeName, float defaultValue) {
+        if (!this.customAttributes.containsKey(customAttributeName)) {
+            return defaultValue;
+        }
+        return this.getCustomAttributeValue(customAttributeName);
+    }
+
     public boolean getCustomAttributeValueAsBoolean(String customAttributeName) {
         return this.getCustomAttributeValue(customAttributeName) > 0.5;
     }

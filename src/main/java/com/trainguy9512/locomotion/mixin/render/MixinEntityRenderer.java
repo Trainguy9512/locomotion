@@ -20,7 +20,7 @@ public class MixinEntityRenderer<T extends Entity, S extends EntityRenderState> 
 
     @Inject(
             method = "extractRenderState",
-            at = @At("TAIL")
+            at = @At("HEAD")
     )
     private void calculatePoseIntoRenderState(T entity, S reusedState, float partialTick, CallbackInfo ci) {
         Optional<AnimationDataContainer> potentialDataContainer = JointAnimatorDispatcher.getInstance().getEntityAnimationDataContainer(entity);

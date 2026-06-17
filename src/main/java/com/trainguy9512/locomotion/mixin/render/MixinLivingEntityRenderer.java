@@ -2,9 +2,12 @@ package com.trainguy9512.locomotion.mixin.render;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.trainguy9512.locomotion.access.EntityRenderStateAccess;
 import com.trainguy9512.locomotion.animation.animator.JointAnimatorDispatcher;
 import com.trainguy9512.locomotion.animation.animator.entity.EntityJointAnimator;
+import com.trainguy9512.locomotion.animation.animator.entity.LivingEntityJointAnimator;
+import com.trainguy9512.locomotion.animation.data.AnimationDataContainer;
 import com.trainguy9512.locomotion.animation.pose.ModelPartSpacePose;
 import com.trainguy9512.locomotion.animation.pose.Pose;
 import net.minecraft.client.model.EntityModel;
@@ -44,6 +47,21 @@ public abstract class MixinLivingEntityRenderer<S extends LivingEntityRenderStat
     private void poseModel(LivingEntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci, @Local RenderLayer<?, ?> renderLayer) {
         Optional<ModelPartSpacePose> potentialPose = ((EntityRenderStateAccess)renderState).animationOverhaul$getInterpolatedAnimationPose();
         potentialPose.ifPresent(pose -> pose.setupAnimOnModel(this.model));
+    }
+
+    @Inject(
+            method = "setupRotations",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    public void transformModel(S renderState, PoseStack poseStack, float bodyRot, float scale, CallbackInfo ci) {
+        Optional<ModelPartSpacePose> potentialPose = ((EntityRenderStateAccess)renderState).animationOverhaul$getInterpolatedAnimationPose();
+        if (potentialPose.isPresent()) {
+            ModelPartSpacePose pose = potentialPose.get();
+            float rotation = pose.getCustomAttributeValueOrDefault(LivingEntityJointAnimator.ENTITY_ROTATION_ATTRIBUTE, 0);
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - rotation));
+            ci.cancel();
+        }
     }
 
 }
