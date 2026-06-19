@@ -35,8 +35,35 @@
   "locomotion.config.option.first_person_mining_speed.name": "채광 애니메이션 속도 배율",
   "locomotion.config.option.first_person_mining_speed.description": "채광 애니메이션이 재생되는 속도를 조절합니다. 1은 기본 속도, 0.5는 절반 속도, 2는 두 배 속도입니다.",
 
+  "locomotion.config.option.running_arm_swing_intensity.name": "달리기 팔 흔들림 강도",
+  "locomotion.config.option.running_arm_swing_intensity.description": "달리기 애니메이션에서 팔이 얼마나 크게 흔들리는지를 조절합니다. 값이 0이면 걷기 애니메이션과 동일하게 재생되며, 값이 1이면 걷이 애니메이션 대신 완전한 달리기 팔 흔들림 애니메이션이 재생됩니다.",
+  
   "locomotion.config.group.first_person_map.name": "지도 아이템",
   "locomotion.config.group.first_person_map.description": "지도 아이템의 표시 방식 및 애니메이션 관련 설정입니다.",
   "locomotion.config.option.first_person_map_movement_animation_intensity.name": "지도 이동 애니메이션 강도",
-  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "지도 아이템을 들고 있을 때 적용되는 이동 애니메이션의 강도를 조절합니다. 강도를 낮추면 지도의 가독성이 향상됩니다."
+  "locomotion.config.option.first_person_map_movement_animation_intensity.description": "지도 아이템을 들고 있을 때 적용되는 이동 애니메이션의 강도를 조절합니다. 강도를 낮추면 지도의 가독성이 향상됩니다.",
+
+  "locomotion.config.group.first_person_arm_offset.name": "팔 위치 오프셋",
+  "locomotion.config.group.first_person_arm_offset.description": "1인칭 팔의 위치를 세부적으로 조정하기 위한 설정입니다.",
+  "locomotion.config.option.first_person_arm_offset_x.name": "팔 X 오프셋",
+  "locomotion.config.option.first_person_arm_offset_x.description": "팔의 X축(수평) 위치 오프셋을 조절합니다.",
+  "locomotion.config.option.first_person_arm_offset_y.name": "팔 Y 오프셋",
+  "locomotion.config.option.first_person_arm_offset_y.description": "팔의 Y축(수직) 위치 오프셋을 조절합니다.",
+  "locomotion.config.option.first_person_arm_offset_z.name": "팔 Z 오프셋",
+  "locomotion.config.option.first_person_arm_offset_z.description": "팔의 Z축(깊이) 위치 오프셋을 조절합니다.",
+
+  "locomotion.config.category.block_entities.name": "블록 엔티티",
+  "locomotion.config.category.block_entities.tooltip": "다양한 블록 엔티티 애니메이션에 대한 설정",
+
+  "locomotion.config.group.individual_block_entity_toggles.name": "개별 블록 토글",
+  "locomotion.config.group.individual_block_entity_toggles.description": "블록 엔티티 종류별 애니메이션 활성화 설정",
+
+  "locomotion.config.group.block_entity_optimization.name": "최적화",
+  "locomotion.config.group.block_entity_optimization.description": "성능에 영향을 주는 블록 엔티티 애니메이션 관련 설정입니다.",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.name": "포즈 계산 주기",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.description": "블록 엔티티 애니메이션의 포즈가 얼마나 자주 계산되는지를 설정합니다. '틱당 1회'는 게임 내 틱마다 한 번 포즈를 계산한 후 선형 보간을 적용합니다. '매 프레임'은 보간 없이 매 프레임마다 포즈를 계산합니다. 일반적으로 '틱당 1회'가 더 최적화되어 있으며, 20FPS 기준의 보간된 애니메이션이 재생됩니다.",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.enum.calculate_once_per_tick": "틱당 1회 (보간 적용)",
+  "locomotion.config.option.block_entity_pose_calculation_frequency.enum.calculate_every_frame": "매 프레임",
+  "locomotion.config.option.block_entity_animation_distance.name": "애니메이션 거리",
+  "locomotion.config.option.block_entity_animation_distance.description": "플레이어로부터 애니메이션이 재생되는 최대 거리를 설정합니다. 설정한 범위를 벗어나면 바닐라 애니메이션이 대신 재생됩니다."
 }
